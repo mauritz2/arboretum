@@ -4,7 +4,7 @@ from arboretum import Board, Player, Deck, Scorer, config
 
 @pytest.fixture
 def board():
-	return Board(5, 2)
+	return Board(rows=5, columns=2)
 
 @pytest.fixture
 def deck():
@@ -12,11 +12,17 @@ def deck():
 
 @pytest.fixture
 def player(board, deck):
-	return Player(deck, board)
+	player = Player(name="Player 1", deck=deck, board=board)
+	player.trees_on_hand = ["Oak 2", "Oak 3", "Oak 1", "Dogwood 6", "Dogwood 2", "Dogwood 3", "Jacaranda 5"]
+	return player
 
 @pytest.fixture
 def player2(board, deck):
-	return Player(deck, board)
+	return Player(name="Player 2", deck=deck, board=board)
+
+@pytest.fixture
+def scorer(player, player2):
+	return Scorer(players=[player, player2], trees=["Cassia", "Dogwood", "Jacaranda", "Oak"])
 
 def test_create_board_grid(board):
 	assert(len(board.board_grid) == 5)
@@ -89,41 +95,96 @@ def test_shuffle_deck(deck):
 	post_shuffle_pickle = pickle.dumps(deck.cards)
 	assert pre_shuffle_pickle != post_shuffle_pickle
 
-def test_establish_scorer_simple_case(player, player2):
+def test_establish_scoring_players_simple_case(player, player2, scorer):
 	player.trees_on_hand = ["Oak 2", "Oak 3", "Cassia 5", "Dogwood 6", "Dogwood 2", "Dogwood 3", "Jacaranda 5"]
 	player2.trees_on_hand = ["Oak 8", "Cassia 8", "Dogwood 4", "Dogwood 5", "Jacaranda 7"]
-	trees = ["Cassia", "Dogwood", "Jacaranda", "Oak"]
-	scorer_dict = Scorer.calculate_scorer([player, player2], trees)
-	assert scorer_dict["Cassia"] == [player2]
-	assert scorer_dict["Dogwood"] == [player]
-	assert scorer_dict["Jacaranda"] == [player2]
-	assert scorer_dict["Oak"] == [player2]
+	scorer.players = [player, player2]
+	scorer_dict = scorer.calculate_scoring_players_by_tree()
+	assert scorer_dict["Cassia"][0] is player2
+	assert scorer_dict["Dogwood"][0] is player
+	assert scorer_dict["Jacaranda"][0] is player2
+	assert scorer_dict["Oak"][0] is player2
 
-def test_establish_scorer_both_score(player, player2):
+def test_establish_scorering_players_both_score(player, player2, scorer):
 	player.trees_on_hand = ["Oak 2", "Oak 3", "Cassia 5", "Cassia 2"]
 	player2.trees_on_hand = ["Oak 5", "Cassia 7"]
-	trees = ["Cassia", "Oak"]
-	scorer_dict = Scorer.calculate_scorer([player, player2], trees)
-	assert player1 in scorer_dict["Cassia"]
+	scorer.players = [player, player2]
+	scorer_dict = scorer.calculate_scoring_players_by_tree()
+	assert player in scorer_dict["Cassia"]
 	assert player2 in scorer_dict["Cassia"]
-	assert player1 in scorer_dict["Oak"]
+	assert player in scorer_dict["Oak"]
 	assert player2 in scorer_dict["Oak"]
 
-def test_establish_scorer_no_one_scores(player, player2):
-	player.trees_on_hand = ["Oak 1", "Oak 2", "Oak 3"]
+def test_establish_scoring_players_empty_hands(player, player2, scorer):
+	player.trees_on_hand = []
 	player2.trees_on_hand = []
-	trees = ["Cassia", "Dogwood", "Jacaranda", "Lilac", "Magnolia", "Maple", "Olive"]
-	scorer_dict = Scorer.calculate_scorer([player, player2], trees)
-	assert scorer_dict["Cassia"] == None
-	assert scorer_dict["Dogwood"] == None
-	assert scorer_dict["Jacaranda"] == None
-	assert scorer_dict["Lilac"] == None
-	assert scorer_dict["Magnolia"] == None
-	assert scorer_dict["Maple"] == None
-	assert scorer_dict["Olive"] == None
+	players = [player, player2]
+	scorer.players = players
+	scorer.trees = ["Cassia", "Dogwood", "Jacaranda", "Lilac", "Magnolia", "Maple", "Olive"]
+	scorer_dict = scorer.calculate_scoring_players_by_tree()
+	for p in players:
+		assert p in scorer_dict["Cassia"]	
+		assert p in scorer_dict["Dogwood"]
+		assert p in scorer_dict["Jacaranda"]
+		assert p in scorer_dict["Lilac"]
+		assert p in scorer_dict["Magnolia"]
+		assert p in scorer_dict["Maple"]
+		assert p in scorer_dict["Olive"]
 
-def test_establish_scorer_8_vs_1(player, player2):
+def test_establish_scorering_players_8_vs_1(player, player2, scorer):
 	player.trees_on_hand = ["Oak 1"]
 	player2.trees_on_hand = ["Oak 8"]
-	scorer_dict = Scorer.calculate_scorer([player, player2], trees)
-	assert scorer_dict["Oak"] == player
+	scorer_dict = scorer.calculate_scoring_players_by_tree()
+	assert len(scorer_dict["Oak"]) == 1
+	assert scorer_dict["Oak"][0] is player
+
+def _test_find_straight_path(player, scorer):
+	player.trees_on_hand ["Oak 2", "Cassia 5", "Oak 7"]
+	player.place_tree(player.trees_on_hand[0], row=0, column=0)
+	player.place_tree(player.trees_on_hand[0], row=1, column=0)
+	player.place_tree(player.trees_on_hand[0], row=1, column=1)
+	scorer.players=[player]
+	paths = scorer.find_paths(tree_type="Oak")
+	assert paths[0] = ["O2", "C5", "O7"]
+
+def _test_find_path_endpoint_coordinates(player, scorer)
+	player.trees_on_hand ["Oak 2", "Oak 4" "Cassia 5", "Oak 6" "Oak 7"]
+	player.place_tree(player.trees_on_hand[0], row=0, column=0)
+	player.place_tree(player.trees_on_hand[0], row=1, column=0)
+	player.place_tree(player.trees_on_hand[0], row=2, column=0)
+	player.place_tree(player.trees_on_hand[0], row=3, column=0)
+	player.place_tree(player.trees_on_hand[0], row=4, column=0)
+
+	scorer.players=[player]
+	coordinates = scorer.find_potential_path_endpoint_coordinates(tree_type="Oak")
+	assert coordinates = [[(0,0),(1,0)],
+	[(0,0),(3,0)],
+	[(0,0),(4,0)],
+	[(1,0),(3,0)],
+	[(1,0),(4,0)],
+	[(3,0),(4,0)],
+
+
+
+	# Length
+	# 0 -1 
+	# O1, O2, O3, O4, O6
+
+
+def _test_find_curved_path(player):
+	pass
+
+def _test_find_multiple_paths(player):
+	pass
+
+
+
+# test_find_top_score
+# test_find_scoring_players
+# test_sum_cards
+# test_check_if_tree_on_hand
+# test_calculate_hand_sums
+# 
+
+
+# def test_no_duplicates in deck()
