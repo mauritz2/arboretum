@@ -1,6 +1,7 @@
 import config
 
-class Board():
+
+class Board:
 	"""
 	Class to hold the board attributes, state (i.e. what cards have been placed) and validate card placement
 	"""

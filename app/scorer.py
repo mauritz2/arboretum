@@ -1,6 +1,7 @@
 import config
 
-class Scorer():
+
+class Scorer:
 	def __init__(self, players:list, trees:list=config.TREES):
 		self.players = players
 		self.trees = trees
@@ -77,12 +78,9 @@ class Scorer():
 		return total
 
 	def find_potential_path_endpoint_coordinates():
+		pass
 		# Create a dict with structure O2: (0, 1)
 		# Loop through this dict and find 
-
-
-
-
 
 	def find_paths(tree_type):
 		# Check if we have two of this type
@@ -98,7 +96,7 @@ class Scorer():
 		pass 
 		# TODO 
 		# Cycle through the tree types
-		# For each type run tests
+		# For each type run test
 			# Do you have a at least two cards of this type?
 				 # If yes - run logic below
 				 # If no - put this tree's path to 0
