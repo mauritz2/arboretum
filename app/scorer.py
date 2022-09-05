@@ -104,6 +104,7 @@ class Scorer:
 				# potential_path = recursive(incremental_adjacency)
 
 
+
 		# potential_paths = []
 		# For each start, end in possible_paths:
 			# potential_paths = [[start] [start]]
