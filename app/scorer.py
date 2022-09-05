@@ -83,29 +83,36 @@ class Scorer:
 		# Loop through this dict and find 
 
 	def find_paths(tree_type):
-		# Check if we have two of this type
-		# Are they increasing by more than 2?
-		# Add all those to a list 
-		# If so - check if there's a path between them
-		# 
+		 # For each card_type in config.TREES:
+			# start_end = board.get_all_cards_of_type(card_type)
+			# // get combinations of start_end (i.e. at least 2 increment between start and end)
+
+			#for combination in combinations:
+				# paths = recursive(current_path=combination[0], next_cells=combination[0])
+
+		#def recursive(current_path:list[Tile], next_cells:list[Tile], target_cell_name:Tile):
+			# if next_cells.card_name = target_cell_name:
+				# if len(potential_path) > 3:
+					# return potential_path
+				# else:
+					# return None
+			# incremental_adjacencies = get_incremental_adjacencies(next_cells)
+			# if incremental_adjacencies == None:
+				# return None
+
+			# for each incremental_adjacency in incremental_adjacencies:
+				# potential_path = recursive(incremental_adjacency)
 
 
-		# Find all the lowest numbers
-		# Add all the ones with a higher adjacent card - cut everything else
-		# Add 
-		pass 
-		# TODO 
-		# Cycle through the tree types
-		# For each type run test
-			# Do you have a at least two cards of this type?
-				 # If yes - run logic below
-				 # If no - put this tree's path to 0
-			# From the lowest denominator card (i.e. start) - check adjacents
-				# Loop through each adjacent
-					# Track the current num of the card for the current candidate path, refresh on finding new valid adjacent
-					# Is it the end tree and it's ascending from current position? If so complete a path and score
-					# Is it not ascending? If so ignore
-					# Is it ascending? If so go to that node and re-run loop
-		# Maybe the best way to do this is through recursion lol
-		# Note that there can be more than 1 valid path - need to find the top scorer
-		# This should return a dict of all valid paths and an int for the score
+		# potential_paths = []
+		# For each start, end in possible_paths:
+			# potential_paths = [[start] [start]]
+			# adjacent = get_adjacent_increasing()
+			# while adjacent:
+				# for potential_path in potential_paths:
+					# for adjacent in adjacncies:
+						# potential_paths.append(adjacent)
+				# current_card = adjacent
+				# potential_path.append(current_card)
+				# adjacent = get_adjacent_increasing()
+
