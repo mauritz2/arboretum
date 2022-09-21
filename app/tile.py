@@ -1,14 +1,21 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal
 import config
 
 
-@dataclass
+@dataclass()
 class Tile:
-    # TBD - this class should be used since it's better than keeping track of strings in a list
     card_tree: Literal[config.TREES]  # Is either a card tree or None
     card_num: int
-    x_coord: int
-    y_coord: int
-    card_name = f"{card_tree} {card_num}"
-    visual_sign: str = config.DECK_SHORTHANDS[card_name]
+
+    def __post_init__(self):
+        if self.card_tree is None or self.card_num is None:
+            self.card_name = None
+            self.visual_shorthand = None
+        else:
+            self.card_name = f"{self.card_tree} {self.card_num}"
+            self.visual_shorthand = config.CARD_SHORTHANDS[self.card_name]
+
+if __name__ == "__main__":
+    tile = Tile(card_tree="Oak", card_num=2)
+    print("AAA")

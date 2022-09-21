@@ -26,7 +26,7 @@ class Player:
             if not self.board.check_if_tree_has_adjacent_tree(row, column):
                 raise ValueError(f"You cannot place a tree that's not adjacent to an existing tree")
 
-        self.board.board_grid[row][column] = config.DECK_SHORTHANDS[tree]
+        self.board.board_grid[row][column] = config.CARD_SHORTHANDS[tree]
         self.trees_on_hand.remove(tree)
         self.first_tree_placed = True
 

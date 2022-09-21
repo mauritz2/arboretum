@@ -3,6 +3,9 @@ import config
 
 class Scorer:
 	def __init__(self, players:list, trees:list=config.TREES):
+		# TODO - does the Scorer "know too much"? changing players class 100% requires changes in scorer
+		# or maybe not - as long as we uphold the contract of what gets passed vs. what gets returned should be fine
+		# make those contracts make sense - don't pass an instance, pass the data the func needs
 		self.players = players
 		self.trees = trees
 
@@ -83,116 +86,27 @@ class Scorer:
 		# Loop through this dict and find 
 
 	def find_paths(tree_type):
-		pass
-
-
-
-		# Recursion
-
-		# FindValidPath(robot_x, robot_y, board_length, board_width, board, current_path, path_index):
-	
+		raise NotImplementedError
+		# TODO Things I need before implementing
+		# 1. filter_board function (board function)
+		# 2. get_adjacent (board function)
+		# 3. find_and_score_paths()
+		# 4. find_paths_recursively()
 
 
 		# For each card_type in config.TREES:
 			# start_end = board.get_all_cards_of_type(card_type)
-			# // get combinations of start_end (i.e. at least 2 increment between start and end)
 
-		# Define start\end pairs
-		# Get all possible paths between these pairs that are NOT loops
-		# Assess if they are incremental or not, disregard each one that is not
 
-		# FindAllPaths
+		# FindAllPaths (not deterministic - loop through 100 times to find "all" paths)
 		# Start at the start square
 		# Try going in all directions and put them in a list
 		# For each entry in the list
-			# Is it a blank - if so break
-			# Check if I have already chosen this specific card - if so break
-			# Check if its not incrementing - if so break
-			# Check if the card isn't used elsewhere in this path (i.e. loop)
-		# If none of the things are feasible -- mark this card as "done"
-		# If its still running
-		# Record the path as a "choice" - i.e. for path step 2 I choose 2
-		# Record the card as taken for this specific path
-		#
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			# Define the start\end combos
-			# For each one see if you can form a path
-			# Get adjacencies
-			# Select the next adjacency in the path (i.e. not used in this path)
-			#
-
-			# for combination in combinations:
-		 		# evaluated_cards = []
-				# evaluated_paths = []
-				# path_location = 0
-			 	# incremental_adjacencies = get_incremental_adjacencies(combination[0])
-			 	# current_path = []
-			 	# while incremental_adjacencies > 0:
-					# path_location += 1
-					# previous_paths = get_all_paths_until_index(path_location)
-					# for each card in incremental_adjacencies:
-						# if current_path + card not in previous_paths:
-							# incremental_adjacencies.append(card)
-
-						# set compare -- incremental_adjacencies vs. cards_at_this_loc
-						# if // this path has already been taken before - select the next path
-						# evaluated_cards.append(card)
-
-						# while
-
-						# new_incremental_adjacencies = get_incremental_adjacencies(combination[0])
-						# incremental_adjacencies.append(get_incremental_adjacencies(card))
-
-
-
-
-
-			# Recursive code
-			#for combination in combinations:
-				# paths = recursive(current_path=combination[0], next_cells=combination[0])
-
-
-
-
-		#def recursive(current_path:list[Tile], next_cells:list[Tile], target_cell_name:Tile):
-			# if next_cells.card_name = target_cell_name:
-				# if len(potential_path) > 3:
-					# return potential_path
-				# else:
-					# return None
-			# incremental_adjacencies = get_incremental_adjacencies(next_cells)
-			# if incremental_adjacencies == None:
-				# return None
-
-			# for each incremental_adjacency in incremental_adjacencies:
-				# potential_path = recursive(current_path = current_path, next_cells=incremental_adjacency)
-
-
-
-		# potential_paths = []
-		# For each start, end in possible_paths:
-			# potential_paths = [[start] [start]]
-			# adjacent = get_adjacent_increasing()
-			# while adjacent:
-				# for potential_path in potential_paths:
-					# for adjacent in adjacncies:
-						# potential_paths.append(adjacent)
-				# current_card = adjacent
-				# potential_path.append(current_card)
-				# adjacent = get_adjacent_increasing()
-
+			# Is it a blank (i.e. no card) - if so remove from options and break
+			# Check if its not incrementing - if so remove from options break
+			# Check if the card isn't used elsewhere in this path (i.e. loop) - if so remove from options and break
+			# If the cell is the destination cell and the length is above 3 - append to paths
+		# If no options remains - return paths
+		# If multiple ones remain - pick a random one
+			# Record the card as taken for this specific path
+			# return FindAllPaths() on the new cell!!!

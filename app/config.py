@@ -1,6 +1,15 @@
 BOARD_ROWS = 8
 BOARD_COLUMNS = 10
-DECK_SHORTHANDS = {
+
+CARD_SHORTHANDS_2 = {
+	"Oak": "O",
+	"Cassia": "C",
+	"Dogwood": "D",
+	"Jacaranda": "J",
+}
+
+# TODO - change this so [] isn't included in the string
+CARD_SHORTHANDS = {
 	"Oak 1":"[O1]",
 	"Oak 2":"[O2]",
 	"Oak 3":"[O3]",
