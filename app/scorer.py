@@ -83,12 +83,91 @@ class Scorer:
 		# Loop through this dict and find 
 
 	def find_paths(tree_type):
-		 # For each card_type in config.TREES:
+		pass
+
+
+
+		# Recursion
+
+		# FindValidPath(robot_x, robot_y, board_length, board_width, board, current_path, path_index):
+	
+
+
+		# For each card_type in config.TREES:
 			# start_end = board.get_all_cards_of_type(card_type)
 			# // get combinations of start_end (i.e. at least 2 increment between start and end)
 
+		# Define start\end pairs
+		# Get all possible paths between these pairs that are NOT loops
+		# Assess if they are incremental or not, disregard each one that is not
+
+		# FindAllPaths
+		# Start at the start square
+		# Try going in all directions and put them in a list
+		# For each entry in the list
+			# Is it a blank - if so break
+			# Check if I have already chosen this specific card - if so break
+			# Check if its not incrementing - if so break
+			# Check if the card isn't used elsewhere in this path (i.e. loop)
+		# If none of the things are feasible -- mark this card as "done"
+		# If its still running
+		# Record the path as a "choice" - i.e. for path step 2 I choose 2
+		# Record the card as taken for this specific path
+		#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			# Define the start\end combos
+			# For each one see if you can form a path
+			# Get adjacencies
+			# Select the next adjacency in the path (i.e. not used in this path)
+			#
+
+			# for combination in combinations:
+		 		# evaluated_cards = []
+				# evaluated_paths = []
+				# path_location = 0
+			 	# incremental_adjacencies = get_incremental_adjacencies(combination[0])
+			 	# current_path = []
+			 	# while incremental_adjacencies > 0:
+					# path_location += 1
+					# previous_paths = get_all_paths_until_index(path_location)
+					# for each card in incremental_adjacencies:
+						# if current_path + card not in previous_paths:
+							# incremental_adjacencies.append(card)
+
+						# set compare -- incremental_adjacencies vs. cards_at_this_loc
+						# if // this path has already been taken before - select the next path
+						# evaluated_cards.append(card)
+
+						# while
+
+						# new_incremental_adjacencies = get_incremental_adjacencies(combination[0])
+						# incremental_adjacencies.append(get_incremental_adjacencies(card))
+
+
+
+
+
+			# Recursive code
 			#for combination in combinations:
 				# paths = recursive(current_path=combination[0], next_cells=combination[0])
+
+
+
 
 		#def recursive(current_path:list[Tile], next_cells:list[Tile], target_cell_name:Tile):
 			# if next_cells.card_name = target_cell_name:
@@ -101,7 +180,7 @@ class Scorer:
 				# return None
 
 			# for each incremental_adjacency in incremental_adjacencies:
-				# potential_path = recursive(incremental_adjacency)
+				# potential_path = recursive(current_path = current_path, next_cells=incremental_adjacency)
 
 
 

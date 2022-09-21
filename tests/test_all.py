@@ -62,7 +62,7 @@ def test_add_drawn_card_to_hand(player):
 	assert card_to_draw in player.trees_on_hand 
 
 def test_remove_drawn_card_from_deck(player):
-	card_to_draw =  player.deck.cards[0]
+	card_to_draw = player.deck.cards[0]
 	player.draw_card()
 	assert card_to_draw not in player.deck.cards 
 
@@ -70,10 +70,10 @@ def test_check_if_occupied_loc(board):
 	row = 1
 	column = 1
 	check_occupied = board._check_if_occupied_loc(row, column)
-	assert (check_occupied == False)
+	assert (check_occupied is False)
 	board.board_grid[row][column] = "Oak 1"
 	check_occupied = board._check_if_occupied_loc(row, column)
-	assert (check_occupied == True)
+	assert (check_occupied is True)
 
 def test_reject_no_adjacency(player):
 	tree = "Oak 2"
