@@ -1,12 +1,8 @@
+# Board config
 BOARD_ROWS = 8
 BOARD_COLUMNS = 10
-
-CARD_SHORTHANDS_2 = {
-	"Oak": "O",
-	"Cassia": "C",
-	"Dogwood": "D",
-	"Jacaranda": "J",
-}
+EMPTY_SLOT_DISPLAY_SHORTHAND = " "
+BOARD_SLOT_DIVIDER = " | "
 
 # TODO - change this so [] isn't included in the string
 CARD_SHORTHANDS = {
@@ -44,8 +40,8 @@ CARD_SHORTHANDS = {
 	"Jacaranda 8":"[J8]",
 }
 
+# Deck configs
+# TODO - add in these trees to use when more than 2 players: ["Lilac", "Magnolia", "Maple", "Olive"]
 TREES = ["Cassia", "Dogwood", "Jacaranda", "Oak"]
-# TODO - add in aditional trees below to use when more than 2 players
-# ["Lilac", "Magnolia", "Maple", "Olive"]
 CARDS_PER_TREE_TYPE = 8
 NUM_CARDS_STARTING_HAND = 7

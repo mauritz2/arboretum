@@ -1,13 +1,10 @@
 import config
-
+from card import Card
 
 class Scorer:
-	def __init__(self, players:list, trees:list=config.TREES):
-		# TODO - does the Scorer "know too much"? changing players class 100% requires changes in scorer
-		# or maybe not - as long as we uphold the contract of what gets passed vs. what gets returned should be fine
-		# make those contracts make sense - don't pass an instance, pass the data the func needs
+	def __init__(self, players:list, trees: list = None):
 		self.players = players
-		self.trees = trees
+		self.trees = config.TREES if trees is None else trees
 
 	def calculate_scoring_players_by_tree(self):
 		scorers_by_tree = {}
@@ -28,27 +25,28 @@ class Scorer:
 		hand_sums = {}
 		for player in self.players:
 			player_sum_by_tree = {}
-			hand = player.trees_on_hand
+			hand = player.cards_on_hand
 			for tree in self.trees:
-				matching_cards = [card for card in hand if tree in card]
-				total_sum = self._sum_cards(matching_cards)
-					# refactor - make cards into a tuple so we can look for 8?
-				if tree + " " + "8" in hand: 
-					print(f"A player has the 8 of {tree}")
-					some_player_has_1 = self._check_if_tree_on_hand(tree, "1")
-					if some_player_has_1:
-						# Card rule - having the 1 makes the 8 count as 0
-						total_sum -= 8
-						print(f"A player has the 1 of {tree} - new hand size is {total_sum}")
+				total_sum = 0
+				for card_name, card in hand.items():
+					if card.tree_type == tree:
+						if card.tree_val == 8:
+							print(f"A player has the 8 of {tree}")
+							some_player_has_1 = self._check_if_tree_on_hand(tree, "1")
+							if some_player_has_1:
+								print(f"A player has the 1 of {tree} - this 8 will be disregarded")
+								break
+						total_sum += card.tree_val
 				player_sum_by_tree[tree] = total_sum
 			hand_sums[player] = player_sum_by_tree
+
 		return hand_sums
 
 	def _check_if_tree_on_hand(self, tree_type:str, tree_num:str):
 		# TODO - refactor this
 		card = tree_type + " " + tree_num
 		for player in self.players:
-			if card in player.trees_on_hand:
+			if card in player.cards_on_hand:
 				return True
 		return False
 
@@ -73,12 +71,6 @@ class Scorer:
 			if scorer_dict[player][tree] == top_score:
 				top_scorers.append(player)
 		return top_scorers
-
-	def _sum_cards(self, cards):
-		total = 0
-		for card in cards:
-			total += int(card[-1])
-		return total
 
 	def find_potential_path_endpoint_coordinates():
 		pass
