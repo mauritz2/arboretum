@@ -105,3 +105,29 @@ class Board:
                     cards_of_type_played.append(played_card)
 
         return cards_of_type_played
+
+    def find_adjacent_incrementing_cards(self, row: int, column: int) -> list[Card]:
+        """
+        Given a location on the board, return a list of all adjacent played cards
+        with a higher value than the card at location. Returns an error if the specified loc is empty
+        This is used to find paths that consist of adjacent incrementing cards
+        """
+        center_tree_value = self.board_grid[row][column].tree_val
+
+        if center_tree_value is None:
+            raise ValueError(f"Can't find incrementing adjacent cards since location at ({row},{column}) is empty")
+
+        incrementing_adjacent = []
+        locs_to_check = [(row-1, column),
+                         (row+1, column),
+                         (row, column+1),
+                         (row, column-1)]
+        for loc in locs_to_check:
+            card_at_loc = self.board_grid[loc[0]][loc[1]]
+            if card_at_loc.tree_type is None:
+                continue
+            if card_at_loc.tree_val <= center_tree_value:
+                continue
+            incrementing_adjacent.append(card_at_loc)
+
+        return incrementing_adjacent

@@ -6,7 +6,8 @@ from board import Board
 class Player:
     def __init__(self,
                  name: str,
-                 deck: Deck, board: Board,
+                 deck: Deck,
+                 board: Board,
                  num_cards_starting_hand: int = config.NUM_CARDS_STARTING_HAND):
 
         # TODO - The GameManager should be able to test for name uniqueness
@@ -22,7 +23,7 @@ class Player:
     def place_tree(self, card_name: str, row: int, column: int):
         """
         Takes the str of a card name (e.g. Oak 2) and the coordinates to place it
-        Checks if valid placement, and if so places card on board and removes from player hard
+        Checks if valid placement, and if so places card on board and removes from player hand
         Returns ValueError if card isn't in players hand or placement is illegal
         """
         if card_name not in self.cards_on_hand:

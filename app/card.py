@@ -3,8 +3,14 @@ from typing import Literal
 import config
 
 
-@dataclass()
+@dataclass(order=True)
 class Card:
+    """
+    Dataclass representing a Card, with it's associated attributes
+    Order = True enables the sorting Cards in a list - used for test cases to check
+    that list of Cards are the same
+    The visual shorthand is the sign (e.g. J2) that represents the card visually on the board
+    """
     tree_type: Literal[config.TREES]  # Is either a card tree or None
     tree_val: int
 
