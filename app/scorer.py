@@ -10,7 +10,11 @@ class Scorer:
         self.players = players
         self.trees = config.TREES if trees is None else trees
 
-    def calculate_scoring_players_by_tree(self):
+    def calculate_scoring_players_by_tree(self) -> dict:
+        """
+        Returns a dict containing each tree type as key, and a list of scoring players as value
+        Who scores is established based on the sum of tree values each player has on hand
+        """
         scorers_by_tree = {}
         hand_sums = self._calculate_hand_sums()
         for tree in self.trees:
@@ -96,10 +100,11 @@ class Scorer:
 
         return start_end_combos
 
-
     def find_paths_for_tree_type(self, tree_type:str, player:Player) -> list[Card]:
         """
-
+        Finds all the valid paths for a specific tree type on a player's board and returns
+        a list where each entry is a list with a valid path. Each step in the path is represented
+        by its Card instance
         """
         valid_paths = []
         cards_of_type = player.board.get_played_cards_of_type(tree_type)
@@ -132,8 +137,66 @@ class Scorer:
 
         return valid_paths
 
-    def score_game(self):
+    def score_paths(self, paths_to_score: list[Card]) -> dict:
+        """
+        Takes a list of valid paths as input and calculates the score for the top scoring path
+        """
+        top_path = []
+        top_score = 0
+
+        for path in paths_to_score:
+            path_score = 0
+
+            # Player gets 1 point for each card in the path
+            path_score += len(path)
+
+            # If the path starts with a 1 the player gets +1 point
+            if path[0].tree_val == 1:
+                path_score += 1
+
+            # If path ends in 8 the player gets +2 points
+            if path[-1].tree_val == 8:
+                path_score += 2
+
+            # Player gets 1 additional point for each card in the path if the path is at least 4 cards
+            # long and all cards in the path are of the same species.
+            tree_types = [card.tree_type for card in path]
+            all_tree_types_same = [tree_types[0]] * len(path) == tree_types
+            if all_tree_types_same and len(path) > 4:
+                path_score += len(path)
+
+            # Check if the current path is the best one
+            if path_score > top_score:
+                top_score = path_score
+                top_path = path
+
+        return top_path, top_score
+
+    def determine_winner(self):
+        """
+        Determines what player won by determining who scores for each tree, and then calculating path scores
+        Returns the scoring player
+        TODO - incorporate possibility of ties
+        """
+        top_score = []
+        winner = None
         for player in self.players:
             for tree in config.TREES:
-                paths = self.find_paths_for_tree_type(tree, player)
+                scoring_players = self.calculate_scoring_players_by_tree
+                # Points should only be counted for player(s) that can score for the specific tree
+                if player in scoring_players[tree]:
+                    paths = self.find_paths_for_tree_type(tree, player)
+                    top_path, top_score = self.score_paths(paths)
+                    player.score += top_score
+            else:
+                if player.score >= top_score:
+                    winner = player
+        return winner
+
+
+
+
+
+
+
 

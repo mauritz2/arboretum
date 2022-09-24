@@ -180,3 +180,71 @@ def test_get_possible_start_end_loc_pairs(scorer):
 def test_get_possible_start_end_loc_pairs_empty(scorer):
     assert scorer.get_possible_start_end_card_pairs([]) == []
 
+
+def test_score_paths_3_paths_and_ending_in_8(scorer):
+    oak2 = Card(tree_type="Oak", tree_val=2)
+    cas4 = Card(tree_type="Cassia", tree_val=4)
+    dog3 = Card(tree_type="Dogwood", tree_val=3)
+    jac6 = Card(tree_type="Jacaranda", tree_val=6)
+    dog7 = Card(tree_type="Dogwood", tree_val=7)
+    oak8 = Card(tree_type="Oak", tree_val=8)
+
+    paths = [[oak2, oak8],
+             [oak2, dog3, dog7, oak8],
+             [oak2, dog3, cas4, jac6, dog7, oak8]]
+
+    expected_best_path = [oak2, dog3, cas4, jac6, dog7, oak8]
+    # 6 from path length, 2 from ending on an 8
+    expected_score = 8
+
+    top_path, score = scorer.score_paths(paths)
+    assert top_path == expected_best_path
+    assert score == expected_score
+
+def test_score_path_all_same_tree_type_and_starts_with_1(scorer):
+    oak1 = Card(tree_type="Oak", tree_val=1)
+    oak3 = Card(tree_type="Oak", tree_val=3)
+    oak4 = Card(tree_type="Oak", tree_val=4)
+    oak5 = Card(tree_type="Oak", tree_val=5)
+    oak6 = Card(tree_type="Oak", tree_val=6)
+    oak7 = Card(tree_type="Oak", tree_val=7)
+
+    paths = [[oak1, oak3, oak4, oak5, oak6, oak7]]
+
+    expected_best_path = [oak1, oak3, oak4, oak5, oak6, oak7]
+
+    # 12 from path length (all Oaks), 1 from starting with 1
+    expected_score = 13
+
+    top_path, score = scorer.score_paths(paths)
+    assert top_path == expected_best_path
+    assert score == expected_score
+
+def test_determine_winner(scorer):
+    raise NotImplemented
+    # Player 1 hand
+
+    # Player 1 paths
+    oak1 = Card(tree_type="Oak", tree_val=1)
+    oak3 = Card(tree_type="Oak", tree_val=3)
+    oak4 = Card(tree_type="Oak", tree_val=4)
+    oak5 = Card(tree_type="Oak", tree_val=5)
+    oak6 = Card(tree_type="Oak", tree_val=6)
+    oak7 = Card(tree_type="Oak", tree_val=7)
+
+    # Player 2 hand
+
+
+    # Player 2 paths
+
+
+    paths = [[oak1, oak3, oak4, oak5, oak6, oak7]]
+
+    expected_best_path = [oak1, oak3, oak4, oak5, oak6, oak7]
+
+    # 12 from path length (all Oaks), 1 from starting with 1
+    expected_score = 13
+
+    top_path, score = scorer.score_paths(paths)
+    assert top_path == expected_best_path
+    assert score == expected_score

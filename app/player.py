@@ -16,6 +16,7 @@ class Player:
         self.deck = deck
         self.board = board
         self.first_tree_placed = False
+        self.score = 0
 
         for i in range(num_cards_starting_hand):
             self.draw_card()
