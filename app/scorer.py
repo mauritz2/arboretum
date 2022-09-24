@@ -2,6 +2,7 @@ import random
 
 import config
 from card import Card
+from player import Player
 
 
 class Scorer:
@@ -95,46 +96,44 @@ class Scorer:
 
         return start_end_combos
 
-    def find_potential_path_endpoint_coordinates(self):
-        pass
 
-    # Create a dict with structure O2: (0, 1)
-    # Loop through this dict and find
+    def find_paths_for_tree_type(self, tree_type:str, player:Player) -> list[Card]:
+        """
 
-    def find_paths(self):
-
-        paths = []
-        # TODO - change to run for all trees
+        """
         valid_paths = []
+        cards_of_type = player.board.get_played_cards_of_type(tree_type)
+        start_end_combos = self.get_possible_start_end_card_pairs(cards_of_type=cards_of_type)
 
-        for tree in ["Oak"]:
-            cards_of_type = self.board.get_played_cards_of_type(tree)
-            start_end_combos = self.get_possible_start_end_card_pairs()
-
+        # TODO - make this deterministic (i.e. we need to know when all possible paths have been traversed)
+        for i in range(20):
             for start_end_combo in start_end_combos:
-                current_path = []
-                adjacencies = self.board.find_adjacent_incrementing_cards(start_end_combo[0])
+                # Start the path with the starting card
+                current_path = [start_end_combo[0]]
 
-                while len(next_adjacencies) > 0:
-                    # This is not deterministic - this is why we have to run many times to make sure we get all the paths
-                    current_adjacency = random.choice(adjacencies)
+                # Find the coordinates of the start card and then all adjacent incrementing cards
+                row_num, col_num = player.board.find_coords_of_card(start_end_combo[0])
+                next_adjs = player.board.find_adj_increment_cards(
+                    row=row_num, column=col_num)
+
+                # Continue until there are no more incremental adjacencies (i.e. no path continuation)
+                while len(next_adjs) > 0:
+                    # TODO - refactor to remove this non-determinism - func has to know when all paths have been found
+                    current_adjacency = random.choice(next_adjs)
                     current_path.append(current_adjacency)
-                    if current_adjacency == start_end_combos[1]:
-                        valid_paths.append(current_path)
+                    if current_adjacency == start_end_combo[1]:
+                        if current_path not in valid_paths:
+                            # We have reached the targeted end card - we've found a valid path
+                            valid_paths.append(current_path)
+                            break
+                    # If path not valid yet, find next set of adjacencies to continue building path
+                    row_num, col_num = player.board.find_coords_of_card(current_adjacency)
+                    next_adjs = player.board.find_adj_increment_cards(row=row_num, column=col_num)
 
-                next_adjacencies = self.board.find_adjacent_incrementing_cards(current_adjacency)
-
-
-                # FindAllPaths (not deterministic - loop through 100 times to find "all" paths)
-                # Start at the start square
-                # Try going in all directions and put them in a list
-                # For each entry in the list
-                # Is it a blank (i.e. no card) - if so remove from options and break
-                # Check if its not incrementing - if so remove from options break
-                # Check if the card isn't used elsewhere in this path (i.e. loop) - if so remove from options and break
-                # If the cell is the destination cell and the length is above 3 - append to paths
-                # If no options remains - return paths
-                # If multiple ones remain - pick a random one
-                # Record the card as taken for this specific path
-                # return FindAllPaths() on the new cell!!!
         return valid_paths
+
+    def score_game(self):
+        for player in self.players:
+            for tree in config.TREES:
+                paths = self.find_paths_for_tree_type(tree, player)
+

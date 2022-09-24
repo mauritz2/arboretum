@@ -106,10 +106,10 @@ class Board:
 
         return cards_of_type_played
 
-    def find_adjacent_incrementing_cards(self, row: int, column: int) -> list[Card]:
+    def find_adj_increment_cards(self, row: int, column: int) -> list[Card]:
         """
         Given a location on the board, return a list of all adjacent played cards
-        with a higher value than the card at location. Returns an error if the specified loc is empty
+        with a higher value than the card at the given location. Returns an error if the specified loc is empty
         This is used to find paths that consist of adjacent incrementing cards
         """
         center_tree_value = self.board_grid[row][column].tree_val
@@ -131,3 +131,19 @@ class Board:
             incrementing_adjacent.append(card_at_loc)
 
         return incrementing_adjacent
+
+    def find_coords_of_card(self, card:Card):
+        """
+        Searches the board for a specific card and returns its' row and column coordinates
+        Returns None if the Card isn't found
+        I think the comparison "if value is card" works here because since Card is a dataclass
+        it automatically implements eq() - maybe ?
+        # TODO - maybe rename row_coords and column_coord to x and y across the app
+        """
+        # TODO - this type of nested for loop search is pretty common across the code - possible to vectorize?
+        for row_coord, row in enumerate(self.board_grid):
+            for col_coord, value in enumerate(row):
+                if value is card:
+                    return (row_coord, col_coord)
+        else:
+            return None

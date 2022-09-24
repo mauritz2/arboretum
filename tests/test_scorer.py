@@ -2,7 +2,6 @@ from app import Card
 
 
 def test_establish_scoring_players_simple_case(player, player2, scorer):
-
     player.cards_on_hand = {}
     tree_types_1 = ["Oak", "Oak", "Cassia", "Dogwood", "Dogwood", "Dogwood", "Jacaranda"]
     tree_vals_1 = [2, 3, 5, 6, 2, 3, 5]
@@ -26,7 +25,6 @@ def test_establish_scoring_players_simple_case(player, player2, scorer):
 
 
 def test_establish_scoring_players_both_score(player, player2, scorer):
-
     player.cards_on_hand = {}
     tree_types_1 = ["Oak", "Oak", "Cassia", "Cassia"]
     tree_vals_1 = [2, 3, 5, 2]
@@ -66,61 +64,119 @@ def test_establish_scoring_players_empty_hands(player, player2, scorer):
         assert p in scorer_dict["Olive"]
 
 
+def test_find_paths_single_simple_path(scorer):
+    oak2 = Card(tree_type="Oak", tree_val=2)
+    cas4 = Card(tree_type="Cassia", tree_val=4)
+    jac6 = Card(tree_type="Jacaranda", tree_val=6)
+    oak7 = Card(tree_type="Oak", tree_val=7)
+
+    scorer.players[0].board.board_grid[2][2] = oak2
+    scorer.players[0].board.board_grid[2][3] = cas4
+    scorer.players[0].board.board_grid[2][4] = jac6
+    scorer.players[0].board.board_grid[2][5] = oak7
+
+    player = scorer.players[0]
+
+    path = scorer.find_paths_for_tree_type("Oak", player)
+    path_expected = [[oak2, cas4, jac6, oak7]]
+
+    assert path == path_expected
 
 
-    # def test_establish_scorering_players_8_vs_1(player, player2, scorer):
-    # 	player.trees_on_hand = ["Oak 1"]
-    # 	player2.trees_on_hand = ["Oak 8"]
-    # 	scorer_dict = scorer.calculate_scoring_players_by_tree()
-    # 	assert len(scorer_dict["Oak"]) == 1
-    # 	assert scorer_dict["Oak"][0] is player
-    #
-    # def _test_find_straight_path(player, scorer):
-    # 	player.trees_on_hand ["Oak 2", "Cassia 5", "Oak 7"]
-    # 	player.place_tree(player.trees_on_hand[0], row=0, column=0)
-    # 	player.place_tree(player.trees_on_hand[0], row=1, column=0)
-    # 	player.place_tree(player.trees_on_hand[0], row=1, column=1)
-    # 	scorer.players=[player]
-    # 	paths = scorer.find_paths(tree_type="Oak")
-    # 	assert paths[0] = ["O2", "C5", "O7"]
-    #
-    # def _test_find_path_endpoint_coordinates(player, scorer)
-    # 	player.trees_on_hand ["Oak 2", "Oak 4" "Cassia 5", "Oak 6" "Oak 7"]
-    # 	player.place_tree(player.trees_on_hand[0], row=0, column=0)
-    # 	player.place_tree(player.trees_on_hand[0], row=1, column=0)
-    # 	player.place_tree(player.trees_on_hand[0], row=2, column=0)
-    # 	player.place_tree(player.trees_on_hand[0], row=3, column=0)
-    # 	player.place_tree(player.trees_on_hand[0], row=4, column=0)
-    #
-    # 	scorer.players=[player]
-    # 	coordinates = scorer.find_potential_path_endpoint_coordinates(tree_type="Oak")
-    # 	assert coordinates == [[(0,0),(1,0)],
-    # 	[(0,0),(3,0)],
-    # 	[(0,0),(4,0)],
-    # 	[(1,0),(3,0)],
-    # 	[(1,0),(4,0)],
-    # 	[(3,0),(4,0)],
-    #
-    #
-    #
-    # 	# Length
-    # 	# 0 -1
-    # 	# O1, O2, O3, O4, O6
-    #
-    #
-    # def _test_find_curved_path(player):
-    # 	pass
-    #
-    # def _test_find_multiple_paths(player):
-    # 	pass
-    #
-    #
+def test_find_paths_two_simple_paths(scorer):
+    oak2 = Card(tree_type="Oak", tree_val=2)
+    cas4 = Card(tree_type="Cassia", tree_val=4)
+    dog3 = Card(tree_type="Dogwood", tree_val=3)
+    dog4 = Card(tree_type="Dogwood", tree_val=4)
+    dog6 = Card(tree_type="Dogwood", tree_val=6)
+    jac6 = Card(tree_type="Jacaranda", tree_val=6)
+    dog7 = Card(tree_type="Dogwood", tree_val=7)
+    oak8 = Card(tree_type="Oak", tree_val=8)
 
-    # test_find_top_score
-    # test_find_scoring_players
-    # test_sum_cards
-    # test_check_if_tree_on_hand
-    # test_calculate_hand_sums
-    #
+    # Path start
+    scorer.players[0].board.board_grid[2][2] = oak2
 
-    # def test_no_duplicates in deck()
+    # Path #1
+    scorer.players[0].board.board_grid[2][3] = cas4
+    scorer.players[0].board.board_grid[2][4] = jac6
+
+    # Path #2
+    scorer.players[0].board.board_grid[3][2] = dog3
+    scorer.players[0].board.board_grid[3][3] = dog4
+    scorer.players[0].board.board_grid[3][4] = dog6
+    scorer.players[0].board.board_grid[3][5] = dog7
+
+    # Path end
+    scorer.players[0].board.board_grid[2][5] = oak8
+
+    player = scorer.players[0]
+
+    path = scorer.find_paths_for_tree_type("Oak", player)
+    path_expected = [[oak2, dog3, dog4, dog6, dog7, oak8],
+                     [oak2, cas4, jac6, oak8]]
+
+    path.sort()
+    path_expected.sort()
+
+    assert path == path_expected
+
+
+def test_find_paths_short_medium_long(scorer):
+    oak2 = Card(tree_type="Oak", tree_val=2)
+    cas4 = Card(tree_type="Cassia", tree_val=4)
+    dog3 = Card(tree_type="Dogwood", tree_val=3)
+    jac6 = Card(tree_type="Jacaranda", tree_val=6)
+    dog7 = Card(tree_type="Dogwood", tree_val=7)
+    oak8 = Card(tree_type="Oak", tree_val=8)
+
+    # Path start
+    scorer.players[0].board.board_grid[2][2] = oak2
+
+    # Path #1 #2 #3
+    scorer.players[0].board.board_grid[1][2] = dog3
+    scorer.players[0].board.board_grid[0][2] = cas4
+    scorer.players[0].board.board_grid[0][3] = jac6
+    scorer.players[0].board.board_grid[1][3] = dog7
+
+    # Path end
+    scorer.players[0].board.board_grid[2][3] = oak8
+
+    player = scorer.players[0]
+
+    path = scorer.find_paths_for_tree_type("Oak", player)
+    path_expected = [[oak2, oak8],
+                     [oak2, dog3, dog7, oak8],
+                     [oak2, dog3, cas4, jac6, dog7, oak8]]
+    path.sort()
+    path_expected.sort()
+
+    assert path == path_expected
+
+
+def test_get_possible_start_end_loc_pairs(scorer):
+    oak1 = Card(tree_type="Oak", tree_val=1)
+    oak2 = Card(tree_type="Oak", tree_val=2)
+    oak4 = Card(tree_type="Oak", tree_val=4)
+    oak8 = Card(tree_type="Oak", tree_val=8)
+
+    cards = [oak1, oak2, oak4, oak8]
+
+    expected_combos = [
+        (oak1, oak2),
+        (oak1, oak4),
+        (oak1, oak8),
+        (oak2, oak4),
+        (oak2, oak8),
+        (oak4, oak8),
+    ]
+    start_end_combos = scorer.get_possible_start_end_card_pairs(cards)
+
+    start_end_combos.sort()
+    expected_combos.sort()
+
+    assert start_end_combos == expected_combos
+
+
+def test_get_possible_start_end_loc_pairs_empty(scorer):
+    assert scorer.get_possible_start_end_card_pairs([]) == []
+
