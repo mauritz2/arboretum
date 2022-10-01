@@ -221,7 +221,7 @@ def test_score_path_all_same_tree_type_and_starts_with_1(scorer):
     assert score == expected_score
 
 
-def test_determine_winner_one_tree(scorer):
+def test_determine_winner_one_tree_one_path_each(scorer):
     """
     Verify  that player 1 wins when they are the only ones that
     can score for their Oak path
@@ -255,7 +255,57 @@ def test_determine_winner_one_tree(scorer):
     scorer.players[1].board.board_grid[1][2] = oak6
     scorer.players[1].board.board_grid[1][3] = oak7
 
-    scorer.trees = ["Oak"]
-
     winner = scorer.determine_winner()
     assert winner.name == "Player 1"
+
+
+def test_determine_winner_multiple_trees_and_paths(scorer):
+    """
+    Verify  that player 2 wins when they have one great path vs. player two's two
+    less good scoring paths
+    """
+    oak1 = Card(tree_type="Oak", tree_val=1)
+    oak2 = Card(tree_type="Oak", tree_val=2)
+    oak3 = Card(tree_type="Oak", tree_val=3)
+    oak5 = Card(tree_type="Oak", tree_val=5)
+    oak6 = Card(tree_type="Oak", tree_val=6)
+    oak7 = Card(tree_type="Oak", tree_val=7)
+    oak8 = Card(tree_type="Oak", tree_val=8)
+    dog4 = Card(tree_type="Dogwood", tree_val=4)
+    dog6 = Card(tree_type="Dogwood", tree_val=6)
+    jac1 = Card(tree_type="Jacaranda", tree_val=1)
+    jac2 = Card(tree_type="Jacaranda", tree_val=2)
+    jac8 = Card(tree_type="Jacaranda", tree_val=8)
+
+    # Player 1 hand
+    scorer.players[0].cards_on_hand = {
+        "Oak 1": oak1,
+        "Oak 2": oak2,
+        "Dog 4": dog4
+    }
+
+    # Player 1 path
+    # Oak Path -> 4
+    # Dogwood Path -> 3
+    scorer.players[0].board.board_grid[1][2] = oak3
+    scorer.players[0].board.board_grid[1][3] = dog4
+    scorer.players[0].board.board_grid[1][4] = oak5
+    scorer.players[0].board.board_grid[1][5] = dog6
+
+
+    # Player 2 hand
+    scorer.players[1].cards_on_hand = {
+        "Oak 8": oak8,
+    }
+
+    # Player 2 path
+    # Jac path -> 8
+    # Oath path -> Not scoring
+    scorer.players[1].board.board_grid[1][0] = jac1
+    scorer.players[1].board.board_grid[1][1] = jac2
+    scorer.players[1].board.board_grid[1][2] = oak6
+    scorer.players[1].board.board_grid[1][3] = oak7
+    scorer.players[1].board.board_grid[1][4] = jac8
+
+    winner = scorer.determine_winner()
+    assert winner.name == "Player 2"
