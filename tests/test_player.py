@@ -66,4 +66,7 @@ def test_reject_no_adjacency_diagnoal_tree(player):
         player.place_tree(tree2, row2, column2)
 
 
+def test_draw_card_from_graveyard():
+    raise NotImplemented
+
 

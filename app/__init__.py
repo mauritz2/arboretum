@@ -4,6 +4,7 @@ from board import Board
 from deck import Deck
 from scorer import Scorer
 from card import Card
+from graveyard import Graveyard
 import config
 
 if __name__ == "__main__":

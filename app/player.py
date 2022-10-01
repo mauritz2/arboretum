@@ -1,12 +1,15 @@
 import config
 from deck import Deck
 from board import Board
+from graveyard import Graveyard
+from typing import Literal
 
 
 class Player:
     def __init__(self,
                  name: str,
                  deck: Deck,
+                 graveyard: Graveyard,
                  board: Board,
                  num_cards_starting_hand: int = config.NUM_CARDS_STARTING_HAND):
 
@@ -14,6 +17,7 @@ class Player:
         self.name = name
         self.cards_on_hand = {}
         self.deck = deck
+        self.graveyard = Graveyard
         self.board = board
         self.first_tree_placed = False
         self.score = 0
@@ -21,7 +25,7 @@ class Player:
         for i in range(num_cards_starting_hand):
             self.draw_card()
 
-    def place_tree(self, card_name: str, row: int, column: int):
+    def place_tree(self, card_name: str, row: int, column: int) -> None:
         """
         Takes the str of a card name (e.g. Oak 2) and the coordinates to place it
         Checks if valid placement, and if so places card on board and removes from player hand
@@ -41,14 +45,22 @@ class Player:
         self.discard_card(card_name=card_name, to_graveyard=False)
         self.first_tree_placed = True
 
-    def draw_card(self):
-        # TODO - implement drawing from Graveyard
+    def draw_card_from_deck(self, target: Literal["Deck", "Graveyard"]) -> None:
         card = self.deck.cards[0]
         self.cards_on_hand[card.card_name] = card
         self.deck.remove_top_card()
 
-    def discard_card(self, card_name: str, to_graveyard: bool):
-        # TODO - implement so discarded card appears in Graveyard
-        del self.cards_on_hand[card_name]
+    def draw_card_from_graveyard(self, player: 'Player') -> None:
+        """
+        Takes a player as input to determine what player's graveyard to draw from
+        Draws a card from that pile (i.e. removes it from that graveyard and adds it to player hand)
+        Type hint is 'Player' as a str since from __future__ import annotations was throwing an error
+        """
+        card = self.player.graveyard.get_top_card()
+        self.cards_on_hand[card.card_name] = card
+        player.graveyard.remove_top_card()
 
+    def discard_card(self, card_name: str) -> None:
+        self.graveyard.add_card_on_top(self.cards_on_hand[card_name])
+        del self.cards_on_hand[card_name]
 

@@ -1,5 +1,5 @@
 import pytest
-from app import Board, Deck, Scorer, Player, Card
+from app import Board, Deck, Scorer, Player, Card, Graveyard
 
 # TODO - add in a dict/fixture that hold all possible Card() types - they are static and have to be re-created in many tests
 
@@ -15,10 +15,13 @@ def board2():
 def deck():
     return Deck()
 
+@pytest.fixture
+def graveyard():
+    return Graveyard()
 
 @pytest.fixture
-def player(board, deck):
-    player = Player(name="Player 1", deck=deck, board=board)
+def player(board, deck, graveyard):
+    player = Player(name="Player 1", deck=deck, board=board, graveyard=graveyard)
 
     tree_types = ["Oak", "Oak", "Oak", "Dogwood", "Dogwood", "Dogwood", "Jacaranda"]
     tree_vals = [2, 3, 1, 6, 2, 3, 5]
@@ -37,8 +40,8 @@ def player(board, deck):
 
 
 @pytest.fixture
-def player2(board2, deck):
-    return Player(name="Player 2", deck=deck, board=board2)
+def player2(board2, deck, graveyard):
+    return Player(name="Player 2", deck=deck, board=board2, graveyard=graveyard)
 
 
 @pytest.fixture
