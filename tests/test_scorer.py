@@ -220,31 +220,42 @@ def test_score_path_all_same_tree_type_and_starts_with_1(scorer):
     assert top_path == expected_best_path
     assert score == expected_score
 
-def test_determine_winner(scorer):
-    raise NotImplemented
-    # Player 1 hand
 
-    # Player 1 paths
+def test_determine_winner_one_tree(scorer):
+    """
+    Verify  that player 1 wins when they are the only ones that
+    can score for their Oak path
+    """
     oak1 = Card(tree_type="Oak", tree_val=1)
+    oak2 = Card(tree_type="Oak", tree_val=2)
     oak3 = Card(tree_type="Oak", tree_val=3)
     oak4 = Card(tree_type="Oak", tree_val=4)
     oak5 = Card(tree_type="Oak", tree_val=5)
     oak6 = Card(tree_type="Oak", tree_val=6)
     oak7 = Card(tree_type="Oak", tree_val=7)
+    oak8 = Card(tree_type="Oak", tree_val=8)
+
+    # Player 1 hand
+    scorer.players[0].cards_on_hand = {
+        "Oak 1": oak1,
+        "Oak 2": oak2
+    }
+
+    # Player 1 path
+    scorer.players[0].board.board_grid[1][2] = oak3
+    scorer.players[0].board.board_grid[1][3] = oak4
+    scorer.players[0].board.board_grid[1][4] = oak5
 
     # Player 2 hand
+    scorer.players[1].cards_on_hand = {
+        "Oak 8": oak8,
+    }
 
+    # Player 2 path
+    scorer.players[1].board.board_grid[1][2] = oak6
+    scorer.players[1].board.board_grid[1][3] = oak7
 
-    # Player 2 paths
+    scorer.trees = ["Oak"]
 
-
-    paths = [[oak1, oak3, oak4, oak5, oak6, oak7]]
-
-    expected_best_path = [oak1, oak3, oak4, oak5, oak6, oak7]
-
-    # 12 from path length (all Oaks), 1 from starting with 1
-    expected_score = 13
-
-    top_path, score = scorer.score_paths(paths)
-    assert top_path == expected_best_path
-    assert score == expected_score
+    winner = scorer.determine_winner()
+    assert winner.name == "Player 1"

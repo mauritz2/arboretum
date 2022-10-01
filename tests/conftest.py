@@ -7,6 +7,9 @@ from app import Board, Deck, Scorer, Player, Card
 def board():
     return Board(num_rows=10, num_columns=10)
 
+@pytest.fixture
+def board2():
+    return Board(num_rows=10, num_columns=10)
 
 @pytest.fixture
 def deck():
@@ -34,8 +37,8 @@ def player(board, deck):
 
 
 @pytest.fixture
-def player2(board, deck):
-    return Player(name="Player 2", deck=deck, board=board)
+def player2(board2, deck):
+    return Player(name="Player 2", deck=deck, board=board2)
 
 
 @pytest.fixture

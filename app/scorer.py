@@ -180,12 +180,13 @@ class Scorer:
         """
         top_score = []
         winner = None
+        scoring_players = self.calculate_scoring_players_by_tree()
         for player in self.players:
-            for tree in config.TREES:
-                scoring_players = self.calculate_scoring_players_by_tree
-                # Points should only be counted for player(s) that can score for the specific tree
+            for tree in self.trees:
                 if player in scoring_players[tree]:
                     paths = self.find_paths_for_tree_type(tree, player)
+                    if len(paths) == 0:
+                        continue
                     top_path, top_score = self.score_paths(paths)
                     player.score += top_score
             else:
