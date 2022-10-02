@@ -57,7 +57,7 @@ class Player:
         Draws a card from that pile (i.e. removes it from that graveyard and adds it to player hand)
         Type hint is 'Player' as a str since from __future__ import annotations was throwing an error
         """
-        card = self.player.graveyard.get_top_card()
+        card = self.graveyard.get_top_card()
         self.cards_on_hand[card.card_name] = card
         player.graveyard.remove_top_card()
 
