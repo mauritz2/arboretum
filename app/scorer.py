@@ -6,7 +6,7 @@ from player import Player
 
 
 class Scorer:
-    def __init__(self, players: list, trees: list = None):
+    def __init__(self, players: list[Player], trees: list[str] = None):
         self.players = players
         self.trees = config.TREES if trees is None else trees
 

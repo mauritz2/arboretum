@@ -13,11 +13,10 @@ class Player:
                  board: Board,
                  num_cards_starting_hand: int = config.NUM_CARDS_STARTING_HAND):
 
-        # TODO - The GameManager should be able to test for name uniqueness
         self.name = name
         self.cards_on_hand = {}
         self.deck = deck
-        self.graveyard = Graveyard
+        self.graveyard = graveyard
         self.board = board
         self.first_tree_placed = False
         self.score = 0

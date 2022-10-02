@@ -1,23 +1,29 @@
 import pytest
 from app import Board, Deck, Scorer, Player, Card, Graveyard
 
+
 # TODO - add in a dict/fixture that hold all possible Card() types - they are static and have to be re-created in many tests
+
 
 @pytest.fixture
 def board():
     return Board(num_rows=10, num_columns=10)
 
+
 @pytest.fixture
 def board2():
     return Board(num_rows=10, num_columns=10)
+
 
 @pytest.fixture
 def deck():
     return Deck()
 
+
 @pytest.fixture
 def graveyard():
     return Graveyard()
+
 
 @pytest.fixture
 def player(board, deck, graveyard):
