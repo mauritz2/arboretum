@@ -10,7 +10,7 @@ class Deck:
         self.shuffle_deck()
 
     @staticmethod
-    def _generate_deck(tree_types, num_cards_per_type):
+    def _generate_deck(tree_types: list[str], num_cards_per_type: int) -> list[Card]:
         cards = []
         # TODO - improve performance by replacing loop with list comprehension
         for tree in tree_types:
@@ -20,8 +20,12 @@ class Deck:
                 cards.append(card)
         return cards
 
-    def remove_top_card(self):
+    def remove_top_card(self) -> None:
         del self.cards[0]
 
-    def shuffle_deck(self):
+    def shuffle_deck(self) -> None:
         random.shuffle(self.cards)
+
+    def check_amt_of_cards_left(self) -> int:
+        return len(self.cards)
+

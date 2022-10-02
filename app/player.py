@@ -15,6 +15,8 @@ class Player:
 
         self.name = name
         self.cards_on_hand = {}
+        # TODO - This inheritance doesn't make sense - why would each player have their own Deck?
+        # It probably makes more sense to have the deck be owned by the GameManager?
         self.deck = deck
         self.graveyard = graveyard
         self.board = board
@@ -22,7 +24,7 @@ class Player:
         self.score = 0
 
         for i in range(num_cards_starting_hand):
-            self.draw_card()
+            self.draw_card_from_deck()
 
     def place_tree(self, card_name: str, row: int, column: int) -> None:
         """
@@ -44,7 +46,7 @@ class Player:
         self.discard_card(card_name=card_name, to_graveyard=False)
         self.first_tree_placed = True
 
-    def draw_card_from_deck(self, target: Literal["Deck", "Graveyard"]) -> None:
+    def draw_card_from_deck(self) -> None:
         card = self.deck.cards[0]
         self.cards_on_hand[card.card_name] = card
         self.deck.remove_top_card()

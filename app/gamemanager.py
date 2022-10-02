@@ -11,8 +11,9 @@ class GameManager:
 
     def __init__(self, num_players: int) -> None:
         # TODO - should players be owned by GameManager or Scorer_
-        self.num_players == num_players
+        self.num_players = num_players
         self.scorer = self.setup_scorer()
+        self.game_over = False
 
     def setup_scorer(self) -> Scorer:
         """
@@ -22,10 +23,10 @@ class GameManager:
         """
 
         players = []
-        for i in range(self.players):
+        deck = Deck()
+        for i in range(self.num_players):
             player_name = f"Player {i + 1}"
 
-            deck = Deck()
             graveyard = Graveyard()
             board = Board(num_rows=config.BOARD_ROWS, num_columns=config.BOARD_COLUMNS)
 
