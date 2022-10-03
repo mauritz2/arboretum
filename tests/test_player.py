@@ -65,15 +65,16 @@ def test_reject_no_adjacency_diagnoal_tree(player):
     with pytest.raises(ValueError):
         player.place_tree(tree2, row2, column2)
 
+
 def test_draw_card_from_graveyard(player):
     """
     Test that drawing from a discard pile removes the card from the discard pile and adds it to the player's hand
     """
     # Graveyard contains Cassia 1 and Cassia 2 by default with Cassia 2 as the top card
-    assert "Cassia 2" not in player.cards_on_hand.keys()
+    assert "Cassia 2" not in player.cards_on_hand
     assert "Cassia 2" in [c.card_name for c in player.graveyard.cards]
     player.draw_card_from_graveyard(player)
-    assert "Cassia 2" in player.cards_on_hand.keys()
+    assert "Cassia 2" in player.cards_on_hand
     assert "Cassia 2" not in [c.card_name for c in player.graveyard.cards]
 
 
