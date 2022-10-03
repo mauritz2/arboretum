@@ -37,14 +37,14 @@ def test_place_card_in_occupied_space(player):
 def test_add_drawn_card_to_hand(player):
     card_to_draw = player.deck.cards[0].card_name
     assert card_to_draw not in player.cards_on_hand
-    player.draw_card()
+    player.draw_card_from_deck()
     assert card_to_draw in player.cards_on_hand
 
 
 def test_remove_drawn_card_from_deck(player):
     card_to_draw = player.deck.cards[0]
     assert card_to_draw in player.deck.cards
-    player.draw_card()
+    player.draw_card_from_deck()
     assert card_to_draw not in player.deck.cards
 
 
@@ -65,8 +65,16 @@ def test_reject_no_adjacency_diagnoal_tree(player):
     with pytest.raises(ValueError):
         player.place_tree(tree2, row2, column2)
 
+def test_draw_card_from_graveyard(player):
+    """
+    Test that drawing from a discard pile removes the card from the discard pile and adds it to the player's hand
+    """
+    # Graveyard contains Cassia 1 and Cassia 2 by default with Cassia 2 as the top card
+    assert "Cassia 2" not in player.cards_on_hand.keys()
+    assert "Cassia 2" in [c.card_name for c in player.graveyard.cards]
+    player.draw_card_from_graveyard(player)
+    assert "Cassia 2" in player.cards_on_hand.keys()
+    assert "Cassia 2" not in [c.card_name for c in player.graveyard.cards]
 
-def test_draw_card_from_graveyard():
-    raise NotImplemented
 
 

@@ -9,14 +9,11 @@ class Graveyard:
     Position 0 in self.cards is the bottom card.
     Position -1 is the last (i.e. top card) that you can draw from.
     """
-    cards = list[Card]
+    cards: list[Card]
 
-    def __len__(self):
-        return len(self.cards)
-
-    def get_top_card(self) -> None:
-        if len(self.cards):
-            raise ValueError("The graveyard is empty")
+    def get_top_card(self) -> Card:
+        if self.get_amt_of_cards_remaining() <= 0:
+            return None
         return self.cards[-1]
 
     def remove_top_card(self) -> None:
@@ -25,6 +22,8 @@ class Graveyard:
     def add_card_on_top(self, card: Card) -> None:
         self.cards.append(card)
 
+    def get_amt_of_cards_remaining(self) -> int:
+        return len(self.cards)
 
 
 

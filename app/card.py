@@ -19,5 +19,6 @@ class Card:
             self.card_name = None
             self.visual_shorthand = None
         else:
+            # TODO - refactor to call it name as opposed to card_name
             self.card_name = f"{self.tree_type} {self.tree_val}"
             self.visual_shorthand = config.CARD_SHORTHANDS[self.card_name]

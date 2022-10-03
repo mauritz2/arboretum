@@ -22,7 +22,10 @@ def deck():
 
 @pytest.fixture
 def graveyard():
-    return Graveyard()
+    return Graveyard(
+        cards=[Card(tree_type="Cassia", tree_val=1),
+               Card(tree_type="Cassia", tree_val=2)]
+    )
 
 
 @pytest.fixture

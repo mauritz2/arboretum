@@ -83,7 +83,7 @@ class Scorer:
         return top_scorers
 
     @staticmethod
-    def get_possible_start_end_card_pairs(cards_of_type:list[Card]) -> list[tuple]:
+    def get_possible_start_end_card_pairs(cards_of_type: list[Card]) -> list[tuple]:
         """
         Takes as input a list with all played Cards of a specific type (e.g. Oak) and returns
         a list of tuples containing the possible start/end Cards that could start/end a path
@@ -100,7 +100,7 @@ class Scorer:
 
         return start_end_combos
 
-    def find_paths_for_tree_type(self, tree_type:str, player:Player) -> list[Card]:
+    def find_paths_for_tree_type(self, tree_type: str, player: Player) -> list[Card]:
         """
         Finds all the valid paths for a specific tree type on a player's board and returns
         a list where each entry is a list with a valid path. Each step in the path is represented
@@ -193,11 +193,3 @@ class Scorer:
                 if player.score >= top_score:
                     winner = player
         return winner
-
-
-
-
-
-
-
-

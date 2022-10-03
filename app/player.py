@@ -47,6 +47,7 @@ class Player:
         self.first_tree_placed = True
 
     def draw_card_from_deck(self) -> None:
+        # TODO - remove inconsistency where card[0] is top card in deck, but bottom card in graveyard
         card = self.deck.cards[0]
         self.cards_on_hand[card.card_name] = card
         self.deck.remove_top_card()
@@ -57,11 +58,14 @@ class Player:
         Draws a card from that pile (i.e. removes it from that graveyard and adds it to player hand)
         Type hint is 'Player' as a str since from __future__ import annotations was throwing an error
         """
+        if len(self.graveyard.cards) <= 0:
+            raise ValueError(f"The targeted discard pile of {self.name} is empty. Try drawing from another discard pile or the deck.")
         card = self.graveyard.get_top_card()
         self.cards_on_hand[card.card_name] = card
         player.graveyard.remove_top_card()
 
-    def discard_card(self, card_name: str) -> None:
-        self.graveyard.add_card_on_top(self.cards_on_hand[card_name])
+    def discard_card(self, card_name: str, to_graveyard: bool) -> None:
+        if to_graveyard:
+            self.graveyard.add_card_on_top(self.cards_on_hand[card_name])
         del self.cards_on_hand[card_name]
 

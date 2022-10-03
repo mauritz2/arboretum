@@ -5,6 +5,7 @@ EMPTY_SLOT_DISPLAY_SHORTHAND = " "
 BOARD_SLOT_DIVIDER = " | "
 
 # TODO - change this so [] isn't included in the string
+# TODO - generate this programmatically
 CARD_SHORTHANDS = {
 	"Oak 1":"[O1]",
 	"Oak 2":"[O2]",

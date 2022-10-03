@@ -1,8 +1,9 @@
 from player import Player
-from graveyard import  Graveyard
+from graveyard import Graveyard
 from deck import Deck
 from board import Board
 from scorer import Scorer
+from card import Card
 import config
 # TODO - should all class files be changed to capital letters based on PEP?
 
@@ -26,8 +27,9 @@ class GameManager:
         deck = Deck()
         for i in range(self.num_players):
             player_name = f"Player {i + 1}"
-
-            graveyard = Graveyard()
+            # TODO - remove placeholder graveyard values
+            graveyard = Graveyard(cards=[Card(tree_type="Oak", tree_val=1),
+                                         Card(tree_type="Oak", tree_val=2)])
             board = Board(num_rows=config.BOARD_ROWS, num_columns=config.BOARD_COLUMNS)
 
             player = Player(name=player_name,
