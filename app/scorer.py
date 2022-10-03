@@ -39,12 +39,10 @@ class Scorer:
                 for card_name, card in hand.items():
                     if card.tree_type == tree:
                         if card.tree_val == 8:
-                            print(f"A player has the 8 of {tree}")
                             another_player_has_the_1 = self._check_if_tree_on_hand(tree_type=tree,
                                                                                    tree_num=1,
                                                                                    player_to_excl=player.name)
                             if another_player_has_the_1:
-                                print(f"A player has the 1 of {tree} - this 8 will be disregarded")
                                 continue
                         total_sum += card.tree_val
                 player_sum_by_tree[tree] = total_sum
@@ -178,7 +176,7 @@ class Scorer:
         Returns the scoring player
         TODO - incorporate possibility of ties
         """
-        top_score = []
+        top_score = 0
         winner = None
         scoring_players = self.calculate_scoring_players_by_tree()
         for player in self.players:

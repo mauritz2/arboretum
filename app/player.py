@@ -39,8 +39,7 @@ class Player:
 
         if self.first_tree_placed:
             if not self.board.check_if_slot_has_adjacent_tree(row, column):
-                raise ValueError(f"You cannot place a tree at ({row}, {column}) \
-                 since it's not adjacent to an existing tree")
+                raise ValueError(f"You cannot place a tree at ({row}, {column}) since it's not adjacent to an existing tree")
 
         self.board.board_grid[row][column] = self.cards_on_hand[card_name]
         self.discard_card(card_name=card_name, to_graveyard=False)
@@ -52,7 +51,7 @@ class Player:
         self.cards_on_hand[card.card_name] = card
         self.deck.remove_top_card()
 
-    def draw_card_from_graveyard(self, player: 'Player') -> None:
+    def draw_card_from_graveyard(self, player_to_draw_from: 'Player') -> None:
         """
         Takes a player as input to determine what player's graveyard to draw from
         Draws a card from that pile (i.e. removes it from that graveyard and adds it to player hand)
@@ -60,12 +59,19 @@ class Player:
         """
         if len(self.graveyard.cards) <= 0:
             raise ValueError(f"The targeted discard pile of {self.name} is empty. Try drawing from another discard pile or the deck.")
-        card = self.graveyard.get_top_card()
+        card = player_to_draw_from.graveyard.get_top_card()
         self.cards_on_hand[card.card_name] = card
-        player.graveyard.remove_top_card()
+        player_to_draw_from.graveyard.remove_top_card()
 
     def discard_card(self, card_name: str, to_graveyard: bool) -> None:
         if to_graveyard:
             self.graveyard.add_card_on_top(self.cards_on_hand[card_name])
         del self.cards_on_hand[card_name]
 
+    def get_player_card_names(self) -> list[str]:
+        """
+        Returns the names of all the cards on hand, sorted by tree type
+        """
+        cards_on_hand = list(self.cards_on_hand.keys())
+        cards_on_hand.sort()
+        return cards_on_hand

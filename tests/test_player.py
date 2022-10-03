@@ -77,4 +77,13 @@ def test_draw_card_from_graveyard(player):
     assert "Cassia 2" not in [c.card_name for c in player.graveyard.cards]
 
 
+def test_draw_card_from_graveyard_draw_from_other_player(player, player2):
+    """
+    Verify that drawing from other players' discard piles works
+    """
+    player2.graveyard.cards = [Card(tree_type="Jacaranda", tree_val=8)]
+    player.draw_card_from_graveyard(player2)
+    assert "Jacaranda 8" in player.cards_on_hand.keys()
+    assert "Jacaranda 8" not in [c.card_name for c in player2.graveyard.cards]
+
 
