@@ -179,7 +179,6 @@ app.config['DEBUG'] = True
 #
 @app.route("/", methods=['GET'])
 def play_game():
-    # return "It's my app and I cry if I want to"
     # data = None
     # global log_message
     # global current_type
@@ -247,5 +246,31 @@ def play_game():
         user_player=players['3'],
         players_score=players_score)
 
+
 if __name__ == "__main__":
     app.run(debug=True)
+
+# Milestones
+# Render cards in the UI
+# Render a players hand
+# Render two players cards
+# Switch art to Arboretum cards
+# Do if-statement breakdown of all actions - then break out so UI calls separate funcs
+
+# What to pass to the template?
+# Player hands - {"Player 1": ["Oak 1", "Oak 2", "Oak 3]}
+# Current Player taking an action - e.g. "Player 1"
+# Game State (e.g. "Draw", "Discard", "Play")
+# Board State
+
+# What does the template pass back?
+# Actions (i.e.: Draw from graveyard, draw from deck, play card X, discard card Y)
+# Who took the action
+# Example data passed back (initial version) ("1", "draw graveyard 1")
+# Long-term the UI should call different functions, not a single one
+
+
+# Thoughts?
+# Weakness in always sending all cards and re-rendering? Might make hand re-render on every action
+# Should I pass the entire player class? Or board class? Probably not. Just need a JSON format of needed data. Decouple UI and backend.
+# We should check if the
