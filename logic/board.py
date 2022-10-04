@@ -138,7 +138,7 @@ class Board:
         Returns None if the Card isn't found
         I think the comparison "if value is card" works here because since Card is a dataclass
         it automatically implements eq() - maybe ?
-        # TODO - maybe rename row_coords and column_coord to x and y across the app
+        # TODO - maybe rename row_coords and column_coord to x and y across the logic
         """
         # TODO - this type of nested for loop search is pretty common across the code - possible to vectorize?
         for row_coord, row in enumerate(self.board_grid):

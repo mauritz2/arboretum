@@ -1,5 +1,5 @@
 import pytest
-from app import Card
+from logic import Card
 
 
 def test_place_tree(player):

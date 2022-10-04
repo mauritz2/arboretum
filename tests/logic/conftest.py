@@ -1,5 +1,5 @@
 import pytest
-from app import Board, Deck, Scorer, Player, Card, Graveyard
+from logic import Board, Deck, Scorer, Player, Card, Graveyard
 
 
 # TODO - add in a dict/fixture that hold all possible Card() types - they are static and have to be re-created in many tests

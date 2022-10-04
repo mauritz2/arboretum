@@ -1,4 +1,4 @@
-from app import Card
+from logic import Card
 
 
 def test_get_top_card(graveyard):

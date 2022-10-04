@@ -1,0 +1,118 @@
+<html>
+<head>
+  <title>Hearts Game</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/cards.css') }}" media="screen" />
+    <!--[if lt IE 9]>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/cards-ie.css') }}" media="screen" />
+    <![endif]-->
+    <!--[if IE 9]>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/cards-ie9.css') }}" media="screen" />
+    <![endif]-->
+    <!-- the following js and css is not part of the CSS cards, but only for this example page -->
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+    <style>
+      td {
+        text-align: center;
+        padding: 8px;
+      }
+    </style>
+</head>
+
+<body>
+    <div class="playingCards fourColours rotateHand">
+
+      <table>
+        <tr>
+  {% for item in user_player %}
+    {% for card in item[1] %}
+        <td>
+      {% if card == 11 %}
+        <div class="card rank-j {{ item[0] if item[0] != 'diamonds' else 'diams' }}">
+          <span class="rank">J</span>
+          <span class="suit">&{{ item[0] if item[0] != 'diamonds' else 'diams' }};</span>
+        </div>
+      {% elif card == 12 %}
+        <div class="card rank-q {{ item[0] if item[0] != 'diamonds' else 'diams' }}">
+          <span class="rank">Q</span>
+          <span class="suit">&{{ item[0] if item[0] != 'diamonds' else 'diams' }};</span>
+        </div>
+      {% elif card == 13 %}
+        <div class="card rank-k {{ item[0] if item[0] != 'diamonds' else 'diams' }}">
+          <span class="rank">K</span>
+          <span class="suit">&{{ item[0] if item[0] != 'diamonds' else 'diams' }};</span>
+        </div>
+      {% elif card == 1 %}
+        <div class="card rank-a {{ item[0] if item[0] != 'diamonds' else 'diams' }}">
+          <span class="rank">A</span>
+          <span class="suit">&{{ item[0] if item[0] != 'diamonds' else 'diams' }};</span>
+        </div>
+      {% else %}
+        <div class="card rank-{{ card }} {{ item[0] if item[0] != 'diamonds' else 'diams' }}">
+          <span class="rank">{{ card }}</span>
+          <span class="suit">&{{ item[0] if item[0] != 'diamonds' else 'diams' }};</span>
+        </div>
+      {% endif %}
+
+      <form action="/play" method="post">
+        <input type="hidden" name="card" value="{{ card }}"><br>
+        <input type="hidden" name="type" value="{{ item[0] }}"><br>
+        <button name="foo" value="bar">Play</button>
+      </form>
+    </td>
+    {% endfor %}
+  {% endfor %}
+</tr>
+</table>
+
+  {% if log_message %}
+    <p>{{ log_message }}</p>
+    {% if 'got this hand' in log_message %}
+      <form action="/play" method="post">
+        <button name="is_hand_over" value="true">Continue</button>
+      </form>
+    {% endif %}
+  {% endif %}
+
+  <table>
+    <tr>
+  {% for player_item in player_current_cards %}
+    <td>
+    <p><b>{{ player_item[0] }} ( {{ players_score[player_item[0]] }} )</b></p>
+    {% if 'card' in player_item[1] %}
+    {% if player_item[1]['card'] == 11 %}
+      <div class="card rank-j {{ player_item[1]['type'] if player_item[1]['type'] != 'diamonds' else 'diams' }}">
+        <span class="rank">J</span>
+        <span class="suit">&{{ player_item[1]['type'] if player_item[1]['type'] != 'diamonds' else 'diams' }};</span>
+      </div>
+    {% elif player_item[1]['card'] == 12 %}
+      <div class="card rank-q {{ player_item[1]['type'] if player_item[1]['type'] != 'diamonds' else 'diams' }}">
+        <span class="rank">Q</span>
+        <span class="suit">&{{ player_item[1]['type'] if player_item[1]['type'] != 'diamonds' else 'diams' }};</span>
+      </div>
+    {% elif player_item[1]['card'] == 13 %}
+      <div class="card rank-k {{ player_item[1]['type'] if player_item[1]['type'] != 'diamonds' else 'diams' }}">
+        <span class="rank">K</span>
+        <span class="suit">&{{ player_item[1]['type'] if player_item[1]['type'] != 'diamonds' else 'diams' }};</span>
+      </div>
+    {% elif player_item[1]['card'] == 1 %}
+      <div class="card rank-a {{ player_item[1]['type'] if player_item[1]['type'] != 'diamonds' else 'diams' }}">
+        <span class="rank">A</span>
+        <span class="suit">&{{ player_item[1]['type'] if player_item[1]['type'] != 'diamonds' else 'diams' }};</span>
+      </div>
+    {% else %}
+      <div class="card rank-{{ player_item[1]['card'] }} {{ player_item[1]['type'] if player_item[1]['type'] != 'diamonds' else 'diams' }}">
+        <span class="rank">{{ player_item[1]['card'] }}</span>
+        <span class="suit">&{{ player_item[1]['type'] if player_item[1]['type'] != 'diamonds' else 'diams' }};</span>
+      </div>
+    {% endif %}
+    {% endif %}
+  </td>
+  {% endfor %}
+</tr>
+</table>
+
+  </div>
+
+</body>
+
+</html>

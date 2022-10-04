@@ -1,4 +1,4 @@
-from app import Card
+from logic import Card
 
 
 def test_establish_scoring_players_simple_case(player, player2, scorer):

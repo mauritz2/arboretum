@@ -1,4 +1,4 @@
-from app import Card
+from logic import Card
 import pytest
 
 def test_shape_create_empty_board_grid(board):
