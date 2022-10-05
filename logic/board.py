@@ -1,6 +1,6 @@
-import config
+import logic.config as config
 from typing import Literal
-from card import Card
+from logic.card import Card
 
 
 class Board:

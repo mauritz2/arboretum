@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Literal
-import config
+import logic.config as config
 
 
 @dataclass(order=True)

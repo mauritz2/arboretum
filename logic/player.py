@@ -1,8 +1,7 @@
-import config
-from deck import Deck
-from board import Board
-from graveyard import Graveyard
-from typing import Literal
+import logic.config as config
+from logic.deck import Deck
+from logic.board import Board
+from logic.graveyard import Graveyard
 
 
 class Player:

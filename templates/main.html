@@ -7,18 +7,27 @@
 </head>
 
 <body>
-    <div class="playingCards fourColours rotateHand">
-      <table>
-          {% for i in range(7) %}
-          <tr>
-            <td>
-              <div class="my_card"></div>
-              <form action="/" method="post"><input type="hidden" name="card" value="Card Type"><input type="hidden" name="type" value="Card Value"><button name="foo" value="bar">Play</button></form>
-            </td>
-        </tr>
-          {% endfor %}
-    </table>
-  </div>
+
+<div class="container fixed-bottom">
+    <div class="row">
+        {% for card in player_hands["Player 1"] %}
+        <div class="col text-center">
+            {% if "Oak" in card %}
+               <span class="oak p-1"></span>
+            {% elif "Cassia" in card %}
+               <span class="cassia p-1"></span>
+            {% elif "Jacaranda" in card %}
+               <span class="jacaranda p-1"></span>
+            {% elif "Dogwood" in card %}
+               <span class="dogwood p-1"></span>
+
+            {% endif %}
+            <p class="p-1">{{card}}</p>
+            <button class="btn border pb-3">Play Card</button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 
 </body>
 

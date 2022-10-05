@@ -1,6 +1,6 @@
-import config
+import logic.config as config
 import random
-from card import Card
+from logic.card import Card
 
 
 class Deck:

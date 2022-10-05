@@ -1,10 +1,10 @@
-from player import Player
-from graveyard import Graveyard
-from deck import Deck
-from board import Board
-from scorer import Scorer
-from card import Card
-import config
+from logic.player import Player
+from logic.graveyard import Graveyard
+from logic.deck import Deck
+from logic.board import Board
+from logic.scorer import Scorer
+from logic.card import Card
+import logic.config as config
 # TODO - should all class files be changed to capital letters based on PEP?
 
 
