@@ -12,10 +12,10 @@ import logic.config as config
 
 game_logic = GameManager(config.NUM_PLAYERS)
 
-game_logic.scorer.players[0].board.board_grid[5][5] = Card(tree_type="Oak", tree_val=1)
-game_logic.scorer.players[0].board.board_grid[4][5] = Card(tree_type="Cassia", tree_val=2)
-game_logic.scorer.players[0].board.board_grid[3][5] = Card(tree_type="Dogwood", tree_val=5)
-game_logic.scorer.players[0].board.board_grid[2][5] = Card(tree_type="Jacaranda", tree_val=7)
+#game_logic.scorer.players[0].board.board_grid[3][2] = Card(tree_type="Cassia", tree_val=1)
+# game_logic.scorer.players[0].board.board_grid[4][5] = Card(tree_type="Cassia", tree_val=2)
+# game_logic.scorer.players[0].board.board_grid[3][5] = Card(tree_type="Dogwood", tree_val=5)
+# game_logic.scorer.players[0].board.board_grid[2][5] = Card(tree_type="Jacaranda", tree_val=7)
 
 
 

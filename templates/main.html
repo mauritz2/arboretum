@@ -16,28 +16,32 @@
     <div class="row">
         <div class="col-3"></div>
         <div class="col-7">
-            <table class="table-sm">
-                {% for row in player_boards['Player 1'] %}
-                <tr>
-                    {% for card in row %}
-                    <td>
-                        {% if card.tree_type == "Oak" %}
-                        <span class="oak-mini"></span>
-                        {% elif card.tree_type == "Dogwood" %}
-                        <span class="dogwood-mini"></span>
-                        {% elif card.tree_type == "Cassia" %}
-                        <span class="cassia-mini"></span>
-                        {% elif card.tree_type == "Jacaranda" %}
-                        <span class="jacaranda-mini"></span>
-
-                        {% else %}
-                        <span class="blank-w-border-mini"></span>
-                        {% endif %}
-                    </td>
+                <table class="table-sm">
+                    {% for row in player_boards['Player 1'] %}
+                    {% set outer_loop = loop.index - 1 %}
+                    <tr>
+                        {% for card in row %}
+                        {% set inner_loop = loop.index - 1 %}
+                        <td>
+                            {% if card.tree_type == "Oak" %}
+                            <span class="oak-mini"></span>
+                            {% elif card.tree_type == "Dogwood" %}
+                            <span class="dogwood-mini"></span>
+                            {% elif card.tree_type == "Cassia" %}
+                            <span class="cassia-mini"></span>
+                            {% elif card.tree_type == "Jacaranda" %}
+                            <span class="jacaranda-mini"></span>
+                            {% else %}
+                            <form action="/choose_coordinates" method="post">
+                                <input type="hidden" name="coords" value="{{outer_loop, inner_loop}}">
+                                <button class="blank-w-border-mini"></button>
+                            </form>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
                     {% endfor %}
-                </tr>
-                {% endfor %}
-            </table>
+                </table>
         </div>
     </div>
 </div>
@@ -55,10 +59,14 @@
                <span class="jacaranda p-1"></span>
             {% elif "Dogwood" in card %}
                <span class="dogwood p-1"></span>
-
             {% endif %}
             <p class="p-1">{{card}}</p>
-            <button class="btn border pb-3">Play Card</button>
+            {% if game_phase == "Choose Card" %}
+            <form action="/play_card" method="post">
+                <input type="hidden" name="card_name" value="{{card}}">
+                <button class="btn border pb-3">Play Card</button>
+            </form>
+            {% endif %}
         </div>
         {% endfor %}
     </div>

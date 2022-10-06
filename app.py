@@ -1,13 +1,36 @@
 from flask import Flask, render_template, request
 from logic import game_logic
-from logic import config
+import random
 
 # Flask config
 app = Flask(__name__)
-app.config['DEBUG'] = True
+app.config['DEBUG'] = False
+
+card_to_play = None
+
+@app.route("/choose_coordinates", methods=["POST"])
+def choose_coordinates():
+    """
+    Gets form input from the tile selected by the user in the format row, column (e.g. 1,1)
+    """
+    global card_to_play
+    row, column = eval(request.form["coords"])
+
+    print("\n\n\n")
+    print(row)
+    print(column)
+    print("\n\n\n")
+    row, column = int(row), int(column)
+    game_logic.scorer.players[0].place_tree(card_to_play, row=row, column=column)
+    card_to_play = None
+    game_logic.game_phase = "Choose Card"
+
+
+    return main()
 
 @app.route("/play_card", methods=["POST"])
 def play_card():
+    global card_to_play
     # Verify that the game state is playing a card!
     # if not game_logic.current_game_state == "Draw"
         # raise ValueError("It's not time to draw"
@@ -15,12 +38,24 @@ def play_card():
         # raise ValueError("It's not your time to play!")
     # Check who the player is
     #player_name = request.form.player
-    #card_played = request.form.card_played
+    card_played = request.form['card_name']
+    #rand_row = random.randrange(0,6)
+    #rand_col = random.randrange(0,10)
+
+    card_to_play = card_played
+
+    # print("\n\n\n")
+    # print(card_played)
+    # print("See card above")
+    # print("\n\n\n")
+
     #row = 5
     #column = 5
 
-    game_logic.scorer.players[0].place_tree(card_name="Oak 1", row=5, column=5)
-    main()
+    game_logic.game_phase = "Choose Coordinates"
+
+    return main()
+
 
 @app.route("/", methods=["GET"])
 def main():
@@ -31,17 +66,18 @@ def main():
     player_board = game_logic.scorer.players[0].board.board_grid
     player_boards = {"Player 1": player_board}
 
-    current_players_turn = game_logic.current_player
-    current_game_phase = game_logic.current_game_phase
+    #current_players_turn = game_logic.current_player
+    #current_game_phase = game_logic.current_game_phase
 
-    current_game_phase = "Draw"
-    current_players_turn = "Player 1"
+    game_phase = game_logic.game_phase
 
     return render_template(
         'main.html',
         player_hands=player_hands,
         player_boards=player_boards,
-        current_game_phase=current_game_phase)
+        game_phase=game_phase,
+    )
+
 
 if __name__ == "__main__":
     app.run(debug=True)
@@ -56,8 +92,6 @@ if __name__ == "__main__":
 # Current Player taking an action - e.g. "Player 1"
 # Game States -> Choose Draw, Choose Discard, Choose Play Card, Choose Play Coordinates
 # Board State
-
-
 
 # What does the template pass back?
 # Actions (i.e.: Draw from graveyard, draw from deck, play card X, discard card Y)
