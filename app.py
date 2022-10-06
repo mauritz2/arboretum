@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from logic import my_game
-
+from logic import config
 
 # Flask config
 app = Flask(__name__)
@@ -11,10 +11,13 @@ app.config['DEBUG'] = True
 def play_game():
     player_hand = my_game.scorer.players[0].get_player_card_names()
     player_hands = {"Player 1": player_hand}
+    board_dimensions = (config.BOARD_ROWS, config.BOARD_COLUMNS)
+
 
     return render_template(
         'main.html',
-        player_hands=player_hands)
+        player_hands=player_hands,
+        board_dimensions=board_dimensions)
 
 if __name__ == "__main__":
     app.run(debug=True)

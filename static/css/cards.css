@@ -1,4 +1,4 @@
-
+/* ratio of the cards should be 3:2 */
 
 .oak {
     content : url("faces/oak.gif");
@@ -23,3 +23,28 @@
     height: 200px;
     width: 130px;
 }
+
+.oak-mini {
+    content : url("faces/oak.gif");
+    height: 84px;
+    width: 56px;
+
+    }
+.blank-mini {
+    content : url("faces/blank.gif");
+    height: 84px;
+    width: 56px;
+
+    }
+.blank-w-border-mini {
+    content : url("faces/blank-w-border.gif");
+    height: 84px;
+    width: 56px;
+
+    }
+
+.blank-w-border-mini:hover
+{
+    content : url("faces/blank-selected.gif");
+}
+
