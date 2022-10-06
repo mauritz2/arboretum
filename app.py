@@ -1,31 +1,52 @@
-from flask import Flask, render_template
-from logic import my_game
+from flask import Flask, render_template, request
+from logic import game_logic
 from logic import config
 
 # Flask config
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
+@app.route("/play_card", methods=["POST"])
+def play_card():
+    # Verify that the game state is playing a card!
+    # if not game_logic.current_game_state == "Draw"
+        # raise ValueError("It's not time to draw"
+    # If not request.form.player == game_logic.current_player:
+        # raise ValueError("It's not your time to play!")
+    # Check who the player is
+    #player_name = request.form.player
+    #card_played = request.form.card_played
+    #row = 5
+    #column = 5
 
-@app.route("/", methods=['GET'])
-def play_game():
-    player_hand = my_game.scorer.players[0].get_player_card_names()
+    game_logic.scorer.players[0].place_tree(card_name="Oak 1", row=5, column=5)
+    main()
+
+@app.route("/", methods=["GET"])
+def main():
+
+    player_hand = game_logic.scorer.players[0].get_player_card_names()
     player_hands = {"Player 1": player_hand}
-    board_dimensions = (config.BOARD_ROWS, config.BOARD_COLUMNS)
 
+    player_board = game_logic.scorer.players[0].board.board_grid
+    player_boards = {"Player 1": player_board}
+
+    current_players_turn = game_logic.current_player
+    current_game_phase = game_logic.current_game_phase
+
+    current_game_phase = "Draw"
+    current_players_turn = "Player 1"
 
     return render_template(
         'main.html',
         player_hands=player_hands,
-        board_dimensions=board_dimensions)
+        player_boards=player_boards,
+        current_game_phase=current_game_phase)
 
 if __name__ == "__main__":
     app.run(debug=True)
 
-# Milestones
-# Render a 10x10 board grid
-
-
+# Next steps
 # Render two players cards
 # Switch art to Arboretum cards
 # Do if-statement breakdown of all actions - then break out so UI calls separate funcs
@@ -33,8 +54,10 @@ if __name__ == "__main__":
 # What to pass to the template?
 # Player hands - {"Player 1": ["Oak 1", "Oak 2", "Oak 3]}
 # Current Player taking an action - e.g. "Player 1"
-# Game State (e.g. "Draw", "Discard", "Play")
+# Game States -> Choose Draw, Choose Discard, Choose Play Card, Choose Play Coordinates
 # Board State
+
+
 
 # What does the template pass back?
 # Actions (i.e.: Draw from graveyard, draw from deck, play card X, discard card Y)

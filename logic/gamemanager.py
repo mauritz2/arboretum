@@ -15,6 +15,8 @@ class GameManager:
         self.num_players = num_players
         self.scorer = self.setup_scorer()
         self.game_over = False
+        self.current_player = None
+        self.current_game_phase = None
 
     def setup_scorer(self) -> Scorer:
         """

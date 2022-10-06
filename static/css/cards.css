@@ -30,6 +30,25 @@
     width: 56px;
 
     }
+.jacaranda-mini {
+    content : url("faces/jacaranda.gif");
+    height: 84px;
+    width: 56px;
+
+    }
+ .cassia-mini {
+    content : url("faces/cassia.gif");
+    height: 84px;
+    width: 56px;
+
+    }
+  .dogwood-mini {
+    content : url("faces/dogwood.gif");
+    height: 84px;
+    width: 56px;
+
+    }
+
 .blank-mini {
     content : url("faces/blank.gif");
     height: 84px;

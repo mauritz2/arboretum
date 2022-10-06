@@ -17,11 +17,22 @@
         <div class="col-3"></div>
         <div class="col-7">
             <table class="table-sm">
-                {% for i in range(board_dimensions[0]) %}
+                {% for row in player_boards['Player 1'] %}
                 <tr>
-                    {% for j in range(board_dimensions[1]) %}
+                    {% for card in row %}
                     <td>
+                        {% if card.tree_type == "Oak" %}
+                        <span class="oak-mini"></span>
+                        {% elif card.tree_type == "Dogwood" %}
+                        <span class="dogwood-mini"></span>
+                        {% elif card.tree_type == "Cassia" %}
+                        <span class="cassia-mini"></span>
+                        {% elif card.tree_type == "Jacaranda" %}
+                        <span class="jacaranda-mini"></span>
+
+                        {% else %}
                         <span class="blank-w-border-mini"></span>
+                        {% endif %}
                     </td>
                     {% endfor %}
                 </tr>
