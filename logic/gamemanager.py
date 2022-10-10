@@ -99,7 +99,7 @@ class GameManager:
                 row_col_input = input()
                 row = int(row_col_input[0])
                 column = int(row_col_input[-1])
-                player.place_tree(card_to_play_input, row, column)
+                player.play_card(card_to_play_input, row, column)
                 no_card_played = False
                 print(f"Played card {card_to_play_input}")
                 print(f"Your updated board is:")

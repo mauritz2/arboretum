@@ -25,7 +25,7 @@ class Player:
         for i in range(num_cards_starting_hand):
             self.draw_card_from_deck()
 
-    def place_tree(self, card_name: str, row: int, column: int) -> None:
+    def play_card(self, card_name: str, row: int, column: int) -> None:
         """
         Takes the str of a card name (e.g. Oak 2) and the coordinates to place it
         Checks if valid placement, and if so places card on board and removes from player hand

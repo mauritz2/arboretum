@@ -1,12 +1,19 @@
 from flask import Flask, render_template, request
 from logic import game_logic
-import random
 
 # Flask config
 app = Flask(__name__)
 app.config['DEBUG'] = False
 
 card_to_play = None
+
+
+@app.route("/draw_card_from_deck", methods=["POST"])
+def draw_card_from_deck():
+    game_logic.scorer.players[0].draw_card_from_deck()
+
+    return main()
+
 
 @app.route("/choose_coordinates", methods=["POST"])
 def choose_coordinates():
@@ -21,10 +28,10 @@ def choose_coordinates():
     print(column)
     print("\n\n\n")
     row, column = int(row), int(column)
-    game_logic.scorer.players[0].place_tree(card_to_play, row=row, column=column)
+    # TODO - refactor so players[0] references the player that clicked the button
+    game_logic.scorer.players[0].play_card(card_to_play, row=row, column=column)
     card_to_play = None
     game_logic.game_phase = "Choose Card"
-
 
     return main()
 
@@ -83,15 +90,15 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 # Next steps
-# Render two players cards
-# Switch art to Arboretum cards
-# Do if-statement breakdown of all actions - then break out so UI calls separate funcs
+# Implement drawing from the deck?
+# Implementing more board states, e.g. Draw -> Choose Card -> Choose Coords
 
 # What to pass to the template?
 # Player hands - {"Player 1": ["Oak 1", "Oak 2", "Oak 3]}
 # Current Player taking an action - e.g. "Player 1"
 # Game States -> Choose Draw, Choose Discard, Choose Play Card, Choose Play Coordinates
 # Board State
+# Graveyard
 
 # What does the template pass back?
 # Actions (i.e.: Draw from graveyard, draw from deck, play card X, discard card Y)

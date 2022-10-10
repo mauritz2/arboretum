@@ -8,13 +8,18 @@
 
 <body>
 
-<!--Board-->
 <div class="container">
+<!--Board-->
     <div class="row text-center">
         <p class="mb-0">Player 1's board</p>
     </div>
     <div class="row">
-        <div class="col-3"></div>
+        <div class="col-3">
+            <!--Deck-->
+            <form action="/draw_card_from_deck" method="post">
+                <input type="submit" value="Draw from deck">
+            </form>
+        </div>
         <div class="col-7">
                 <table class="table-sm">
                     {% for row in player_boards['Player 1'] %}
@@ -44,31 +49,31 @@
                 </table>
         </div>
     </div>
-</div>
 
-<!--Player hand-->
-<div class="container fixed-bottom">
-    <div class="row">
-        {% for card in player_hands["Player 1"] %}
-        <div class="col text-center">
-            {% if "Oak" in card %}
-               <span class="oak p-1"></span>
-            {% elif "Cassia" in card %}
-               <span class="cassia p-1"></span>
-            {% elif "Jacaranda" in card %}
-               <span class="jacaranda p-1"></span>
-            {% elif "Dogwood" in card %}
-               <span class="dogwood p-1"></span>
-            {% endif %}
-            <p class="p-1">{{card}}</p>
-            {% if game_phase == "Choose Card" %}
-            <form action="/play_card" method="post">
-                <input type="hidden" name="card_name" value="{{card}}">
-                <button class="btn border pb-3">Play Card</button>
-            </form>
-            {% endif %}
+    <!--Player hand-->
+    <div class="container fixed-bottom">
+        <div class="row">
+            {% for card in player_hands["Player 1"] %}
+            <div class="col text-center">
+                {% if "Oak" in card %}
+                   <span class="oak p-1"></span>
+                {% elif "Cassia" in card %}
+                   <span class="cassia p-1"></span>
+                {% elif "Jacaranda" in card %}
+                   <span class="jacaranda p-1"></span>
+                {% elif "Dogwood" in card %}
+                   <span class="dogwood p-1"></span>
+                {% endif %}
+                <p class="p-1">{{card}}</p>
+                {% if game_phase == "Choose Card" %}
+                <form action="/play_card" method="post">
+                    <input type="hidden" name="card_name" value="{{card}}">
+                    <button class="btn border pb-3">Play Card</button>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 </div>
 

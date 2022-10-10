@@ -5,9 +5,7 @@ from logic.card import Card
 
 class Board:
     """
-    Class to hold the board attributes, state (i.e. what cards have been placed) and validate card placement
-
-    TODO - there should be methods to easily query the board - e.g. give all locations with a specific tree
+    Class to hold the board attributes, state (i.e. what cards have been placed) and methods to validate card placement
     """
 
     def __init__(self, num_rows: int = config.BOARD_ROWS,
@@ -42,7 +40,6 @@ class Board:
         # Print the board
         for row in board_to_display:
             print(config.BOARD_SLOT_DIVIDER.join(row))
-
 
     def _check_if_occupied_loc(self, row, column):
         """
