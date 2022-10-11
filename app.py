@@ -129,6 +129,7 @@ def main(message=None):
 
     #top_discard_cards = {"Player 1": game_logic.scorer.players[0].graveyard.get_top_card(only_str=True)}
 
+    num_cards_in_deck = game_logic.scorer.players[0].deck.get_amt_of_cards_left()
 
     flash(game_logic.game_phase)
 
@@ -139,6 +140,7 @@ def main(message=None):
         game_phase=game_phase,
         top_discard_cards=top_discard_cards,
         current_player_name=current_player_name,
+        num_cards_in_deck=num_cards_in_deck,
         message=message
 
     )

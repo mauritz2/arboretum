@@ -8,51 +8,15 @@
 }
 
 .card_on_board {
-    height: 84px;
-    width: 56px;
+    height: 120px;
+    width: 80px;
 }
 
-.oak-mini {
-    content : url("faces/oak.gif");
-    height: 84px;
-    width: 56px;
 
-    }
-.jacaranda-mini {
-    content : url("faces/jacaranda.gif");
-    height: 84px;
-    width: 56px;
 
-    }
- .cassia-mini {
-    content : url("faces/cassia.gif");
-    height: 84px;
-    width: 56px;
-
-    }
-  .bluespruce-mini {
-    content : url("faces/bluespruce.png");
-    height: 84px;
-    width: 56px;
-
-    }
-
-.blank-mini {
-    content : url("other/blank.png");
-    height: 84px;
-    width: 56px;
-
-    }
-.blank-w-border-mini {
-    content : url("other/blank-w-border.png");
-    height: 84px;
-    width: 56px;
-
-    }
-
-input.blank-w-border-mini:hover
+input.selector_highlight:hover
 {
-    content : url("other/blank-selected.png");
+    content : url("");
 }
 
 .deck-full

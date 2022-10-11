@@ -26,6 +26,6 @@ class Deck:
     def shuffle_deck(self) -> None:
         random.shuffle(self.cards)
 
-    def check_amt_of_cards_left(self) -> int:
+    def get_amt_of_cards_left(self) -> int:
         return len(self.cards)
 
