@@ -6,6 +6,11 @@
     width: 130px;
 }
 
+.card_on_hand {
+    height: 200px;
+    width: 130px;
+}
+
 .cassia {
     content : url("faces/cassia.gif");
     height: 200px;

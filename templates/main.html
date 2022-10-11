@@ -81,7 +81,8 @@
                     {% set top_discard_card = top_discard_cards[player_name] %}
                     {% if top_discard_card != None %}
                         {% if "Oak" in top_discard_card %}
-                        <span class="oak"></span>
+                        <span class="oak"><h3 class="first-txt">GeeksforGeeks</h3></span>
+
                         {% elif "Dogwood" in top_discard_card %}
                         <span class="dogwood"></span>
                         {% elif "Cassia" in top_discard_card %}
@@ -109,7 +110,7 @@
             {% for card in player_hands[current_player_name] %}
             <div class="col text-center">
                 {% if "Oak" in card %}
-                   <span class="oak p-1"></span>
+                    <img class="card_on_hand" src="../static/css/faces/cassia.png">
                 {% elif "Cassia" in card %}
                    <span class="cassia p-1"></span>
                 {% elif "Jacaranda" in card %}
