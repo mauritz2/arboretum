@@ -8,6 +8,8 @@
 
 <body>
 
+<!--TODO - maybe split components (e.g. board, hand) and then have an overall template where they plug in?-->
+
 <div class="container">
 
     <!--Messages-->
@@ -23,7 +25,7 @@
 
     <!--Board-->
     <div class="row text-center">
-        <p class="mb-0">Player 1's board</p>
+        <p class="mb-0">{{ current_player_name}}'s board</p>
     </div>
     <div class="row">
         <div class="col-2">
@@ -36,15 +38,16 @@
             </form>
         </div>
         <div class="col-8">
+                <!--Board-->
                 <table class="table-sm">
-                    {% for row in player_boards['Player 1'] %}
+                    {% for row in player_boards[current_player_name] %}
                     {% set outer_loop = loop.index - 1 %}
                     <tr>
                         {% for card in row %}
                         {% set inner_loop = loop.index - 1 %}
                         <td>
-<!--                            TODO - replace this with more dynamic check - e.g. concat a str with type and number-->
-<!--                            that matches a CSS class that shows the correct card-->
+                            <!-- TODO - replace this with more dynamic check - e.g. concat a str with type and number-->
+                            <!-- that matches a CSS class that shows the correct card-->
                             {% if card.tree_type == "Oak" %}
                             <span class="oak-mini"></span>
                             {% elif card.tree_type == "Dogwood" %}
@@ -73,24 +76,28 @@
             <!--Discard pile-->
             <form action="/draw_from_discard" method="post">
                 <!--TODO - replace so can show for multiple players-->
-                {% set top_discard_card = top_discard_cards['Player 1'] %}
-                {% if top_discard_card != None %}
-                    {% if "Oak" in top_discard_card %}
-                    <span class="oak"></span>
-                    {% elif "Dogwood" in top_discard_card %}
-                    <span class="dogwood"></span>
-                    {% elif "Cassia" in top_discard_card %}
-                    <span class="cassia"></span>
-                    {% elif "Jacaranda" in top_discard_card %}
-                    <span class="jacaranda"></span>
+                {% for player_name in top_discard_cards %}
+                    <p><b>{{player_name}}'s discard pile</b></p>
+                    {% set top_discard_card = top_discard_cards[player_name] %}
+                    {% if top_discard_card != None %}
+                        {% if "Oak" in top_discard_card %}
+                        <span class="oak"></span>
+                        {% elif "Dogwood" in top_discard_card %}
+                        <span class="dogwood"></span>
+                        {% elif "Cassia" in top_discard_card %}
+                        <span class="cassia"></span>
+                        {% elif "Jacaranda" in top_discard_card %}
+                        <span class="jacaranda"></span>
+                        {% endif %}
+
+                        <input type="hidden" name="discard_owner" value="{{player_name}}">
+                        {% if game_phase == "Draw" %}
+                        <input type="submit" class="btn btn-info" value="Draw from discard">
+                        {% endif %}
+                    {% else %}
+                        <p>Discard pile is empty</p>
                     {% endif %}
-    
-                    {% if game_phase == "Draw" %}
-                    <!-- Refactor to support multiple players -->
-                    <input type="hidden" name="discard_owner" value="Player 1">
-                    <input type="submit" class="btn btn-info" value="Draw from discard">
-                    {% endif %}
-                {% endif %}
+                {% endfor %}
             </form>
         </div>
     </div>
@@ -99,7 +106,7 @@
     <!--Player hand-->
     <div class="container fixed-bottom">
         <div class="row">
-            {% for card in player_hands["Player 1"] %}
+            {% for card in player_hands[current_player_name] %}
             <div class="col text-center">
                 {% if "Oak" in card %}
                    <span class="oak p-1"></span>

@@ -17,7 +17,8 @@ class GameManager:
         self.num_players = num_players
         self.scorer = self.setup_scorer()
         self.game_over = False
-        self.current_player = None
+        self.current_player_index = 0
+        self.current_player = self.scorer.players[self.current_player_index]
         self.game_phase = GameState.CHOOSE_WHAT_TO_DRAW
         self.num_cards_drawn_current_turn = 0
         self.selected_card_to_play = None
@@ -129,6 +130,19 @@ class GameManager:
         self.game_phase = GameState.CHOOSE_WHAT_TO_DRAW
         self.num_cards_drawn_current_turn = 0
         self.selected_card_to_play = None
+        self.current_player_index = self._get_next_player_index()
+        self.current_player = self.scorer.players[self.current_player_index]
+
+    def _get_next_player_index(self):
+        """
+        Gets the next index for the next player
+        or return 0 to start over from the first player if the last player just took their turn
+        """
+        i = self.current_player_index
+        i += 1
+        if i >= len(self.scorer.players):
+            i = 0
+        return i
 
 
 class GameState(Enum):

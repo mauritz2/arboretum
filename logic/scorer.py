@@ -7,6 +7,7 @@ from logic.player import Player
 
 class Scorer:
     def __init__(self, players: list[Player], trees: list[str] = None):
+        # TODO - should the Scorer have the players - or shouldn't that be managed by the GameManager?
         self.players = players
         self.trees = config.TREES if trees is None else trees
 
@@ -198,6 +199,10 @@ class Scorer:
         This assumes player names are unique, which they currently are since they are
         assigned as Player 1, Player 2 etc.
         """
+        print(f"I am doing to draw from {name}")
         for p in self.players:
             if name == p.name:
+                print(f"I just drew from {p.name}")
                 return p
+        else:
+            raise ValueError("Tried finding a player instance for a player name that doesn't exist")

@@ -38,7 +38,7 @@ class Player:
 
         if self.first_tree_placed:
             if not self.board.check_if_slot_has_adjacent_tree(row, column):
-                raise ValueError(f"You cannot place a tree at ({row}, {column}) since it's not adjacent to an existing tree")
+                raise ValueError(f"You cannot place a tree at ({row}, {column}) since it's not adjacent to an existing tree.")
 
         self.board.board_grid[row][column] = self.cards_on_hand[card_name]
         self.discard_card(card_name=card_name, to_graveyard=False)
@@ -58,9 +58,9 @@ class Player:
 
         # TODO - refactor so it takes a PLayer name as input as opposed to passing an entire Player instance
         """
-        if len(self.graveyard.cards) <= 0:
-            raise ValueError(f"The targeted discard pile of {self.name} is empty. Try drawing from another discard pile or the deck.")
-        card = player_to_draw_from.graveyard.get_top_card(False)
+        if len(player_to_draw_from.graveyard.cards) <= 0:
+            raise ValueError(f"The targeted discard pile of {player_to_draw_from.name} is empty. Try drawing from another discard pile or the deck.")
+        card = player_to_draw_from.graveyard.get_top_card(only_str=False)
         self.cards_on_hand[card.card_name] = card
         player_to_draw_from.graveyard.remove_top_card()
 
