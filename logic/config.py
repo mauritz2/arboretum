@@ -5,8 +5,9 @@ EMPTY_SLOT_DISPLAY_SHORTHAND = "  "
 BOARD_SLOT_DIVIDER = "|"
 
 # Deck configs
-# TODO - add in these trees to use when more than 2 players: ["Lilac", "Magnolia", "Maple", "Olive"]
-TREES = ["Cassia", "Dogwood", "Jacaranda", "Oak"]
+# All: ["Cassia", "Dogwood", "Jacaranda", "Olive", "Lilac", "Magnolia", "Maple", "Royal Poinciana", "Oak", Willow"]
+# The online rules don't seem to include Blue Spruce for some reason, but it's for sure in the game
+TREES = ["Cassia", "Blue Spruce", "Jacaranda", "Oak"]
 CARDS_PER_TREE_TYPE = 8
 NUM_CARDS_STARTING_HAND = 7
 

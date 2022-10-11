@@ -12,13 +12,13 @@
 }
 
 .cassia {
-    content : url("faces/cassia.gif");
+    content : url("faces/cassia_test.png");
     height: 200px;
     width: 130px;
 }
 
-.dogwood {
-    content : url("faces/dogwood.gif");
+.bluespruce {
+    content : url("faces/bluespruce.png");
     height: 200px;
     width: 130px;
 }
@@ -47,8 +47,8 @@
     width: 56px;
 
     }
-  .dogwood-mini {
-    content : url("faces/dogwood.gif");
+  .bluespruce-mini {
+    content : url("faces/bluespruce.png");
     height: 84px;
     width: 56px;
 

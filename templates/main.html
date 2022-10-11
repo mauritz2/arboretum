@@ -50,8 +50,8 @@
                             <!-- that matches a CSS class that shows the correct card-->
                             {% if card.tree_type == "Oak" %}
                             <span class="oak-mini"></span>
-                            {% elif card.tree_type == "Dogwood" %}
-                            <span class="dogwood-mini"></span>
+                            {% elif card.tree_type == "Blue Spruce" %}
+                            <span class="bluespruce-mini"></span>
                             {% elif card.tree_type == "Cassia" %}
                             <span class="cassia-mini"></span>
                             {% elif card.tree_type == "Jacaranda" %}
@@ -83,8 +83,8 @@
                         {% if "Oak" in top_discard_card %}
                         <span class="oak"><h3 class="first-txt">GeeksforGeeks</h3></span>
 
-                        {% elif "Dogwood" in top_discard_card %}
-                        <span class="dogwood"></span>
+                        {% elif "Blue Spruce" in top_discard_card %}
+                        <span class="bluespruce"></span>
                         {% elif "Cassia" in top_discard_card %}
                         <span class="cassia"></span>
                         {% elif "Jacaranda" in top_discard_card %}
@@ -110,13 +110,13 @@
             {% for card in player_hands[current_player_name] %}
             <div class="col text-center">
                 {% if "Oak" in card %}
-                    <img class="card_on_hand" src="../static/css/faces/cassia.png">
+                   <span class="oak p-1"></span>
                 {% elif "Cassia" in card %}
                    <span class="cassia p-1"></span>
                 {% elif "Jacaranda" in card %}
                    <span class="jacaranda p-1"></span>
-                {% elif "Dogwood" in card %}
-                   <span class="dogwood p-1"></span>
+                {% elif "Blue Spruce" in card %}
+                   <span class="bluespruce p-1"></span>
                 {% endif %}
                 <p class="p-1">{{card}}</p>
                 {% if game_phase == "Choose Card" %}
