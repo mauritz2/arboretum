@@ -1,4 +1,3 @@
-#import player
 from logic.player import Player
 from logic.board import Board
 from logic.deck import Deck
@@ -6,6 +5,7 @@ from logic.scorer import Scorer
 from logic.card import Card
 from logic.graveyard import Graveyard
 from logic.gamemanager import GameManager
+from logic.gamemanager import GameState
 import logic.config as config
 
 # New code when Arboretum is imported

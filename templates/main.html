@@ -9,18 +9,33 @@
 <body>
 
 <div class="container">
-<!--Board-->
+
+    <!--Messages-->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    {% endwith %}
+
+    <!--Board-->
     <div class="row text-center">
         <p class="mb-0">Player 1's board</p>
     </div>
     <div class="row">
-        <div class="col-3">
+        <div class="col-2">
             <!--Deck-->
             <form action="/draw_card_from_deck" method="post">
-                <input type="submit" value="Draw from deck">
+                <span class="deck-full"></span>
+                {% if game_phase == "Draw" %}
+                <input type="submit" class="btn btn-info" value="Draw from deck">
+                {% endif %}
             </form>
         </div>
-        <div class="col-7">
+        <div class="col-8">
                 <table class="table-sm">
                     {% for row in player_boards['Player 1'] %}
                     {% set outer_loop = loop.index - 1 %}
@@ -28,6 +43,8 @@
                         {% for card in row %}
                         {% set inner_loop = loop.index - 1 %}
                         <td>
+<!--                            TODO - replace this with more dynamic check - e.g. concat a str with type and number-->
+<!--                            that matches a CSS class that shows the correct card-->
                             {% if card.tree_type == "Oak" %}
                             <span class="oak-mini"></span>
                             {% elif card.tree_type == "Dogwood" %}
@@ -48,7 +65,32 @@
                     {% endfor %}
                 </table>
         </div>
+        <div class="col-2">
+            <!--Discard pile-->
+            <form action="/draw_from_discard" method="post">
+                <!--TODO - replace so can show for multiple players-->
+                {% set top_discard_card = top_discard_cards['Player 1'] %}
+                {% if top_discard_card == None %}
+                <span></span>
+                {% elif "Oak" in top_discard_card %}
+                <span class="oak"></span>
+                {% elif "Dogwood" in top_discard_card %}
+                <span class="dogwood"></span>
+                {% elif "Cassia" in top_discard_card %}
+                <span class="cassia"></span>
+                {% elif "Jacaranda" in top_discard_card %}
+                <span class="jacaranda"></span>
+                {% endif %}
+
+                {% if game_phase == "Draw" %}
+                <!-- Refactor to support multiple players -->
+                <input type="hidden" name="discard_owner" value="Player 1">
+                <input type="submit" class="btn btn-info" value="Draw from discard">
+                {% endif %}
+            </form>
+        </div>
     </div>
+
 
     <!--Player hand-->
     <div class="container fixed-bottom">
@@ -69,6 +111,11 @@
                 <form action="/play_card" method="post">
                     <input type="hidden" name="card_name" value="{{card}}">
                     <button class="btn border pb-3">Play Card</button>
+                </form>
+                {% elif game_phase == "Choose Discard" %}
+                <form action="/discard_card" method="post">
+                    <input type="hidden" name="card_name" value="{{card}}">
+                    <button class="btn border pb-3">Discard Card</button>
                 </form>
                 {% endif %}
             </div>

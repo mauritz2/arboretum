@@ -191,3 +191,13 @@ class Scorer:
                 if player.score >= top_score:
                     winner = player
         return winner
+
+    def get_player_instance(self, name: str) -> Player:
+        """
+        Takes a player's name as input and returns the Player instance corresponding with that name
+        This assumes player names are unique, which they currently are since they are
+        assigned as Player 1, Player 2 etc.
+        """
+        for p in self.players:
+            if name == p.name:
+                return p

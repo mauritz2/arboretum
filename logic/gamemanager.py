@@ -4,6 +4,8 @@ from logic.deck import Deck
 from logic.board import Board
 from logic.scorer import Scorer
 from logic.card import Card
+from enum import Enum
+
 import logic.config as config
 # TODO - should all class files be changed to capital letters based on PEP?
 
@@ -16,7 +18,8 @@ class GameManager:
         self.scorer = self.setup_scorer()
         self.game_over = False
         self.current_player = None
-        self.game_phase = "Choose Card"
+        self.game_phase = GameState.CHOOSE_WHAT_TO_DRAW
+        self.num_cards_drawn_current_turn = 0
 
     def setup_scorer(self) -> Scorer:
         """
@@ -52,7 +55,7 @@ class GameManager:
             print(f"There are {len(player.deck.cards)} cards in the deck")
             print(f"The top cards in each player's discard pile is:")
             for p in self.scorer.players:
-                print(f"{p.name}: {p.graveyard.get_top_card().card_name if p.graveyard.get_top_card() else None}")
+                print(f"{p.name}: {p.graveyard.get_top_card(False).card_name if p.graveyard.get_top_card(False) else None}")
             print(f"Your current hand: {player.get_player_card_names()}")
             print("Allowed messages: [1] draw deck [2] draw discard {player num} (example: draw discard 1)")
 
@@ -73,7 +76,7 @@ class GameManager:
                         cards_drawn += 1
                         print(
                             f"Card drawn. There are now {len(p.graveyard.cards)} card(s) in the discard pile of {p.name}. "
-                            f"The new top card is {p.graveyard.get_top_card().card_name if p.graveyard.get_top_card() else None}")
+                            f"The new top card is {p.graveyard.get_top_card(False).card_name if p.graveyard.get_top_card(False) else None}")
                         break
                 else:
                     print(f"No matching player ID found for {draw_input}. Please try again.")
@@ -106,6 +109,7 @@ class GameManager:
                 player.board.print_board()
             except ValueError as e:
                 print(e)
+
     def start_discard_phase(self, player) -> None:
         card_not_discarded = True
         while card_not_discarded:
@@ -122,5 +126,15 @@ class GameManager:
             except ValueError as e:
                 print(e)
 
+    def next_player(self):
+        self.game_phase = GameState.CHOOSE_WHAT_TO_DRAW
+        self.num_cards_drawn_current_turn = 0
 
+
+class GameState(Enum):
+    CHOOSE_WHAT_TO_DRAW = "Draw"
+    CHOOSE_CARD_TO_PLAY = "Choose Card"
+    CHOOSE_WHERE_TO_PLAY = "Choose Coords"
+    CHOOSE_DISCARD = "Choose Discard"
+    SCORING = "Scoring"
 

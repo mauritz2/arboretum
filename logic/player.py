@@ -55,10 +55,12 @@ class Player:
         Takes a player as input to determine what player's graveyard to draw from
         Draws a card from that pile (i.e. removes it from that graveyard and adds it to player hand)
         Type hint is 'Player' as a str since from __future__ import annotations was throwing an error
+
+        # TODO - refactor so it takes a PLayer name as input as opposed to passing an entire Player instance
         """
         if len(self.graveyard.cards) <= 0:
             raise ValueError(f"The targeted discard pile of {self.name} is empty. Try drawing from another discard pile or the deck.")
-        card = player_to_draw_from.graveyard.get_top_card()
+        card = player_to_draw_from.graveyard.get_top_card(False)
         self.cards_on_hand[card.card_name] = card
         player_to_draw_from.graveyard.remove_top_card()
 

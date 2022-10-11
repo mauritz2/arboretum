@@ -1,43 +1,97 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
 from logic import game_logic
+from logic import GameState
 
 # Flask config
 app = Flask(__name__)
+app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
 app.config['DEBUG'] = False
 
+# TODO - make card_to_play part of the GameManager class
 card_to_play = None
 
 
 @app.route("/draw_card_from_deck", methods=["POST"])
 def draw_card_from_deck():
+
+    if game_logic.game_phase != GameState.CHOOSE_WHAT_TO_DRAW:
+        flash(f"You can't draw cards now. The current game phase is {game_logic.game_phase}")
+        return redirect(url_for("main"))
+
     game_logic.scorer.players[0].draw_card_from_deck()
+    game_logic.num_cards_drawn_current_turn += 1
+    if game_logic.num_cards_drawn_current_turn >= 2:
+        game_logic.game_phase = GameState.CHOOSE_CARD_TO_PLAY
 
-    return main()
+    return redirect(url_for("main"))
 
+
+@app.route("/draw_from_discard", methods=["POST"])
+def draw_card_from_discard():
+
+    if game_logic.game_phase != GameState.CHOOSE_WHAT_TO_DRAW:
+        flash(f"You can't discard cards now. The current game phase is {game_logic.game_phase}")
+        return redirect(url_for("main"))
+
+    player_to_draw_from = request.form["discard_owner"]
+    player_instance = game_logic.scorer.get_player_instance(player_to_draw_from)
+    game_logic.scorer.players[0].draw_card_from_graveyard(player_instance)
+
+    game_logic.num_cards_drawn_current_turn += 1
+    if game_logic.num_cards_drawn_current_turn >= 2:
+        game_logic.game_phase = GameState.CHOOSE_CARD_TO_PLAY
+
+    return redirect(url_for("main"))
 
 @app.route("/choose_coordinates", methods=["POST"])
 def choose_coordinates():
     """
     Gets form input from the tile selected by the user in the format row, column (e.g. 1,1)
     """
+
+    if game_logic.game_phase != GameState.CHOOSE_WHERE_TO_PLAY:
+        flash(f"You can't choose where to place a card now. The current game phase is {game_logic.game_phase}")
+        return redirect(url_for("main"))
+
     global card_to_play
     row, column = eval(request.form["coords"])
 
-    print("\n\n\n")
-    print(row)
-    print(column)
-    print("\n\n\n")
     row, column = int(row), int(column)
     # TODO - refactor so players[0] references the player that clicked the button
     game_logic.scorer.players[0].play_card(card_to_play, row=row, column=column)
     card_to_play = None
-    game_logic.game_phase = "Choose Card"
 
-    return main()
+    game_logic.game_phase = GameState.CHOOSE_DISCARD
+
+    return redirect(url_for("main"))
+
+
+@app.route("/discard_card", methods=["POST"])
+def discard_card():
+    """
+    Discards a chosen card from the player's hand
+    """
+
+    if game_logic.game_phase != GameState.CHOOSE_DISCARD:
+        flash(f"You can't discard a card now. The current game phase is {game_logic.game_phase}")
+        return redirect(url_for("main"))
+
+    card_to_discard = request.form["card_name"]
+    game_logic.scorer.players[0].discard_card(card_to_discard, to_graveyard=True)
+
+    game_logic.next_player()
+
+    return redirect(url_for("main"))
+
 
 @app.route("/play_card", methods=["POST"])
 def play_card():
     global card_to_play
+
+    if game_logic.game_phase != GameState.CHOOSE_CARD_TO_PLAY:
+        flash(f"You can't play a card now. The current game phase is {game_logic.game_phase}")
+        return redirect(url_for("main"))
+
     # Verify that the game state is playing a card!
     # if not game_logic.current_game_state == "Draw"
         # raise ValueError("It's not time to draw"
@@ -59,13 +113,13 @@ def play_card():
     #row = 5
     #column = 5
 
-    game_logic.game_phase = "Choose Coordinates"
+    game_logic.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
 
-    return main()
+    return redirect(url_for("main"))
 
 
 @app.route("/", methods=["GET"])
-def main():
+def main(message=None):
 
     player_hand = game_logic.scorer.players[0].get_player_card_names()
     player_hands = {"Player 1": player_hand}
@@ -76,13 +130,20 @@ def main():
     #current_players_turn = game_logic.current_player
     #current_game_phase = game_logic.current_game_phase
 
-    game_phase = game_logic.game_phase
+    top_discard_cards = {"Player 1": game_logic.scorer.players[0].graveyard.get_top_card(only_str=True)}
+
+    game_phase = game_logic.game_phase.value
+
+    flash(game_logic.game_phase)
 
     return render_template(
         'main.html',
         player_hands=player_hands,
         player_boards=player_boards,
         game_phase=game_phase,
+        top_discard_cards=top_discard_cards,
+        message=message
+
     )
 
 
@@ -98,7 +159,7 @@ if __name__ == "__main__":
 # Current Player taking an action - e.g. "Player 1"
 # Game States -> Choose Draw, Choose Discard, Choose Play Card, Choose Play Coordinates
 # Board State
-# Graveyard
+# Top graveyard cards: {"Player 1": "Oak 1", "Player 2: "Oak 2"}
 
 # What does the template pass back?
 # Actions (i.e.: Draw from graveyard, draw from deck, play card X, discard card Y)

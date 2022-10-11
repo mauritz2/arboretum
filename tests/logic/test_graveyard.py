@@ -2,7 +2,7 @@ from logic import Card
 
 
 def test_get_top_card(graveyard):
-    assert graveyard.get_top_card().card_name == "Cassia 2"
+    assert graveyard.get_top_card(False).card_name == "Cassia 2"
 
 
 def test_remove_top_card(graveyard):

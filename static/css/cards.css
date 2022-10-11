@@ -67,3 +67,9 @@ button .blank-w-border-mini:hover
     content : url("faces/blank-selected.gif");
 }
 
+.deck-full
+{
+    content : url("faces/deck-full.gif");
+    height: 200px;
+    width: 130px;
+}
