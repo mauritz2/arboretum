@@ -46,25 +46,17 @@
                         {% for card in row %}
                         {% set inner_loop = loop.index - 1 %}
                         <td>
-                            <!-- TODO - replace this with more dynamic check - e.g. concat a str with type and number-->
-                            <!-- that matches a CSS class that shows the correct card-->
-                            {% if card.tree_type == "Oak" %}
-                            <span class="oak-mini"></span>
-                            {% elif card.tree_type == "Blue Spruce" %}
-                            <span class="bluespruce-mini"></span>
-                            {% elif card.tree_type == "Cassia" %}
-                            <span class="cassia-mini"></span>
-                            {% elif card.tree_type == "Jacaranda" %}
-                            <span class="jacaranda-mini"></span>
+                            {% if card.card_name != None %}
+                            <img class="card_on_board" src="../static/css/playing_cards/{{card.card_name}}.png">
                             {% else %}
-                                {% if game_phase == "Choose Coords" %}
-                                <form action="/choose_coordinates" method="post">
-                                    <input type="hidden" name="coords" value="{{outer_loop, inner_loop}}">
-                                    <input type="image" class="blank-w-border-mini"></input>
-                                </form>
-                                {% else %}
-                                <span class="blank-w-border-mini"></span>
-                                {% endif %}
+                            {% if game_phase == "Choose Coords" %}
+                            <form action="/choose_coordinates" method="post">
+                                <input type="hidden" name="coords" value="{{outer_loop, inner_loop}}">
+                                 <input type="image" class="card_on_board" src="../static/css/other/blank-w-border.png">
+                            </form>
+                            {% else %}
+                            <span class="blank-w-border-mini"></span>
+                            {% endif %}
                             {% endif %}
                         </td>
                         {% endfor %}
@@ -109,16 +101,6 @@
         <div class="row">
             {% for card in player_hands[current_player_name] %}
             <div class="col text-center">
-                {% if "Oak" in card %}
-                   <span class="oak p-1"></span>
-                {% elif "Cassia" in card %}
-                   <span class="cassia p-1"></span>
-                {% elif "Jacaranda" in card %}
-                   <span class="jacaranda p-1"></span>
-                {% elif "Blue Spruce" in card %}
-                   <span class="bluespruce p-1"></span>
-                {% endif %}
-                <p class="p-1">{{card}}</p>
                 {% if game_phase == "Choose Card" %}
                 <form action="/play_card" method="post">
                     <input type="hidden" name="card_name" value="{{card}}">
@@ -130,6 +112,7 @@
                     <button class="btn border pb-3">Discard Card</button>
                 </form>
                 {% endif %}
+                <img class="card_on_hand" src="../static/css/playing_cards/{{card}}.png">
             </div>
             {% endfor %}
         </div>

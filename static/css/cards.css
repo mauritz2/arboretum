@@ -1,32 +1,15 @@
 /* ratio of the cards should be 3:2 */
 
-.oak {
-    content : url("faces/oak.gif");
-    height: 200px;
-    width: 130px;
-}
+
 
 .card_on_hand {
     height: 200px;
     width: 130px;
 }
 
-.cassia {
-    content : url("faces/cassia_test.png");
-    height: 200px;
-    width: 130px;
-}
-
-.bluespruce {
-    content : url("faces/bluespruce.png");
-    height: 200px;
-    width: 130px;
-}
-
-.jacaranda {
-    content : url("faces/jacaranda.gif");
-    height: 200px;
-    width: 130px;
+.card_on_board {
+    height: 84px;
+    width: 56px;
 }
 
 .oak-mini {
@@ -55,13 +38,13 @@
     }
 
 .blank-mini {
-    content : url("faces/blank.gif");
+    content : url("other/blank.png");
     height: 84px;
     width: 56px;
 
     }
 .blank-w-border-mini {
-    content : url("faces/blank-w-border.gif");
+    content : url("other/blank-w-border.png");
     height: 84px;
     width: 56px;
 
@@ -69,12 +52,12 @@
 
 input.blank-w-border-mini:hover
 {
-    content : url("faces/blank-selected.gif");
+    content : url("other/blank-selected.png");
 }
 
 .deck-full
 {
-    content : url("faces/deck-full.gif");
+    content : url("other/deck-full.png");
     height: 200px;
     width: 130px;
 }

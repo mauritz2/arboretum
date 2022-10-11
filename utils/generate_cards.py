@@ -5,7 +5,7 @@ import pathlib
 BASE_URL = "../static/css"
 INPUT_FOLDER = "other"
 OUTPUT_FOLDER = "playing_cards"
-BLANK_CARD_PNGS = ["bluespruce_template.png",
+BLANK_CARD_PNGS = ["blue spruce_template.png",
                    "cassia_template.png",
                    "oak_template.png",
                    "jacaranda_template.png"]

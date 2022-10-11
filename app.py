@@ -116,9 +116,12 @@ def main(message=None):
         print("See all player names below")
         print(p.name)
         player_name = p.name
+        # TODO This sends a nested list with Cards() - send just the card name instead?
         player_boards[player_name] = p.board.board_grid
         player_hands[player_name] = p.get_player_card_names()
         top_discard_cards[player_name] = p.graveyard.get_top_card(only_str=True)
+
+    print(player_boards["Player 1"])
 
     # TODO - this structure is silly - the GameManager should have the .players as opposed to scorer
     current_player_name = game_logic.current_player.name
