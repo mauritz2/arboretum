@@ -20,6 +20,7 @@ class GameManager:
         self.current_player = None
         self.game_phase = GameState.CHOOSE_WHAT_TO_DRAW
         self.num_cards_drawn_current_turn = 0
+        self.selected_card_to_play = None
 
     def setup_scorer(self) -> Scorer:
         """
@@ -32,9 +33,7 @@ class GameManager:
         deck = Deck()
         for i in range(self.num_players):
             player_name = f"Player {i + 1}"
-            # TODO - remove placeholder graveyard values
-            graveyard = Graveyard(cards=[Card(tree_type="Oak", tree_val=1),
-                                         Card(tree_type="Oak", tree_val=2)])
+            graveyard = Graveyard(cards=[])
             board = Board(num_rows=config.BOARD_ROWS, num_columns=config.BOARD_COLUMNS)
 
             player = Player(name=player_name,
@@ -129,6 +128,7 @@ class GameManager:
     def next_player(self):
         self.game_phase = GameState.CHOOSE_WHAT_TO_DRAW
         self.num_cards_drawn_current_turn = 0
+        self.selected_card_to_play = None
 
 
 class GameState(Enum):

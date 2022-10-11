@@ -54,10 +54,14 @@
                             {% elif card.tree_type == "Jacaranda" %}
                             <span class="jacaranda-mini"></span>
                             {% else %}
-                            <form action="/choose_coordinates" method="post">
-                                <input type="hidden" name="coords" value="{{outer_loop, inner_loop}}">
-                                <button class="blank-w-border-mini"></button>
-                            </form>
+                                {% if game_phase == "Choose Coords" %}
+                                <form action="/choose_coordinates" method="post">
+                                    <input type="hidden" name="coords" value="{{outer_loop, inner_loop}}">
+                                    <input type="image" class="blank-w-border-mini"></input>
+                                </form>
+                                {% else %}
+                                <span class="blank-w-border-mini"></span>
+                                {% endif %}
                             {% endif %}
                         </td>
                         {% endfor %}
@@ -70,22 +74,22 @@
             <form action="/draw_from_discard" method="post">
                 <!--TODO - replace so can show for multiple players-->
                 {% set top_discard_card = top_discard_cards['Player 1'] %}
-                {% if top_discard_card == None %}
-                <span></span>
-                {% elif "Oak" in top_discard_card %}
-                <span class="oak"></span>
-                {% elif "Dogwood" in top_discard_card %}
-                <span class="dogwood"></span>
-                {% elif "Cassia" in top_discard_card %}
-                <span class="cassia"></span>
-                {% elif "Jacaranda" in top_discard_card %}
-                <span class="jacaranda"></span>
-                {% endif %}
-
-                {% if game_phase == "Draw" %}
-                <!-- Refactor to support multiple players -->
-                <input type="hidden" name="discard_owner" value="Player 1">
-                <input type="submit" class="btn btn-info" value="Draw from discard">
+                {% if top_discard_card != None %}
+                    {% if "Oak" in top_discard_card %}
+                    <span class="oak"></span>
+                    {% elif "Dogwood" in top_discard_card %}
+                    <span class="dogwood"></span>
+                    {% elif "Cassia" in top_discard_card %}
+                    <span class="cassia"></span>
+                    {% elif "Jacaranda" in top_discard_card %}
+                    <span class="jacaranda"></span>
+                    {% endif %}
+    
+                    {% if game_phase == "Draw" %}
+                    <!-- Refactor to support multiple players -->
+                    <input type="hidden" name="discard_owner" value="Player 1">
+                    <input type="submit" class="btn btn-info" value="Draw from discard">
+                    {% endif %}
                 {% endif %}
             </form>
         </div>

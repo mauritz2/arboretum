@@ -62,7 +62,7 @@
 
     }
 
-button .blank-w-border-mini:hover
+input.blank-w-border-mini:hover
 {
     content : url("faces/blank-selected.gif");
 }

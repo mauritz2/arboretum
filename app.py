@@ -7,9 +7,6 @@ app = Flask(__name__)
 app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
 app.config['DEBUG'] = False
 
-# TODO - make card_to_play part of the GameManager class
-card_to_play = None
-
 
 @app.route("/draw_card_from_deck", methods=["POST"])
 def draw_card_from_deck():
@@ -53,13 +50,14 @@ def choose_coordinates():
         flash(f"You can't choose where to place a card now. The current game phase is {game_logic.game_phase}")
         return redirect(url_for("main"))
 
-    global card_to_play
+    card_to_play = game_logic.selected_card_to_play
     row, column = eval(request.form["coords"])
 
     row, column = int(row), int(column)
     # TODO - refactor so players[0] references the player that clicked the button
     game_logic.scorer.players[0].play_card(card_to_play, row=row, column=column)
-    card_to_play = None
+
+    game_logic.selected_card_to_play = None
 
     game_logic.game_phase = GameState.CHOOSE_DISCARD
 
@@ -86,7 +84,6 @@ def discard_card():
 
 @app.route("/play_card", methods=["POST"])
 def play_card():
-    global card_to_play
 
     if game_logic.game_phase != GameState.CHOOSE_CARD_TO_PLAY:
         flash(f"You can't play a card now. The current game phase is {game_logic.game_phase}")
@@ -99,20 +96,9 @@ def play_card():
         # raise ValueError("It's not your time to play!")
     # Check who the player is
     #player_name = request.form.player
-    card_played = request.form['card_name']
-    #rand_row = random.randrange(0,6)
-    #rand_col = random.randrange(0,10)
+    selected_card_to_play = request.form['card_name']
 
-    card_to_play = card_played
-
-    # print("\n\n\n")
-    # print(card_played)
-    # print("See card above")
-    # print("\n\n\n")
-
-    #row = 5
-    #column = 5
-
+    game_logic.selected_card_to_play = selected_card_to_play
     game_logic.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
 
     return redirect(url_for("main"))
@@ -128,7 +114,6 @@ def main(message=None):
     player_boards = {"Player 1": player_board}
 
     #current_players_turn = game_logic.current_player
-    #current_game_phase = game_logic.current_game_phase
 
     top_discard_cards = {"Player 1": game_logic.scorer.players[0].graveyard.get_top_card(only_str=True)}
 
@@ -151,24 +136,6 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 # Next steps
-# Implement drawing from the deck?
-# Implementing more board states, e.g. Draw -> Choose Card -> Choose Coords
-
-# What to pass to the template?
-# Player hands - {"Player 1": ["Oak 1", "Oak 2", "Oak 3]}
-# Current Player taking an action - e.g. "Player 1"
-# Game States -> Choose Draw, Choose Discard, Choose Play Card, Choose Play Coordinates
-# Board State
-# Top graveyard cards: {"Player 1": "Oak 1", "Player 2: "Oak 2"}
-
-# What does the template pass back?
-# Actions (i.e.: Draw from graveyard, draw from deck, play card X, discard card Y)
-# Who took the action
-# Example data passed back (initial version) ("1", "draw graveyard 1")
-# Long-term the UI should call different functions, not a single one
-
-
-# Thoughts?
-# Weakness in always sending all cards and re-rendering? Might make hand re-render on every action
-# Should I pass the entire player class? Or board class? Probably not. Just need a JSON format of needed data. Decouple UI and backend.
-# We should check if the
+# Display amount  of cards left in deck
+# Dynamic "numbers" on cards
+# Cool "appear-on-hover" buttons on cards as opposed to ugly always-visible buttons
