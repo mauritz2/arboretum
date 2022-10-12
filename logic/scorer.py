@@ -191,7 +191,7 @@ class Scorer:
             else:
                 if player.score >= top_score:
                     winner = player
-        return winner
+        return winner, scoring_players
 
     def get_player_instance(self, name: str) -> Player:
         """

@@ -115,15 +115,11 @@ def main():
     player_hands = {}
     top_discard_cards = {}
     for p in game_logic.scorer.players:
-        print("See all player names below")
-        print(p.name)
         player_name = p.name
         # TODO This sends a nested list with Cards() - send just the card name instead?
         player_boards[player_name] = p.board.board_grid
         player_hands[player_name] = p.get_player_card_names()
         top_discard_cards[player_name] = p.graveyard.get_top_card(only_str=True)
-
-    print(player_boards["Player 1"])
 
     # TODO - this structure is silly - the GameManager should have the .players as opposed to scorer
     current_player_name = game_logic.current_player.name
@@ -137,10 +133,23 @@ def main():
 
     game_logic.game_phase = GameState.SCORING
     if game_logic.game_phase == GameState.SCORING:
-        game_logic.get_winner()
+        winner, scorer_by_tree = game_logic.get_winner()
         ## Scoring code
         # pass
         # {"Player 1": {"Cassia": [(1, 1), (2, 3), (4, 5)]}}
+        print(scorer_by_tree)
+        # TODO - refactor this dict so that it's {"Player 1: ["Cassia", "Jacaranda"]} and then remove this code
+        scoring_players_updated = {}
+        for player in ["Player 1", "Player 2"]:
+            scoring_for = []
+            for tree in scorer_by_tree:
+                for p in scorer_by_tree[tree]:
+                    if player == p.name:
+                        scoring_for.append(tree)
+            scoring_players_updated[player] = scoring_for
+        print("\n")
+        print(scoring_players_updated)
+
 
     return render_template(
         'game.html',
@@ -150,6 +159,7 @@ def main():
         top_discard_cards=top_discard_cards,
         current_player_name=current_player_name,
         num_cards_in_deck=num_cards_in_deck,
+        scoring_players=scoring_players_updated
     )
 
 
