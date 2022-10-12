@@ -5,14 +5,17 @@ from logic import GameState, player_game_state_messages
 # Flask config
 app = Flask(__name__)
 app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
-app.config['DEBUG'] = False
 
 
 @app.route("/draw_card_from_deck", methods=["POST"])
 def draw_card_from_deck():
 
     if game_logic.game_phase != GameState.CHOOSE_WHAT_TO_DRAW:
-        flash(f"You can't draw cards now. The current game phase is {game_logic.game_phase}")
+        flash(f"You can't draw cards now. The current game phase is {game_logic.game_phase}", "error")
+        return redirect(url_for("main"))
+
+    if game_logic.current_player.deck.get_amt_of_cards_left() <= 0:
+        flash("The deck is empty. Scoring will start after the current turn is complete.", "error")
         return redirect(url_for("main"))
 
     game_logic.current_player.draw_card_from_deck()
@@ -40,6 +43,7 @@ def draw_card_from_discard():
         game_logic.game_phase = GameState.CHOOSE_CARD_TO_PLAY
 
     return redirect(url_for("main"))
+
 
 @app.route("/choose_coordinates", methods=["POST"])
 def choose_coordinates():
@@ -125,11 +129,18 @@ def main():
     current_player_name = game_logic.current_player.name
     game_phase = game_logic.game_phase.value
 
-    #top_discard_cards = {"Player 1": game_logic.scorer.players[0].graveyard.get_top_card(only_str=True)}
+    # top_discard_cards = {"Player 1": game_logic.scorer.players[0].graveyard.get_top_card(only_str=True)}
 
     num_cards_in_deck = game_logic.scorer.players[0].deck.get_amt_of_cards_left()
 
     flash(player_game_state_messages[game_logic.game_phase])
+
+    game_logic.game_phase = GameState.SCORING
+    if game_logic.game_phase == GameState.SCORING:
+        game_logic.get_winner()
+        ## Scoring code
+        # pass
+        # {"Player 1": {"Cassia": [(1, 1), (2, 3), (4, 5)]}}
 
     return render_template(
         'game.html',
@@ -152,4 +163,5 @@ if __name__ == "__main__":
 # "Display Player 2 board"
 # Implement player turns - or design that system (e.g. does the front-end AND backend know whos turn it is?
 # I think the backend can know - or must know. And it passes this information to the front-end.
-#
+
+

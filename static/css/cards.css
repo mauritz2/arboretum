@@ -3,13 +3,21 @@
 .card_on_hand {
     height: 180px;
     width: 120px;
-    border-radius: 7px;
+    border-radius: 10px;
 }
 
 .card_on_board {
     height: 90px;
     width: 60px;
     border-radius: 7px;
+}
+
+.blank {
+    opacity: 0.5;
+}
+
+.blank_choose_coord:hover {
+    opacity: 1;
 }
 
 .card_on_mini_board {
@@ -55,7 +63,7 @@ width:100%;
 }
 .overlay-button-container input {
   position: absolute;
-  top: 85%;
+  top: 88%;
   left: 50%;
   transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
@@ -76,4 +84,9 @@ input.selector_highlight:hover
     content : url("other/deck-full.png");
     height: 180px;
     width: 120px;
+}
+
+connection {
+    border: 10px solid #b51c29;
+    border-radius: 50px;
 }

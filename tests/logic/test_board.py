@@ -34,7 +34,7 @@ def test_get_played_cards_by_type(board):
     board.board_grid[3][2] = oak_3
     board.board_grid[4][2] = oak_8
     board.board_grid[5][3] = Card(tree_type="Jacaranda", tree_val=8)
-    board.board_grid[5][1] = Card(tree_type="Dogwood", tree_val=8)
+    board.board_grid[5][1] = Card(tree_type="Blue Spruce", tree_val=8)
 
     oak_trees_played = board.get_played_cards_of_type("Oak")
 
@@ -46,16 +46,16 @@ def test_find_adjacent_incrementing_cards(board):
     oak4 = Card(tree_type="Oak", tree_val=4)
     oak1 = Card(tree_type="Oak", tree_val=1)
     jac6 = Card(tree_type="Jacaranda", tree_val=6)
-    dog1 = Card(tree_type="Dogwood", tree_val=1)
-    dog7 = Card(tree_type="Dogwood", tree_val=7)
-    dog8 = Card(tree_type="Dogwood", tree_val=8)
+    blue1 = Card(tree_type="Blue Spruce", tree_val=1)
+    blue7 = Card(tree_type="Blue Spruce", tree_val=7)
+    blue8 = Card(tree_type="Blue Spruce", tree_val=8)
 
     # Target location
     board.board_grid[2][2] = Card(tree_type="Jacaranda", tree_val=5)
 
     # Adjacent and incrementing
-    board.board_grid[2][3] = dog7
-    board.board_grid[3][2] = dog8
+    board.board_grid[2][3] = blue7
+    board.board_grid[3][2] = blue8
 
     # Adjacent but non-incrementing
     board.board_grid[1][2] = oak1
@@ -63,12 +63,12 @@ def test_find_adjacent_incrementing_cards(board):
 
     # Non-adjacent
     board.board_grid[5][5] = oak1
-    board.board_grid[0][0] = dog1
+    board.board_grid[0][0] = blue1
     board.board_grid[1][1] = oak4
     board.board_grid[3][3] = jac6
 
     incremental_adjacent = board.find_adj_increment_cards(row=2, column=2)
-    incremental_adj_expected = [dog7, dog8]
+    incremental_adj_expected = [blue7, blue8]
 
     incremental_adjacent.sort()
     incremental_adj_expected.sort()
@@ -83,7 +83,7 @@ def test_find_adjacent_incrementing_cards_no_adjacencies(board):
     board.board_grid[2][2] = Card(tree_type="Jacaranda", tree_val=5)
     board.board_grid[0][0] = Card(tree_type="Oak", tree_val=4)
     board.board_grid[4][4] = Card(tree_type="Jacaranda", tree_val=6)
-    board.board_grid[5][5] = Card(tree_type="Dogwood", tree_val=7)
+    board.board_grid[5][5] = Card(tree_type="Blue Spruce", tree_val=7)
 
     incremental_adjacent = board.find_adj_increment_cards(row=2, column=2)
     assert len(incremental_adjacent) == 0

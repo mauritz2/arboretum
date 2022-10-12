@@ -127,11 +127,21 @@ class GameManager:
                 print(e)
 
     def next_player(self):
+        if self.check_if_game_is_over():
+            self.game_phase = GameState.SCORING
+            return
+
         self.game_phase = GameState.CHOOSE_WHAT_TO_DRAW
         self.num_cards_drawn_current_turn = 0
         self.selected_card_to_play = None
         self.current_player_index = self._get_next_player_index()
         self.current_player = self.scorer.players[self.current_player_index]
+
+    def check_if_game_is_over(self):
+        if self.scorer.players[0].deck.get_amt_of_cards_left() <= 0:
+            return True
+        else:
+            return False
 
     def _get_next_player_index(self):
         """
@@ -143,6 +153,9 @@ class GameManager:
         if i >= len(self.scorer.players):
             i = 0
         return i
+
+    def get_winner(self):
+        self.scorer.determine_winner()
 
 
 class GameState(Enum):

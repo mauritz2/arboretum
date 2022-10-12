@@ -32,7 +32,7 @@ def graveyard():
 def player(board, deck, graveyard):
     player = Player(name="Player 1", deck=deck, board=board, graveyard=graveyard)
 
-    tree_types = ["Oak", "Oak", "Oak", "Dogwood", "Dogwood", "Dogwood", "Jacaranda"]
+    tree_types = ["Oak", "Oak", "Oak", "Blue Spruce", "Blue Spruce", "Blue Spruce", "Jacaranda"]
     tree_vals = [2, 3, 1, 6, 2, 3, 5]
 
     for card_name in zip(tree_types, tree_vals):
@@ -55,5 +55,5 @@ def player2(board2, deck, graveyard):
 
 @pytest.fixture
 def scorer(player, player2):
-    return Scorer(players=[player, player2], trees=["Cassia", "Dogwood", "Jacaranda", "Oak"])
+    return Scorer(players=[player, player2], trees=["Cassia", "Blue Spruce", "Jacaranda", "Oak"])
 

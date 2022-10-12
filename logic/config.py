@@ -5,7 +5,7 @@ EMPTY_SLOT_DISPLAY_SHORTHAND = "  "
 BOARD_SLOT_DIVIDER = "|"
 
 # Deck configs
-# All: ["Cassia", "Dogwood", "Jacaranda", "Olive", "Lilac", "Magnolia", "Maple", "Royal Poinciana", "Oak", Willow"]
+# All: ["Cassia", "Blue Spruce", "Jacaranda", "Olive", "Lilac", "Magnolia", "Maple", "Royal Poinciana", "Oak", Willow"]
 # The online rules don't seem to include Blue Spruce for some reason, but it's for sure in the game
 TREES = ["Cassia", "Blue Spruce", "Jacaranda", "Oak"]
 CARDS_PER_TREE_TYPE = 8

@@ -3,14 +3,14 @@ from logic import Card
 
 def test_establish_scoring_players_simple_case(player, player2, scorer):
     player.cards_on_hand = {}
-    tree_types_1 = ["Oak", "Oak", "Cassia", "Dogwood", "Dogwood", "Dogwood", "Jacaranda"]
+    tree_types_1 = ["Oak", "Oak", "Cassia", "Blue Spruce", "Blue Spruce", "Blue Spruce", "Jacaranda"]
     tree_vals_1 = [2, 3, 5, 6, 2, 3, 5]
     for card_name in zip(tree_types_1, tree_vals_1):
         card = Card(tree_type=card_name[0], tree_val=card_name[1])
         player.cards_on_hand[card.card_name] = card
 
     player2.cards_on_hand = {}
-    tree_types_2 = ["Oak", "Cassia", "Dogwood", "Dogwood", "Jacaranda"]
+    tree_types_2 = ["Oak", "Cassia", "Blue Spruce", "Blue Spruce", "Jacaranda"]
     tree_vals_2 = [8, 8, 4, 5, 7]
     for card_name in zip(tree_types_2, tree_vals_2):
         card = Card(tree_type=card_name[0], tree_val=card_name[1])
@@ -19,7 +19,7 @@ def test_establish_scoring_players_simple_case(player, player2, scorer):
     scorer.players = [player, player2]
     scorer_dict = scorer.calculate_scoring_players_by_tree()
     assert scorer_dict["Cassia"][0] is player2
-    assert scorer_dict["Dogwood"][0] is player
+    assert scorer_dict["Blue Spruce"][0] is player
     assert scorer_dict["Jacaranda"][0] is player2
     assert scorer_dict["Oak"][0] is player2
 
@@ -52,11 +52,11 @@ def test_establish_scoring_players_empty_hands(player, player2, scorer):
     player2.cards_on_hand = {}
     players = [player, player2]
     scorer.players = players
-    scorer.trees = ["Cassia", "Dogwood", "Jacaranda", "Lilac", "Magnolia", "Maple", "Olive"]
+    scorer.trees = ["Cassia", "Blue Spruce", "Jacaranda", "Lilac", "Magnolia", "Maple", "Olive"]
     scorer_dict = scorer.calculate_scoring_players_by_tree()
     for p in players:
         assert p in scorer_dict["Cassia"]
-        assert p in scorer_dict["Dogwood"]
+        assert p in scorer_dict["Blue Spruce"]
         assert p in scorer_dict["Jacaranda"]
         assert p in scorer_dict["Lilac"]
         assert p in scorer_dict["Magnolia"]
@@ -86,11 +86,11 @@ def test_find_paths_single_simple_path(scorer):
 def test_find_paths_two_simple_paths(scorer):
     oak2 = Card(tree_type="Oak", tree_val=2)
     cas4 = Card(tree_type="Cassia", tree_val=4)
-    dog3 = Card(tree_type="Dogwood", tree_val=3)
-    dog4 = Card(tree_type="Dogwood", tree_val=4)
-    dog6 = Card(tree_type="Dogwood", tree_val=6)
+    blue3 = Card(tree_type="Blue Spruce", tree_val=3)
+    blue4 = Card(tree_type="Blue Spruce", tree_val=4)
+    blue6 = Card(tree_type="Blue Spruce", tree_val=6)
     jac6 = Card(tree_type="Jacaranda", tree_val=6)
-    dog7 = Card(tree_type="Dogwood", tree_val=7)
+    blue7 = Card(tree_type="Blue Spruce", tree_val=7)
     oak8 = Card(tree_type="Oak", tree_val=8)
 
     # Path start
@@ -101,10 +101,10 @@ def test_find_paths_two_simple_paths(scorer):
     scorer.players[0].board.board_grid[2][4] = jac6
 
     # Path #2
-    scorer.players[0].board.board_grid[3][2] = dog3
-    scorer.players[0].board.board_grid[3][3] = dog4
-    scorer.players[0].board.board_grid[3][4] = dog6
-    scorer.players[0].board.board_grid[3][5] = dog7
+    scorer.players[0].board.board_grid[3][2] = blue3
+    scorer.players[0].board.board_grid[3][3] = blue4
+    scorer.players[0].board.board_grid[3][4] = blue6
+    scorer.players[0].board.board_grid[3][5] = blue7
 
     # Path end
     scorer.players[0].board.board_grid[2][5] = oak8
@@ -112,7 +112,7 @@ def test_find_paths_two_simple_paths(scorer):
     player = scorer.players[0]
 
     path = scorer.find_paths_for_tree_type("Oak", player)
-    path_expected = [[oak2, dog3, dog4, dog6, dog7, oak8],
+    path_expected = [[oak2, blue3, blue4, blue6, blue7, oak8],
                      [oak2, cas4, jac6, oak8]]
 
     path.sort()
@@ -124,19 +124,19 @@ def test_find_paths_two_simple_paths(scorer):
 def test_find_paths_short_medium_long(scorer):
     oak2 = Card(tree_type="Oak", tree_val=2)
     cas4 = Card(tree_type="Cassia", tree_val=4)
-    dog3 = Card(tree_type="Dogwood", tree_val=3)
+    blue3 = Card(tree_type="Blue Spruce", tree_val=3)
     jac6 = Card(tree_type="Jacaranda", tree_val=6)
-    dog7 = Card(tree_type="Dogwood", tree_val=7)
+    blue7 = Card(tree_type="Blue Spruce", tree_val=7)
     oak8 = Card(tree_type="Oak", tree_val=8)
 
     # Path start
     scorer.players[0].board.board_grid[2][2] = oak2
 
     # Path #1 #2 #3
-    scorer.players[0].board.board_grid[1][2] = dog3
+    scorer.players[0].board.board_grid[1][2] = blue3
     scorer.players[0].board.board_grid[0][2] = cas4
     scorer.players[0].board.board_grid[0][3] = jac6
-    scorer.players[0].board.board_grid[1][3] = dog7
+    scorer.players[0].board.board_grid[1][3] = blue7
 
     # Path end
     scorer.players[0].board.board_grid[2][3] = oak8
@@ -145,8 +145,8 @@ def test_find_paths_short_medium_long(scorer):
 
     path = scorer.find_paths_for_tree_type("Oak", player)
     path_expected = [[oak2, oak8],
-                     [oak2, dog3, dog7, oak8],
-                     [oak2, dog3, cas4, jac6, dog7, oak8]]
+                     [oak2, blue3, blue7, oak8],
+                     [oak2, blue3, cas4, jac6, blue7, oak8]]
     path.sort()
     path_expected.sort()
 
@@ -184,16 +184,16 @@ def test_get_possible_start_end_loc_pairs_empty(scorer):
 def test_score_paths_3_paths_and_ending_in_8(scorer):
     oak2 = Card(tree_type="Oak", tree_val=2)
     cas4 = Card(tree_type="Cassia", tree_val=4)
-    dog3 = Card(tree_type="Dogwood", tree_val=3)
+    blue3 = Card(tree_type="Blue Spruce", tree_val=3)
     jac6 = Card(tree_type="Jacaranda", tree_val=6)
-    dog7 = Card(tree_type="Dogwood", tree_val=7)
+    blue7 = Card(tree_type="Blue Spruce", tree_val=7)
     oak8 = Card(tree_type="Oak", tree_val=8)
 
     paths = [[oak2, oak8],
-             [oak2, dog3, dog7, oak8],
-             [oak2, dog3, cas4, jac6, dog7, oak8]]
+             [oak2, blue3, blue7, oak8],
+             [oak2, blue3, cas4, jac6, blue7, oak8]]
 
-    expected_best_path = [oak2, dog3, cas4, jac6, dog7, oak8]
+    expected_best_path = [oak2, blue3, cas4, jac6, blue7, oak8]
     # 6 from path length, 2 from ending on an 8
     expected_score = 8
 
@@ -271,8 +271,8 @@ def test_determine_winner_multiple_trees_and_paths(scorer):
     oak6 = Card(tree_type="Oak", tree_val=6)
     oak7 = Card(tree_type="Oak", tree_val=7)
     oak8 = Card(tree_type="Oak", tree_val=8)
-    dog4 = Card(tree_type="Dogwood", tree_val=4)
-    dog6 = Card(tree_type="Dogwood", tree_val=6)
+    blue4 = Card(tree_type="Blue Spruce", tree_val=4)
+    blue6 = Card(tree_type="Blue Spruce", tree_val=6)
     jac1 = Card(tree_type="Jacaranda", tree_val=1)
     jac2 = Card(tree_type="Jacaranda", tree_val=2)
     jac8 = Card(tree_type="Jacaranda", tree_val=8)
@@ -281,16 +281,16 @@ def test_determine_winner_multiple_trees_and_paths(scorer):
     scorer.players[0].cards_on_hand = {
         "Oak 1": oak1,
         "Oak 2": oak2,
-        "Dog 4": dog4
+        "Dog 4": blue4
     }
 
     # Player 1 path
     # Oak Path -> 4
-    # Dogwood Path -> 3
+    # Blue Spruce Path -> 3
     scorer.players[0].board.board_grid[1][2] = oak3
-    scorer.players[0].board.board_grid[1][3] = dog4
+    scorer.players[0].board.board_grid[1][3] = blue4
     scorer.players[0].board.board_grid[1][4] = oak5
-    scorer.players[0].board.board_grid[1][5] = dog6
+    scorer.players[0].board.board_grid[1][5] = blue6
 
 
     # Player 2 hand
