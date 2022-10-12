@@ -40,7 +40,7 @@
 
     <div class="col-5">
         <!--Board-->
-        <p><strong>{{ current_player_name }}'s board</strong></p>
+        <p><h4>Current player's board ({{ current_player_name }})</h4></p>
         <table class="table-sm">
             {% for row in player_boards[current_player_name] %}
             {% set outer_loop = loop.index - 1 %}
@@ -49,7 +49,7 @@
                 {% set inner_loop = loop.index - 1 %}
                 <td>
                     {% if card.card_name != None %}
-                    <img class="card_on_board" src="../static/css/playing_cards/{{card.card_name}}.png">
+                    <img class="card_on_board zoom" src="../static/css/playing_cards/{{card.card_name}}.png">
                     {% else %}
                     {% if game_phase == "Choose Coords" %}
                     <form action="/choose_coordinates" method="post">
@@ -73,14 +73,14 @@
     <div class="col-3">
         {% for player_name in player_boards %}
             {% if player_name != current_player_name %}
-                <h10>{{ player_name }}'s board</h10>
+                <p><strong>{{ player_name }}'s board</strong></p>
                 <table class="table-sm">
                 {% for row in player_boards[player_name] %}
                     <tr>
                     {% for card in row %}
                         <td>
                         {% if card.card_name != None %}
-                            <img class="card_on_mini_board" src="../static/css/playing_cards/{{card.card_name}}.png">
+                            <img class="card_on_mini_board zoom-larger" src="../static/css/playing_cards/{{card.card_name}}.png">
                         {% else %}
                             <img class="card_on_mini_board" src="../static/css/other/blank-w-border.png">
                         {% endif %}
@@ -93,7 +93,7 @@
 
 </div>
 
-<div class="row fixed-bottom">
+<div class="row fixed-bottom mb-2">
     <div class="col"></div>
     {% for card in player_hands[current_player_name] %}
     <div class="col">

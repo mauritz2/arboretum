@@ -18,6 +18,13 @@
     border-radius: 2px;
 }
 
+.zoom:hover {
+    scale: 3;
+}
+
+.zoom-larger:hover {
+    scale: 5;
+}
 
 
 body {
