@@ -152,3 +152,11 @@ class GameState(Enum):
     CHOOSE_DISCARD = "Choose Discard"
     SCORING = "Scoring"
 
+
+player_game_state_messages = {
+    GameState.CHOOSE_WHAT_TO_DRAW: "Draw two cards from either the deck or one of the discard piles",
+    GameState.CHOOSE_CARD_TO_PLAY: "Select a card to play",
+    GameState.CHOOSE_WHERE_TO_PLAY: "Select a location on the board where you want to place your card",
+    GameState.CHOOSE_DISCARD: "Choose a card to discard. It will appear in your discard pile.",
+    GameState.SCORING: "Scoring in progress"
+}

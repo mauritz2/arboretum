@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from logic import game_logic
-from logic import GameState
+from logic import GameState, player_game_state_messages
 
 # Flask config
 app = Flask(__name__)
@@ -27,13 +27,11 @@ def draw_card_from_deck():
 def draw_card_from_discard():
 
     if game_logic.game_phase != GameState.CHOOSE_WHAT_TO_DRAW:
-        flash(f"You can't discard cards now. The current game phase is {game_logic.game_phase}")
+        flash(f"You can't discard cards now. The current game phase is {game_logic.game_phase}", "error")
         return redirect(url_for("main"))
 
     player_to_draw_from = request.form["discard_owner"]
-    print("\n\n\n")
-    print(player_to_draw_from)
-    print("\n\n\n")
+
     player_instance = game_logic.scorer.get_player_instance(player_to_draw_from)
     game_logic.current_player.draw_card_from_graveyard(player_instance)
 
@@ -51,7 +49,7 @@ def choose_coordinates():
     """
 
     if game_logic.game_phase != GameState.CHOOSE_WHERE_TO_PLAY:
-        flash(f"You can't choose where to place a card now. The current game phase is {game_logic.game_phase}")
+        flash(f"You can't choose where to place a card now. The current game phase is {game_logic.game_phase}", "error")
         return redirect(url_for("main"))
 
     card_to_play = game_logic.selected_card_to_play
@@ -64,7 +62,7 @@ def choose_coordinates():
         # User chose an invalid place for a card - notifying user and resetting to start of play phase
         game_logic.selected_card_to_play = None
         game_logic.game_phase = GameState.CHOOSE_CARD_TO_PLAY
-        flash(str(e) + " Please select what card to play")
+        flash(str(e) + " Please select what card to play", "error")
         return redirect(url_for("main"))
 
     game_logic.selected_card_to_play = None
@@ -80,7 +78,7 @@ def discard_card():
     """
 
     if game_logic.game_phase != GameState.CHOOSE_DISCARD:
-        flash(f"You can't discard a card now. The current game phase is {game_logic.game_phase}")
+        flash(f"You can't discard a card now. The current game phase is {game_logic.game_phase}", "error")
         return redirect(url_for("main"))
 
     card_to_discard = request.form["card_name"]
@@ -106,7 +104,7 @@ def play_card():
 
 
 @app.route("/", methods=["GET"])
-def main(message=None):
+def main():
 
     # Create player boards and hand dicts
     player_boards = {}
@@ -131,18 +129,16 @@ def main(message=None):
 
     num_cards_in_deck = game_logic.scorer.players[0].deck.get_amt_of_cards_left()
 
-    flash(game_logic.game_phase)
+    flash(player_game_state_messages[game_logic.game_phase])
 
     return render_template(
-        'main.html',
+        'game.html',
         player_hands=player_hands,
         player_boards=player_boards,
         game_phase=game_phase,
         top_discard_cards=top_discard_cards,
         current_player_name=current_player_name,
         num_cards_in_deck=num_cards_in_deck,
-        message=message
-
     )
 
 

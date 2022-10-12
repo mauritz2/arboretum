@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block game %}
+
+<!--Player hand-->
+<div class="row align-items-end">
+    <div class="col-1 offset-1">
+        <p class="mb-0"><strong>Deck</strong></p>
+        <p><small>{{num_cards_in_deck}} cards remain</small></p>
+        <!--Deck-->
+        <form action="/draw_card_from_deck" method="post">
+            <div class="overlay-button-container">
+                <img class="card_on_hand" src="../static/css/other/deck-full.png">
+                {% if game_phase == "Draw" %}
+                <input class="btn btn-dark" type="submit" value="Draw card">
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    <!--Discard pile-->
+        {% for player_name in top_discard_cards %}
+            <div class="col-1">
+                <p class="mb-0 mt-3"><strong>Discard pile</strong></p>
+            <p><small>{{player_name}}</small></p>
+            {% set top_discard_card = top_discard_cards[player_name] %}
+            {% if top_discard_card != None %}
+                <div class="overlay-button-container">
+                <img class="card_on_hand" src="../static/css/playing_cards/{{top_discard_card}}.png">
+                {% if game_phase == "Draw" %}
+                    <form action="/draw_from_discard" method="post">
+                        <input name="discard_owner" type="hidden" value="{{player_name}}">
+                        <input class="btn btn-dark" type="submit" value="Draw card">
+                    </form>
+                {% endif %}
+                </div>
+            {% else %}
+                <img class="card_on_hand" src="../static/css/other/blank-w-border.png">
+            {% endif %}
+                </div>
+    {% endfor %}
+
+    <div class="col-5">
+        <!--Board-->
+        <p><strong>{{ current_player_name }}'s board</strong></p>
+        <table class="table-sm">
+            {% for row in player_boards[current_player_name] %}
+            {% set outer_loop = loop.index - 1 %}
+            <tr>
+                {% for card in row %}
+                {% set inner_loop = loop.index - 1 %}
+                <td>
+                    {% if card.card_name != None %}
+                    <img class="card_on_board" src="../static/css/playing_cards/{{card.card_name}}.png">
+                    {% else %}
+                    {% if game_phase == "Choose Coords" %}
+                    <form action="/choose_coordinates" method="post">
+                        <input name="coords" type="hidden" value="{{outer_loop, inner_loop}}">
+                        <input class="card_on_board" onmouseout="unhover(this);" onmouseover="hover(this);" src="../static/css/other/blank-w-border.png"
+                               type="image">
+                    </form>
+                    {% else %}
+                    <!-- Form tag is here to ensure formatting is the same as during coord selection -->
+                    <form>
+                        <img class="card_on_board" src="../static/css/other/blank-w-border.png">
+                    </form>
+                    {% endif %}
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-3">
+        {% for player_name in player_boards %}
+            {% if player_name != current_player_name %}
+                <h10>{{ player_name }}'s board</h10>
+                <table class="table-sm">
+                {% for row in player_boards[player_name] %}
+                    <tr>
+                    {% for card in row %}
+                        <td>
+                        {% if card.card_name != None %}
+                            <img class="card_on_mini_board" src="../static/css/playing_cards/{{card.card_name}}.png">
+                        {% else %}
+                            <img class="card_on_mini_board" src="../static/css/other/blank-w-border.png">
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        <table class="table-sm">
+    </div>
+
+</div>
+
+<div class="row fixed-bottom">
+    <div class="col"></div>
+    {% for card in player_hands[current_player_name] %}
+    <div class="col">
+        <div class="overlay-button-container">
+            <img class="card_on_hand" src="../static/css/playing_cards/{{card}}.png">
+            {% if game_phase == "Choose Card" %}
+            <form action="/play_card" method="post">
+                <input name="card_name" type="hidden" value="{{card}}">
+                <input type="submit" class="btn btn-dark" value="Play card">
+            </form>
+            {% elif game_phase == "Choose Discard" %}
+            <form action="/discard_card" method="post">
+                <input name="card_name" type="hidden" value="{{card}}">
+                <input type="submit" class="btn btn-dark" value="Discard card">
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    <div class="col"></div>
+</div>
+
+<script>
+// Lights up empty tiles when player is choosing where to place a card
+function hover(element) {
+element.setAttribute('src', '../static/css/other/blank-selected.png');
+}
+
+function unhover(element) {
+  element.setAttribute('src', '../static/css/other/blank-w-border.png');
+}
+</script>
+
+{% endblock %}

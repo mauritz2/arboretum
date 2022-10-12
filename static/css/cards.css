@@ -1,17 +1,62 @@
 /* ratio of the cards should be 3:2 */
 
-
-
 .card_on_hand {
-    height: 200px;
-    width: 130px;
+    height: 180px;
+    width: 120px;
+    border-radius: 7px;
 }
 
 .card_on_board {
-    height: 120px;
-    width: 80px;
+    height: 90px;
+    width: 60px;
+    border-radius: 7px;
 }
 
+.card_on_mini_board {
+    height: 30px;
+    width: 20px;
+    border-radius: 2px;
+}
+
+
+
+body {
+  overflow-y:hidden;
+  background-color: rgb(45,45,45) !important;
+  color: white !important;
+   caret-color: transparent;
+}
+
+.overlay-button-container {
+    position: relative;
+    width:100%;
+    max-width:120px;
+}
+.overlay-button-container:before {
+  content:"";
+  position:absolute;
+width:100%;
+  height:100%;
+  top:0;left:0;right:0;
+  background-color:rgba(0,0,0,0);
+}
+.overlay-button-container:hover::before {
+  background-color:rgba(0,0,0,0.5);
+}
+.overlay-button-container img {
+  display:block;
+}
+.overlay-button-container input {
+  position: absolute;
+  top: 85%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  opacity:0.6;
+}
+.overlay-button-container:hover input {
+  opacity: 1;
+}
 
 
 input.selector_highlight:hover
@@ -22,6 +67,6 @@ input.selector_highlight:hover
 .deck-full
 {
     content : url("other/deck-full.png");
-    height: 200px;
-    width: 130px;
+    height: 180px;
+    width: 120px;
 }
