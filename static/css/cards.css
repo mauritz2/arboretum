@@ -18,7 +18,7 @@
 
 .highlighted_path
 {
-    opacity: 0.3;
+    opacity: 0.2;
 }
 
 .blank_choose_coord:hover {
@@ -45,7 +45,6 @@
 .zoom-larger:hover {
     scale: 5;
 }
-
 
 body {
   overflow-y:hidden;

@@ -44,7 +44,7 @@
                 <p><strong>Scoring trees for {{ player }}</strong></p>
                     {% for tree in scoring_players[player] %}
                     <div class="scoring_tree_type">
-                        <p onmouseover='highlight_path("{{tree}}");' onmouseleave='highlight_path("None");'>{{tree}}</p>
+                        <p onmouseover='highlight_path("{{tree}}");' onmouseleave="remove_all_highlights();">{{tree}}</p>
                     </div>
                     {% endfor %}
             {% endfor %}
@@ -129,48 +129,5 @@
     {% endfor %}
     <div class="col"></div>
 </div>
-
-<script>
-// Lights up empty tiles when player is choosing where to place a card
-function hover(element) {
-element.setAttribute('src', '../static/css/other/blank-selected.png');
-}
-
-function unhover(element) {
-  element.setAttribute('src', '../static/css/other/blank-w-border.png');
-}
-
-</script>
-
-<script>
-var top_paths = ({{ top_paths|tojson|safe }})
-
-function highlight_path(to_highlight)
-{
-    // Highlights/un-highlights paths on the board based on user selection
-
-    console.log(to_highlight)
-
-    // Beautiful Javascript loop.. I'm sure there's no better way to do this :-)
-    for (const [player, tree_dict] of Object.entries(top_paths)){
-        for (const [tree_type, score_dict] of Object.entries(tree_dict)){
-      if(score_dict.Path.length > 0) {
-        score_dict.Path.forEach(function(coord){
-            if (coord.length > 0){
-                var card = document.getElementById(coord);
-
-                if(tree_type != to_highlight){
-                    card.classList.add("highlighted_path");
-                    }
-                 else{
-                    card.classList.remove("highlighted_path");
-                 }
-          };
-        })
-      }
-    }
-   }
-}
-</script>
 
 {% endblock %}
