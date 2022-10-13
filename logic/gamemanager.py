@@ -155,8 +155,8 @@ class GameManager:
         return i
 
     def get_winner(self):
-        winner, scorers_by_tree = self.scorer.determine_winner()
-        return winner, scorers_by_tree
+        winner, scorers_by_tree, top_paths = self.scorer.determine_winner()
+        return winner, scorers_by_tree, top_paths
 
 
 class GameState(Enum):

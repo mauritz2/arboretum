@@ -60,7 +60,7 @@
                 {% set inner_loop = loop.index - 1 %}
                 <td>
                     {% if card.card_name != None %}
-                    <img class="card_on_board zoom" src="../static/css/playing_cards/{{card.card_name}}.png">
+                    <img class="card_on_board zoom" id="{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.card_name}}.png">
                     {% else %}
                     {% if game_phase == "Choose Coords" %}
                     <form action="/choose_coordinates" method="post">
@@ -139,5 +139,25 @@ function unhover(element) {
 }
 
 </script>
+
+{% if game_phase == "Scoring" %}
+{% endif %}
+<script>
+    var toppy = ({{ top_paths|tojson|safe }})
+    console.log(toppy)
+    for (const [key, value] of Object.entries(toppy)){
+    console.log(key, value);
+    }
+
+    {% for tree_dict in top_paths["Player 1"] %}
+        console.log("Loop 2")
+        {% for coord in top_paths["Player 1"][tree_dict]["Path"] %}
+            console.log("Loop 3")
+            console.log({{coord}})
+            var card = document.getElementById({{coord}});
+            card.classList.add("highlighted_path");
+        {% endfor %}
+     {% endfor %}
+    </script>
 
 {% endblock %}

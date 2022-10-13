@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from logic import game_logic
 from logic import GameState, player_game_state_messages
+import json
 
 # Flask config
 app = Flask(__name__)
@@ -123,7 +124,9 @@ def main():
 
     # TODO - this structure is silly - the GameManager should have the .players as opposed to scorer
     current_player_name = game_logic.current_player.name
+    game_logic.game_phase = GameState.SCORING
     game_phase = game_logic.game_phase.value
+    print(f"The game phase is {game_phase}")
 
     # top_discard_cards = {"Player 1": game_logic.scorer.players[0].graveyard.get_top_card(only_str=True)}
 
@@ -131,13 +134,12 @@ def main():
 
     flash(player_game_state_messages[game_logic.game_phase])
 
-    game_logic.game_phase = GameState.SCORING
     if game_logic.game_phase == GameState.SCORING:
-        winner, scorer_by_tree = game_logic.get_winner()
+        winner, scorer_by_tree, top_paths = game_logic.get_winner()
         ## Scoring code
         # pass
         # {"Player 1": {"Cassia": [(1, 1), (2, 3), (4, 5)]}}
-        print(scorer_by_tree)
+        #print(scorer_by_tree)
         # TODO - refactor this dict so that it's {"Player 1: ["Cassia", "Jacaranda"]} and then remove this code
         scoring_players_updated = {}
         for player in ["Player 1", "Player 2"]:
@@ -147,9 +149,29 @@ def main():
                     if player == p.name:
                         scoring_for.append(tree)
             scoring_players_updated[player] = scoring_for
-        print("\n")
+        #print("\n")
+        #print(scoring_players_updated)
         print(scoring_players_updated)
+        print("Top paths below \n\n")
+        print(top_paths)
 
+        for player in top_paths:
+            for tree_dict in top_paths[player]:
+                list_of_coords = []
+                for card in top_paths[player][tree_dict]["Path"]:
+                    print(card)
+                    # TODO - make this dynamically call the correct player's board
+                    (row, col) = game_logic.scorer.players[0].board.find_coords_of_card(card)
+                    coords = str(row) + str(col)
+                    list_of_coords.append(coords)
+                top_paths[player][tree_dict]["Path"] = list_of_coords
+
+        print("Updated top paths below")
+        print(top_paths)
+
+        # TODO - these type of data structures should be made available in the GameManager instead of implementing them here
+
+        top_paths_json = jsonify(top_paths)
 
     return render_template(
         'game.html',
@@ -159,7 +181,9 @@ def main():
         top_discard_cards=top_discard_cards,
         current_player_name=current_player_name,
         num_cards_in_deck=num_cards_in_deck,
-        scoring_players=scoring_players_updated
+        scoring_players=scoring_players_updated,
+        top_paths=top_paths,
+        top_paths_json=json.dumps(top_paths)
     )
 
 

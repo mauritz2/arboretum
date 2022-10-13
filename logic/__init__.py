@@ -12,6 +12,15 @@ import logic.config as config
 
 game_logic = GameManager(config.NUM_PLAYERS)
 
+oak2 = Card(tree_type="Oak", tree_val=2)
+cas4 = Card(tree_type="Cassia", tree_val=4)
+jac6 = Card(tree_type="Jacaranda", tree_val=6)
+oak7 = Card(tree_type="Oak", tree_val=7)
+
+game_logic.scorer.players[0].board.board_grid[2][2] = oak2
+game_logic.scorer.players[0].board.board_grid[2][3] = cas4
+game_logic.scorer.players[0].board.board_grid[2][4] = jac6
+game_logic.scorer.players[0].board.board_grid[2][5] = oak7
 
 # Old code to run Arboretum in the console
 # def main():

@@ -16,6 +16,11 @@
     opacity: 0.5;
 }
 
+.highlighted_path
+{
+    opacity: 0.3;
+}
+
 .blank_choose_coord:hover {
     opacity: 1;
 }

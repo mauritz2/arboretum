@@ -177,21 +177,31 @@ class Scorer:
         Returns the scoring player
         TODO - incorporate possibility of ties
         """
+        # TODO - this function is doing a lot (e.g. getting top-paths data structure) - break out
+        # TODO - the best return data format would be the below - None could mean you didn't score - otherwise path and points
+        # {"Player 1: {"Cassia: {"Path": None, "Score": None}, {"Oak: {"Path": [Card(...), Card(...)], "Score":4}.. "Player 2" ...
+        # TODO - make a function that returns the data structure above and yo can specify the card attribute you want (?) e.g. coords
+        top_paths = {}
         top_score = 0
         winner = None
+
         scoring_players = self.calculate_scoring_players_by_tree()
         for player in self.players:
+            individual_scores = {}
             for tree in self.trees:
-                if player in scoring_players[tree]:
-                    paths = self.find_paths_for_tree_type(tree, player)
-                    if len(paths) == 0:
-                        continue
-                    top_path, top_score = self.score_paths(paths)
-                    player.score += top_score
+                #if player in scoring_players[tree]:
+                paths = self.find_paths_for_tree_type(tree, player)
+                # if len(paths) == 0:
+                #      continue
+                top_path, top_score = self.score_paths(paths)
+                individual_scores[tree] = {"Path": top_path, "Score": top_score}
+                player.score += top_score
             else:
+                top_paths[player.name] = individual_scores
                 if player.score >= top_score:
                     winner = player
-        return winner, scoring_players
+
+        return winner, scoring_players, top_paths
 
     def get_player_instance(self, name: str) -> Player:
         """
