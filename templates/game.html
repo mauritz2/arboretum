@@ -143,21 +143,21 @@ function unhover(element) {
 {% if game_phase == "Scoring" %}
 {% endif %}
 <script>
-    var toppy = ({{ top_paths|tojson|safe }})
-    console.log(toppy)
-    for (const [key, value] of Object.entries(toppy)){
-    console.log(key, value);
-    }
+    var top_paths = ({{ top_paths|tojson|safe }})
 
-    {% for tree_dict in top_paths["Player 1"] %}
-        console.log("Loop 2")
-        {% for coord in top_paths["Player 1"][tree_dict]["Path"] %}
-            console.log("Loop 3")
-            console.log({{coord}})
-            var card = document.getElementById({{coord}});
-            card.classList.add("highlighted_path");
-        {% endfor %}
-     {% endfor %}
+    <!-- Beautiful Javascript loop.. I'm sure there's no better way to do this :-) -->
+    for (const [player, tree_dict] of Object.entries(top_paths)){
+        for (const [tree_type, score_dict] of Object.entries(tree_dict)){
+      if(score_dict.Path.length > 0) {
+        score_dict.Path.forEach(function(coord){
+            if (coord.length > 0){
+                var card = document.getElementById(coord);
+                card.classList.add("highlighted_path");
+          };
+        })
+      }
+    }
+    }
     </script>
 
 {% endblock %}
