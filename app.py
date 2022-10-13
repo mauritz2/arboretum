@@ -186,6 +186,19 @@ def main():
         top_paths_json=json.dumps(top_paths)
     )
 
+@app.route("/game_over", methods=["GET"])
+def game_over():
+    # return render_template("game_over.html")
+    # Elements on the game over screen
+    # Player 1 and Player 2 Boards
+    # Player 1 and Player 2 Hands
+    # Should show:
+        # Who scored for what
+        # How much they scored for that color
+        # Mouse-over highlight showing the path that they scored for
+    pass
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

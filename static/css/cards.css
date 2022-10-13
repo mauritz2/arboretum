@@ -1,5 +1,10 @@
 /* ratio of the cards should be 3:2 */
 
+.highlighted_path
+{
+    filter: brightness(1.75);
+}
+
 .card_on_hand {
     height: 180px;
     width: 120px;
@@ -14,15 +19,6 @@
 
 .blank {
     opacity: 0.5;
-}
-
-.highlighted_path
-{
-    opacity: 0.2;
-}
-
-.blank_choose_coord:hover {
-    opacity: 1;
 }
 
 .card_on_mini_board {
@@ -58,20 +54,24 @@ body {
     width:100%;
     max-width:120px;
 }
+
 .overlay-button-container:before {
   content:"";
   position:absolute;
-width:100%;
+  width:100%;
   height:100%;
   top:0;left:0;right:0;
   background-color:rgba(0,0,0,0);
 }
+
 .overlay-button-container:hover::before {
   background-color:rgba(0,0,0,0.5);
 }
+
 .overlay-button-container img {
   display:block;
 }
+
 .overlay-button-container input {
   position: absolute;
   top: 88%;
@@ -80,10 +80,10 @@ width:100%;
   -ms-transform: translate(-50%, -50%);
   opacity:0.6;
 }
+
 .overlay-button-container:hover input {
   opacity: 1;
 }
-
 
 input.selector_highlight:hover
 {

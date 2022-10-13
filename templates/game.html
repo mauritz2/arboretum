@@ -44,7 +44,7 @@
                 <p><strong>Scoring trees for {{ player }}</strong></p>
                     {% for tree in scoring_players[player] %}
                     <div class="scoring_tree_type">
-                        <p onmouseover='highlight_path("{{tree}}");' onmouseleave="remove_all_highlights();">{{tree}}</p>
+                        <p onmouseover='highlight_path("{{tree}}");'">{{tree}}</p>
                     </div>
                     {% endfor %}
             {% endfor %}
@@ -62,6 +62,7 @@
                         {% set inner_loop = loop.index - 1 %}
                         <td>
                             {% if card.card_name != None %}
+                            <!-- TODO - address that IDs are 11, but values are (1,2). Make consistently 11?-->
                             <img class="card_on_board zoom" id="{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.card_name}}.png">
                             {% else %}
                             {% if game_phase == "Choose Coords" %}
@@ -74,7 +75,7 @@
                             <!-- Form tag is here to ensure formatting is the same as during coord selection -->
                             <form>
                             <!-- Not used - putting here to mirror padding when coords are being selected-->
-                                <input disabled class="card_on_board blank" src="../static/css/other/blank-w-border.png" type="image">
+                                <input disabled class="card_on_board blank" id="{{outer_loop}}{{inner_loop}}" src="../static/css/other/blank-w-border.png" type="image">
                             </form>
                             {% endif %}
                             {% endif %}
