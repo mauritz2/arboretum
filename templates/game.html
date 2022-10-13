@@ -43,7 +43,9 @@
             {% for player in scoring_players %}
                 <p><strong>Scoring trees for {{ player }}</strong></p>
                     {% for tree in scoring_players[player] %}
-                        <p>{{ tree }}</p>
+                    <div class="scoring_tree_type">
+                        <p onmouseover='highlight_path("{{tree}}");' onmouseleave='highlight_path("None");'>{{tree}}</p>
+                    </div>
                     {% endfor %}
             {% endfor %}
         </div>
@@ -54,31 +56,31 @@
         <h4 class="mb-1">Current player's board ({{ current_player_name }})</h4>
         <table class="table-sm">
             {% for row in player_boards[current_player_name] %}
-            {% set outer_loop = loop.index - 1 %}
-            <tr>
-                {% for card in row %}
-                {% set inner_loop = loop.index - 1 %}
-                <td>
-                    {% if card.card_name != None %}
-                    <img class="card_on_board zoom" id="{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.card_name}}.png">
-                    {% else %}
-                    {% if game_phase == "Choose Coords" %}
-                    <form action="/choose_coordinates" method="post">
-                        <input name="coords" type="hidden" value="{{outer_loop, inner_loop}}">
-                        <input class="card_on_board blank blank_choose_coord" src="../static/css/other/blank-w-border.png"
-                               type="image">
-                    </form>
-                    {% else %}
-                    <!-- Form tag is here to ensure formatting is the same as during coord selection -->
-                    <form>
-<!--                        Not used - putting here to mirror padding when coords are being selected-->
-                        <input disabled class="card_on_board blank" src="../static/css/other/blank-w-border.png" type="image">
-                    </form>
-                    {% endif %}
-                    {% endif %}
-                </td>
-                {% endfor %}
-            </tr>
+                {% set outer_loop = loop.index - 1 %}
+                <tr>
+                    {% for card in row %}
+                        {% set inner_loop = loop.index - 1 %}
+                        <td>
+                            {% if card.card_name != None %}
+                            <img class="card_on_board zoom" id="{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.card_name}}.png">
+                            {% else %}
+                            {% if game_phase == "Choose Coords" %}
+                            <form action="/choose_coordinates" method="post">
+                                <input name="coords" type="hidden" value="{{outer_loop, inner_loop}}">
+                                <input class="card_on_board blank blank_choose_coord" src="../static/css/other/blank-w-border.png"
+                                       type="image">
+                            </form>
+                            {% else %}
+                            <!-- Form tag is here to ensure formatting is the same as during coord selection -->
+                            <form>
+                            <!-- Not used - putting here to mirror padding when coords are being selected-->
+                                <input disabled class="card_on_board blank" src="../static/css/other/blank-w-border.png" type="image">
+                            </form>
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
             {% endfor %}
         </table>
     </div>
@@ -140,24 +142,35 @@ function unhover(element) {
 
 </script>
 
-{% if game_phase == "Scoring" %}
-{% endif %}
 <script>
-    var top_paths = ({{ top_paths|tojson|safe }})
+var top_paths = ({{ top_paths|tojson|safe }})
 
-    <!-- Beautiful Javascript loop.. I'm sure there's no better way to do this :-) -->
+function highlight_path(to_highlight)
+{
+    // Highlights/un-highlights paths on the board based on user selection
+
+    console.log(to_highlight)
+
+    // Beautiful Javascript loop.. I'm sure there's no better way to do this :-)
     for (const [player, tree_dict] of Object.entries(top_paths)){
         for (const [tree_type, score_dict] of Object.entries(tree_dict)){
       if(score_dict.Path.length > 0) {
         score_dict.Path.forEach(function(coord){
             if (coord.length > 0){
                 var card = document.getElementById(coord);
-                card.classList.add("highlighted_path");
+
+                if(tree_type != to_highlight){
+                    card.classList.add("highlighted_path");
+                    }
+                 else{
+                    card.classList.remove("highlighted_path");
+                 }
           };
         })
       }
     }
-    }
-    </script>
+   }
+}
+</script>
 
 {% endblock %}

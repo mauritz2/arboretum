@@ -172,5 +172,5 @@ player_game_state_messages = {
     GameState.CHOOSE_CARD_TO_PLAY: "Select a card to play",
     GameState.CHOOSE_WHERE_TO_PLAY: "Select a location on the board where you want to place your card",
     GameState.CHOOSE_DISCARD: "Choose a card to discard. It will appear in your discard pile.",
-    GameState.SCORING: "Scoring in progress"
+    GameState.SCORING: "The game is over"
 }

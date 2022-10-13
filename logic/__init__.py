@@ -22,6 +22,21 @@ game_logic.scorer.players[0].board.board_grid[2][3] = cas4
 game_logic.scorer.players[0].board.board_grid[2][4] = jac6
 game_logic.scorer.players[0].board.board_grid[2][5] = oak7
 
+blue1 = Card(tree_type="Blue Spruce", tree_val=1)
+blue2 = Card(tree_type="Blue Spruce", tree_val=2)
+blue3 = Card(tree_type="Blue Spruce", tree_val=3)
+blue4 = Card(tree_type="Blue Spruce", tree_val=4)
+
+game_logic.scorer.players[0].board.board_grid[3][2] = blue1
+game_logic.scorer.players[0].board.board_grid[3][3] = blue2
+game_logic.scorer.players[0].board.board_grid[3][4] = blue3
+game_logic.scorer.players[0].board.board_grid[3][5] = blue4
+
+blue8 = Card(tree_type="Blue Spruce", tree_val=8)
+
+game_logic.scorer.players[0].board.board_grid[1][5] = blue8
+
+
 # Old code to run Arboretum in the console
 # def main():
 #     # TODO - change graveyard to discard pile naming consistently
