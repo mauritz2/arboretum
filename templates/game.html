@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 {% block game %}
 
-<!--Player hand-->
 <div class="row align-items-end">
-    {% if game_phase != "Scoring" %}
         <div class="col-1 offset-1">
             <p class="mb-0"><strong>Deck</strong></p>
             <p><small>{{num_cards_in_deck}} cards remain</small></p>
@@ -38,18 +36,6 @@
                 {% endif %}
                     </div>
             {% endfor %}
-    {% else %}
-        <div class="col-2 offset-1">
-            {% for player in scoring_players %}
-                <p><strong>Scoring trees for {{ player }}</strong></p>
-                    {% for tree in scoring_players[player] %}
-                    <div class="scoring_tree_type">
-                        <p onmouseover='highlight_path("{{tree}}");'">{{tree}}</p>
-                    </div>
-                    {% endfor %}
-            {% endfor %}
-        </div>
-    {% endif %}
 
     <div class="col-5">
         <!--Board-->

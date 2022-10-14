@@ -12,6 +12,7 @@ import logic.config as config
 
 game_logic = GameManager(config.NUM_PLAYERS)
 
+# Player 1 paths
 oak2 = Card(tree_type="Oak", tree_val=2)
 cas4 = Card(tree_type="Cassia", tree_val=4)
 jac6 = Card(tree_type="Jacaranda", tree_val=6)
@@ -35,6 +36,17 @@ game_logic.scorer.players[0].board.board_grid[3][5] = blue4
 blue8 = Card(tree_type="Blue Spruce", tree_val=8)
 
 game_logic.scorer.players[0].board.board_grid[1][5] = blue8
+
+# Player 2 paths
+jac1 = Card(tree_type="Jacaranda", tree_val=1)
+jac2 = Card(tree_type="Jacaranda", tree_val=2)
+jac3 = Card(tree_type="Jacaranda", tree_val=3)
+jac4 = Card(tree_type="Jacaranda", tree_val=4)
+
+game_logic.scorer.players[1].board.board_grid[3][2] = jac1
+game_logic.scorer.players[1].board.board_grid[3][3] = jac2
+game_logic.scorer.players[1].board.board_grid[3][4] = jac3
+game_logic.scorer.players[1].board.board_grid[3][5] = jac4
 
 
 # Old code to run Arboretum in the console

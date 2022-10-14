@@ -89,6 +89,22 @@ def test_find_adjacent_incrementing_cards_no_adjacencies(board):
     assert len(incremental_adjacent) == 0
 
 
+def test_find_adjacent_incrementing_cards_out_of_bounds_check(board):
+    """
+    Make sure code handles case when cards are next to the board edge
+    """
+    board.board_grid[5][0] = Card(tree_type="Jacaranda", tree_val=5)
+    board.board_grid[4][0] = Card(tree_type="Jacaranda", tree_val=6)
+    board.board_grid[0][9] = Card(tree_type="Oak", tree_val=4)
+    board.board_grid[0][8] = Card(tree_type="Blue Spruce", tree_val=7)
+
+    incremental_adjacent = board.find_adj_increment_cards(row=5, column=0)
+    assert incremental_adjacent == [Card(tree_type="Jacaranda", tree_val=6)]
+    incremental_adjacent = board.find_adj_increment_cards(row=0, column=9)
+    assert incremental_adjacent == [Card(tree_type="Blue Spruce", tree_val=7)]
+
+
+
 def test_find_adjacent_incrementing_cards_no_card(board):
     """
     When we specify a location without a card we expect an error since there's nothing to assess

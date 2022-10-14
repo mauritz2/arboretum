@@ -189,13 +189,16 @@ class Scorer:
         for player in self.players:
             individual_scores = {}
             for tree in self.trees:
-                #if player in scoring_players[tree]:
-                paths = self.find_paths_for_tree_type(tree, player)
-                # if len(paths) == 0:
-                #      continue
-                top_path, top_score = self.score_paths(paths)
-                individual_scores[tree] = {"Path": top_path, "Score": top_score}
-                player.score += top_score
+                if player not in scoring_players[tree]:
+                    # The player did not score for this path so no need to calculate points
+                    # Score = None indicates the player did not score
+                    individual_scores[tree] = {"Path": [], "Score": None}
+                else:
+                    # The player scored - calculate the highest-scoring path and add it to the total
+                    paths = self.find_paths_for_tree_type(tree, player)
+                    top_path, top_score = self.score_paths(paths)
+                    individual_scores[tree] = {"Path": top_path, "Score": top_score}
+                    player.score += top_score
             else:
                 top_paths[player.name] = individual_scores
                 if player.score >= top_score:
@@ -209,10 +212,8 @@ class Scorer:
         This assumes player names are unique, which they currently are since they are
         assigned as Player 1, Player 2 etc.
         """
-        print(f"I am doing to draw from {name}")
         for p in self.players:
             if name == p.name:
-                print(f"I just drew from {p.name}")
                 return p
         else:
             raise ValueError("Tried finding a player instance for a player name that doesn't exist")

@@ -91,6 +91,9 @@ def discard_card():
 
     game_logic.next_player()
 
+    if game_logic.game_phase == GameState.SCORING:
+        return redirect(url_for("game_over"))
+
     return redirect(url_for("main"))
 
 
@@ -124,54 +127,15 @@ def main():
 
     # TODO - this structure is silly - the GameManager should have the .players as opposed to scorer
     current_player_name = game_logic.current_player.name
-    game_logic.game_phase = GameState.SCORING
+    #game_logic.game_phase = GameState.SCORING
     game_phase = game_logic.game_phase.value
-    print(f"The game phase is {game_phase}")
+    #print(f"The game phase is {game_phase}")
 
     # top_discard_cards = {"Player 1": game_logic.scorer.players[0].graveyard.get_top_card(only_str=True)}
 
     num_cards_in_deck = game_logic.scorer.players[0].deck.get_amt_of_cards_left()
 
     flash(player_game_state_messages[game_logic.game_phase])
-
-    if game_logic.game_phase == GameState.SCORING:
-        winner, scorer_by_tree, top_paths = game_logic.get_winner()
-        ## Scoring code
-        # pass
-        # {"Player 1": {"Cassia": [(1, 1), (2, 3), (4, 5)]}}
-        #print(scorer_by_tree)
-        # TODO - refactor this dict so that it's {"Player 1: ["Cassia", "Jacaranda"]} and then remove this code
-        scoring_players_updated = {}
-        for player in ["Player 1", "Player 2"]:
-            scoring_for = []
-            for tree in scorer_by_tree:
-                for p in scorer_by_tree[tree]:
-                    if player == p.name:
-                        scoring_for.append(tree)
-            scoring_players_updated[player] = scoring_for
-        #print("\n")
-        #print(scoring_players_updated)
-        print(scoring_players_updated)
-        print("Top paths below \n\n")
-        print(top_paths)
-
-        for player in top_paths:
-            for tree_dict in top_paths[player]:
-                list_of_coords = []
-                for card in top_paths[player][tree_dict]["Path"]:
-                    print(card)
-                    # TODO - make this dynamically call the correct player's board
-                    (row, col) = game_logic.scorer.players[0].board.find_coords_of_card(card)
-                    coords = str(row) + str(col)
-                    list_of_coords.append(coords)
-                top_paths[player][tree_dict]["Path"] = list_of_coords
-
-        print("Updated top paths below")
-        print(top_paths)
-
-        # TODO - these type of data structures should be made available in the GameManager instead of implementing them here
-
-        top_paths_json = jsonify(top_paths)
 
     return render_template(
         'game.html',
@@ -181,22 +145,65 @@ def main():
         top_discard_cards=top_discard_cards,
         current_player_name=current_player_name,
         num_cards_in_deck=num_cards_in_deck,
-        scoring_players=scoring_players_updated,
-        top_paths=top_paths,
-        top_paths_json=json.dumps(top_paths)
+
     )
 
 @app.route("/game_over", methods=["GET"])
 def game_over():
-    # return render_template("game_over.html")
-    # Elements on the game over screen
-    # Player 1 and Player 2 Boards
-    # Player 1 and Player 2 Hands
-    # Should show:
-        # Who scored for what
-        # How much they scored for that color
-        # Mouse-over highlight showing the path that they scored for
-    pass
+
+    if game_logic.game_phase != GameState.SCORING:
+        flash("The game isn't over yet", "error")
+        return redirect(url_for("main"))
+
+    # TODO - this is repetition with main() - break out into function?
+    # Create player boards and hand dicts
+    player_boards = {}
+    player_hands = {}
+    for p in game_logic.scorer.players:
+        player_name = p.name
+        # TODO This sends a nested list with Cards() - send just the card name instead?
+        player_boards[player_name] = p.board.board_grid
+        player_hands[player_name] = p.get_player_card_names()
+
+
+    winner, scorer_by_tree, top_paths = game_logic.get_winner()
+
+    # TODO - refactor this dict so that it's {"Player 1: ["Cassia", "Jacaranda"]} and then remove this code
+    scoring_players_updated = {}
+    for player in ["Player 1", "Player 2"]:
+        scoring_for = []
+        for tree in scorer_by_tree:
+            for p in scorer_by_tree[tree]:
+                if player == p.name:
+                    scoring_for.append(tree)
+        scoring_players_updated[player] = scoring_for
+    #print("\n")
+    #print(scoring_players_updated)
+    #print("Player boards below \n\n")
+    #print(player_boards)
+
+    for player in top_paths:
+        for tree_dict in top_paths[player]:
+            list_of_coords = []
+            for card in top_paths[player][tree_dict]["Path"]:
+                print(card)
+                # TODO - make this dynamically call the correct player's board
+                player_instance = game_logic.scorer.get_player_instance(player)
+                (row, col) = player_instance.board.find_coords_of_card(card)
+                # If is player num, row, col (e.g. 111 is Player 1 row 1 column 1)
+                coords_id = str(player)[-1] + str(row) + str(col)
+                list_of_coords.append(coords_id)
+            top_paths[player][tree_dict]["Path"] = list_of_coords
+
+    print(top_paths)
+
+    return render_template("game_over.html",
+                           player_hands=player_hands,
+                           player_boards=player_boards,
+                           scoring_players=scoring_players_updated,
+                           top_paths=top_paths,
+                           winner_name=winner.name
+                           )
 
 
 

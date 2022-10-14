@@ -2,42 +2,42 @@
 function highlight_path(to_highlight)
 {
 
+
+
     dim_all_cards();
 
-//    // Un-dim the cards that are part of the path to highlight to make it stand out
-//    for (const [player, tree_dict] of Object.entries(top_paths)){
-//        console.log(player)
-//        for (const [tree_type, coord] of Object.entries(tree_dict[to_highlight].Path)){
-//              console.log(coord)
-//              var card = document.getElementById(coord);
-//              card.classList.remove("highlighted_path");
-//		}
-//    }
+    // Un-dim the cards that are part of the path to highlight to make it stand out
+    for (const [player, tree_dict] of Object.entries(top_paths)){
+        for (const [tree_type, coord] of Object.entries(tree_dict[to_highlight].Path)){
+              var card = document.getElementById(coord);
+              card.classList.remove("dimmed");
+		}
+    }
 };
 
 function dim_all_cards()
 {
-    // :-)
+    // :-) :-) :-)
+    // TODO - this is a very silly loop to dim all coords - refactor
     all_coords = []
+    num_players = 2
     rows = 5
     columns = 10
-    for (i = 0; i < rows ; i++)
+    for (p = 1; p <= num_players; p++)
     {
-        console.log(i)
-        for (j = 0; j < columns; j++)
-      {
-        i_str = i.toString();
-        j_str = j.toString();
-        coord =  + i_str + j_str;
-          all_coords.push(coord);
-      }
-    }
+        for (i = 0; i < rows ; i++)
+        {
+            for (j = 0; j < columns; j++)
+          {
+            coord_id = p.toString() + i.toString() + j.toString()
+            all_coords.push(coord_id);
+          }
+        }
+     };
 
     all_coords.forEach(function(coord){
-        console.log("I'm going to read from");
-        console.log(coord);
         card = document.getElementById(coord);
-        card.classList.add("highlight_path");
+        card.classList.add("dimmed");
     });
  };
 

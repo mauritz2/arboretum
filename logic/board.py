@@ -120,6 +120,12 @@ class Board:
                          (row, column+1),
                          (row, column-1)]
         for loc in locs_to_check:
+            # There was an index out of range error here - adding check and also test case
+            if (loc[0] >= config.BOARD_ROWS) or (loc[1] >= config.BOARD_COLUMNS):
+                continue
+            if (loc[0] < 0) or (loc[1] < 0):
+                continue
+
             card_at_loc = self.board_grid[loc[0]][loc[1]]
             if card_at_loc.tree_type is None:
                 continue

@@ -1,10 +1,5 @@
 /* ratio of the cards should be 3:2 */
 
-.highlighted_path
-{
-    filter: brightness(1.75);
-}
-
 .card_on_hand {
     height: 180px;
     width: 120px;
@@ -18,6 +13,11 @@
 }
 
 .blank {
+    opacity: 0.5;
+}
+
+.dimmed
+{
     opacity: 0.5;
 }
 
