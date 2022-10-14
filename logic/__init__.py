@@ -48,6 +48,11 @@ game_logic.scorer.players[1].board.board_grid[3][3] = jac2
 game_logic.scorer.players[1].board.board_grid[3][4] = jac3
 game_logic.scorer.players[1].board.board_grid[3][5] = jac4
 
+game_logic.scorer.players[1].board.board_grid[5][2] = blue1
+game_logic.scorer.players[1].board.board_grid[5][3] = blue2
+game_logic.scorer.players[1].board.board_grid[5][4] = blue3
+game_logic.scorer.players[1].board.board_grid[5][5] = blue4
+
 
 # Old code to run Arboretum in the console
 # def main():

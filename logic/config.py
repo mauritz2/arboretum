@@ -20,5 +20,3 @@ CARD_SHORTHANDS = {}
 for tree in TREES:
 	for i in range(1, CARDS_PER_TREE_TYPE+1):
 		CARD_SHORTHANDS[f"{tree} {i}"] = f"{tree[0]}{i}"
-
-# Cassia second path is highlighted!!

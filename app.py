@@ -151,9 +151,9 @@ def main():
 @app.route("/game_over", methods=["GET"])
 def game_over():
 
-    if game_logic.game_phase != GameState.SCORING:
-        flash("The game isn't over yet", "error")
-        return redirect(url_for("main"))
+    # if game_logic.game_phase != GameState.SCORING:
+    #     flash("The game isn't over yet", "error")
+    #     return redirect(url_for("main"))
 
     # TODO - this is repetition with main() - break out into function?
     # Create player boards and hand dicts

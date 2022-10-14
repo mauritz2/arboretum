@@ -161,7 +161,7 @@ class Scorer:
             # long and all cards in the path are of the same species.
             tree_types = [card.tree_type for card in path]
             all_tree_types_same = [tree_types[0]] * len(path) == tree_types
-            if all_tree_types_same and len(path) > 4:
+            if all_tree_types_same and len(path) >= 4:
                 path_score += len(path)
 
             # Check if the current path is the best one

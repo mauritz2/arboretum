@@ -201,20 +201,22 @@ def test_score_paths_3_paths_and_ending_in_8(scorer):
     assert top_path == expected_best_path
     assert score == expected_score
 
-def test_score_path_all_same_tree_type_and_starts_with_1(scorer):
+
+def test_score_path_complex(scorer):
+    """
+    Tests a path where all trees are the same (i.e. double points) and that starts with 1 and ends with 8
+    """
     oak1 = Card(tree_type="Oak", tree_val=1)
     oak3 = Card(tree_type="Oak", tree_val=3)
     oak4 = Card(tree_type="Oak", tree_val=4)
-    oak5 = Card(tree_type="Oak", tree_val=5)
-    oak6 = Card(tree_type="Oak", tree_val=6)
-    oak7 = Card(tree_type="Oak", tree_val=7)
+    oak8 = Card(tree_type="Oak", tree_val=8)
 
-    paths = [[oak1, oak3, oak4, oak5, oak6, oak7]]
+    paths = [[oak1, oak3, oak4, oak8]]
 
-    expected_best_path = [oak1, oak3, oak4, oak5, oak6, oak7]
+    expected_best_path = [oak1, oak3, oak4, oak8]
 
     # 12 from path length (all Oaks), 1 from starting with 1
-    expected_score = 13
+    expected_score = 11
 
     top_path, score = scorer.score_paths(paths)
     assert top_path == expected_best_path

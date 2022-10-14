@@ -1,19 +1,17 @@
 
-function highlight_path(to_highlight)
+function highlight_path(player, tree_type)
 {
-
-
 
     dim_all_cards();
 
     // Un-dim the cards that are part of the path to highlight to make it stand out
-    for (const [player, tree_dict] of Object.entries(top_paths)){
-        for (const [tree_type, coord] of Object.entries(tree_dict[to_highlight].Path)){
+    //for (const [player, tree_dict] of Object.entries(top_paths)){
+        for (const [tree, coord] of Object.entries(top_paths[player][tree_type].Path)){
               var card = document.getElementById(coord);
               card.classList.remove("dimmed");
 		}
-    }
-};
+    };
+//};
 
 function dim_all_cards()
 {
@@ -21,7 +19,7 @@ function dim_all_cards()
     // TODO - this is a very silly loop to dim all coords - refactor
     all_coords = []
     num_players = 2
-    rows = 5
+    rows = 6
     columns = 10
     for (p = 1; p <= num_players; p++)
     {
@@ -34,6 +32,8 @@ function dim_all_cards()
           }
         }
      };
+
+    console.log(all_coords)
 
     all_coords.forEach(function(coord){
         card = document.getElementById(coord);

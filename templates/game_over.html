@@ -17,7 +17,7 @@
                             {% set score = top_paths[player][tree]["Score"] %}
                             {% if score != None %}
                             <div class="scoring_tree_type">
-                                <p onmouseover='highlight_path("{{tree}}");'>{{tree}}: {{score}}</p>
+                                <p onmouseover='highlight_path("{{player}}", "{{tree}}");' onmouseleave="dim_all_cards();">{{tree}}: {{score}}</p>
                             </div>
                             {% endif %}
                         {% endfor %}
@@ -88,6 +88,9 @@
 
 <script>
     var top_paths = ({{ top_paths|tojson|safe }})
+
+    dim_all_cards();
+
 </script>
 
 {% endblock %}
