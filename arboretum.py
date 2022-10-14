@@ -20,7 +20,7 @@ def main():
         # TODO This sends a nested list with Cards() - send just the card name instead?
         player_boards[player_name] = p.board.board_grid
         player_hands[player_name] = p.get_player_card_names()
-        top_discard_cards[player_name] = p.graveyard.get_top_card(only_str=True)
+        top_discard_cards[player_name] = p.discard.get_top_card(only_str=True)
 
     current_player_name = game_manager.current_player.name
     game_phase = game_manager.game_phase.value
@@ -104,7 +104,7 @@ def draw_card_from_discard():
     """
     player_to_draw_from = request.form["discard_owner"]
     player_instance = game_manager.scorer.get_player_instance(player_to_draw_from)
-    game_manager.current_player.draw_card_from_graveyard(player_to_draw_from=player_instance)
+    game_manager.current_player.draw_card_from_discard(player_to_draw_from=player_instance)
 
     game_manager.num_cards_drawn_current_turn += 1
     if game_manager.num_cards_drawn_current_turn >= 2:
@@ -169,7 +169,7 @@ def discard_card():
     If it is, navigate to the scoring screen. If it's not, start the next player's turn.
     """
     card_to_discard = request.form["card_name"]
-    game_manager.current_player.discard_card(card_to_discard, to_graveyard=True)
+    game_manager.current_player.discard_card(card_to_discard, to_discard=True)
 
     game_over_bool = game_manager.check_if_game_is_over()
 

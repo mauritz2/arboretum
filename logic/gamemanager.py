@@ -1,5 +1,5 @@
 from logic.player import Player
-from logic.graveyard import Graveyard
+from logic.discard import Discard
 from logic.deck import Deck
 from logic.board import Board
 from logic.scorer import Scorer
@@ -27,7 +27,7 @@ class GameManager:
     def setup_scorer(self) -> Scorer:
         """
         Creates all the class instances needed to run the game, including the Scorer
-        which contains all the players and their respective boards, decks, graveyards
+        which contains all the players and their respective boards, decks, discard piles
         Returns a Scorer instance which contain all the instances to run the game
         """
 
@@ -35,12 +35,12 @@ class GameManager:
         deck = Deck()
         for i in range(self.num_players):
             player_name = f"Player {i + 1}"
-            graveyard = Graveyard(cards=[])
+            discard = Discard(cards=[])
             board = Board(num_rows=config.BOARD_ROWS, num_columns=config.BOARD_COLUMNS)
 
             player = Player(name=player_name,
                             deck=deck,
-                            graveyard=graveyard,
+                            discard=discard,
                             board=board
                             )
             players.append(player)

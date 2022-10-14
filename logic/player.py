@@ -1,14 +1,14 @@
 import logic.config as config
 from logic.deck import Deck
 from logic.board import Board
-from logic.graveyard import Graveyard
+from logic.discard import Discard
 
 
 class Player:
     def __init__(self,
                  name: str,
                  deck: Deck,
-                 graveyard: Graveyard,
+                 discard: Discard,
                  board: Board,
                  num_cards_starting_hand: int = config.NUM_CARDS_STARTING_HAND):
 
@@ -17,7 +17,7 @@ class Player:
         # TODO - This inheritance doesn't make sense - why would each player have their own Deck?
         # It probably makes more sense to have the deck be owned by the GameManager?
         self.deck = deck
-        self.graveyard = graveyard
+        self.discard = discard
         self.board = board
         self.first_tree_placed = False
         self.score = 0
@@ -41,32 +41,32 @@ class Player:
                 raise ValueError(f"You cannot place a tree at ({row}, {column}) since it's not adjacent to an existing tree.")
 
         self.board.board_grid[row][column] = self.cards_on_hand[card_name]
-        self.discard_card(card_name=card_name, to_graveyard=False)
+        self.discard_card(card_name=card_name, to_discard=False)
         self.first_tree_placed = True
 
     def draw_card_from_deck(self) -> None:
-        # TODO - remove inconsistency where card[0] is top card in deck, but bottom card in graveyard
+        # TODO - remove inconsistency where card[0] is top card in deck, but bottom card in discard
         card = self.deck.cards[0]
         self.cards_on_hand[card.card_name] = card
         self.deck.remove_top_card()
 
-    def draw_card_from_graveyard(self, player_to_draw_from: 'Player') -> None:
+    def draw_card_from_discard(self, player_to_draw_from: 'Player') -> None:
         """
-        Takes a player as input to determine what player's graveyard to draw from
-        Draws a card from that pile (i.e. removes it from that graveyard and adds it to player hand)
+        Takes a player as input to determine what player's discard to draw from
+        Draws a card from that pile (i.e. removes it from that discard and adds it to player hand)
         Type hint is 'Player' as a str since from __future__ import annotations was throwing an error
 
         # TODO - refactor so it takes a PLayer name as input as opposed to passing an entire Player instance
         """
-        if len(player_to_draw_from.graveyard.cards) <= 0:
+        if len(player_to_draw_from.discard.cards) <= 0:
             raise ValueError(f"The targeted discard pile of {player_to_draw_from.name} is empty. Try drawing from another discard pile or the deck.")
-        card = player_to_draw_from.graveyard.get_top_card(only_str=False)
+        card = player_to_draw_from.discard.get_top_card(only_str=False)
         self.cards_on_hand[card.card_name] = card
-        player_to_draw_from.graveyard.remove_top_card()
+        player_to_draw_from.discard.remove_top_card()
 
-    def discard_card(self, card_name: str, to_graveyard: bool) -> None:
-        if to_graveyard:
-            self.graveyard.add_card_on_top(self.cards_on_hand[card_name])
+    def discard_card(self, card_name: str, to_discard: bool) -> None:
+        if to_discard:
+            self.discard.add_card_on_top(self.cards_on_hand[card_name])
         del self.cards_on_hand[card_name]
 
     def get_player_card_names(self) -> list[str]:

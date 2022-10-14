@@ -66,25 +66,25 @@ def test_reject_no_adjacency_diagnoal_tree(player):
         player.play_card(tree2, row2, column2)
 
 
-def test_draw_card_from_graveyard(player):
+def test_draw_card_from_discard(player):
     """
     Test that drawing from a discard pile removes the card from the discard pile and adds it to the player's hand
     """
-    # Graveyard contains Cassia 1 and Cassia 2 by default with Cassia 2 as the top card
+    # discard contains Cassia 1 and Cassia 2 by default with Cassia 2 as the top card
     assert "Cassia 2" not in player.cards_on_hand
-    assert "Cassia 2" in [c.card_name for c in player.graveyard.cards]
-    player.draw_card_from_graveyard(player)
+    assert "Cassia 2" in [c.card_name for c in player.discard.cards]
+    player.draw_card_from_discard(player)
     assert "Cassia 2" in player.cards_on_hand
-    assert "Cassia 2" not in [c.card_name for c in player.graveyard.cards]
+    assert "Cassia 2" not in [c.card_name for c in player.discard.cards]
 
 
-def test_draw_card_from_graveyard_draw_from_other_player(player, player2):
+def test_draw_card_from_discard_draw_from_other_player(player, player2):
     """
     Verify that drawing from other players' discard piles works
     """
-    player2.graveyard.cards = [Card(tree_type="Jacaranda", tree_val=8)]
-    player.draw_card_from_graveyard(player2)
+    player2.discard.cards = [Card(tree_type="Jacaranda", tree_val=8)]
+    player.draw_card_from_discard(player2)
     assert "Jacaranda 8" in player.cards_on_hand.keys()
-    assert "Jacaranda 8" not in [c.card_name for c in player2.graveyard.cards]
+    assert "Jacaranda 8" not in [c.card_name for c in player2.discard.cards]
 
 

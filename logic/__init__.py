@@ -3,7 +3,7 @@ from logic.board import Board
 from logic.deck import Deck
 from logic.scorer import Scorer
 from logic.card import Card
-from logic.graveyard import Graveyard
+from logic.discard import Discard
 from logic.gamemanager import GameManager
 from logic.gamemanager import GameState, player_game_state_messages
 import logic.config as config

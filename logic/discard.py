@@ -3,9 +3,9 @@ from logic.card import Card
 
 
 @dataclass()
-class Graveyard:
+class Discard:
     """
-    Graveyard deck containing discarded cards. The players can draw from either player's graveyard.
+    The discard pile contains cards discarded by players. The players can draw from either player's discard pile.
     Position 0 in self.cards is the bottom card.
     Position -1 is the last (i.e. top card) that you can draw from.
     """
