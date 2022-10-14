@@ -8,6 +8,19 @@ from logic.gamemanager import GameManager
 from logic.gamemanager import GameState, player_game_state_messages
 import logic.config as config
 
+# TODO
+# Thoughts on stuff to fix
+# Fix all TODOs :-)
+# Break out the deck
+# Refactor the GameManager
+# The GameManager should set up the deck, players. It then calls the Scorer when needed.
+# Refactor how the board is dimmed - at minimmum it needs to read col and row lengths
+#
+
+
+## UI
+# Log message box that shows what just happened? E.g. "Player drew card X"?
+
 # New code when Arboretum is imported
 
 game_logic = GameManager(config.NUM_PLAYERS)

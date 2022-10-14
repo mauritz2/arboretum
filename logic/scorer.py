@@ -182,7 +182,7 @@ class Scorer:
         # {"Player 1: {"Cassia: {"Path": None, "Score": None}, {"Oak: {"Path": [Card(...), Card(...)], "Score":4}.. "Player 2" ...
         # TODO - make a function that returns the data structure above and yo can specify the card attribute you want (?) e.g. coords
         top_paths = {}
-        top_score = 0
+        winning_score = 0
         winner = None
 
         scoring_players = self.calculate_scoring_players_by_tree()
@@ -201,10 +201,11 @@ class Scorer:
                     player.score += top_score
             else:
                 top_paths[player.name] = individual_scores
-                if player.score >= top_score:
+                if player.score >= winning_score:
+                    winning_score = player.score
                     winner = player
 
-        return winner, scoring_players, top_paths
+        return winner, top_paths
 
     def get_player_instance(self, name: str) -> Player:
         """

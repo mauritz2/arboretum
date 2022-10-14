@@ -125,7 +125,6 @@ def main():
         player_hands[player_name] = p.get_player_card_names()
         top_discard_cards[player_name] = p.graveyard.get_top_card(only_str=True)
 
-    # TODO - this structure is silly - the GameManager should have the .players as opposed to scorer
     current_player_name = game_logic.current_player.name
     #game_logic.game_phase = GameState.SCORING
     game_phase = game_logic.game_phase.value
@@ -165,18 +164,8 @@ def game_over():
         player_boards[player_name] = p.board.board_grid
         player_hands[player_name] = p.get_player_card_names()
 
+    winner, top_paths = game_logic.get_winner()
 
-    winner, scorer_by_tree, top_paths = game_logic.get_winner()
-
-    # TODO - refactor this dict so that it's {"Player 1: ["Cassia", "Jacaranda"]} and then remove this code
-    scoring_players_updated = {}
-    for player in ["Player 1", "Player 2"]:
-        scoring_for = []
-        for tree in scorer_by_tree:
-            for p in scorer_by_tree[tree]:
-                if player == p.name:
-                    scoring_for.append(tree)
-        scoring_players_updated[player] = scoring_for
     #print("\n")
     #print(scoring_players_updated)
     #print("Player boards below \n\n")
@@ -186,8 +175,6 @@ def game_over():
         for tree_dict in top_paths[player]:
             list_of_coords = []
             for card in top_paths[player][tree_dict]["Path"]:
-                print(card)
-                # TODO - make this dynamically call the correct player's board
                 player_instance = game_logic.scorer.get_player_instance(player)
                 (row, col) = player_instance.board.find_coords_of_card(card)
                 # If is player num, row, col (e.g. 111 is Player 1 row 1 column 1)
@@ -200,7 +187,6 @@ def game_over():
     return render_template("game_over.html",
                            player_hands=player_hands,
                            player_boards=player_boards,
-                           scoring_players=scoring_players_updated,
                            top_paths=top_paths,
                            winner_name=winner.name
                            )

@@ -227,6 +227,7 @@ def test_determine_winner_one_tree_one_path_each(scorer):
     """
     Verify  that player 1 wins when they are the only ones that
     can score for their Oak path
+    TODO - improve these test cases since this func now returns multiple values
     """
     oak1 = Card(tree_type="Oak", tree_val=1)
     oak2 = Card(tree_type="Oak", tree_val=2)
@@ -243,7 +244,7 @@ def test_determine_winner_one_tree_one_path_each(scorer):
         "Oak 2": oak2
     }
 
-    # Player 1 path
+    # Player 1 path - 3
     scorer.players[0].board.board_grid[1][2] = oak3
     scorer.players[0].board.board_grid[1][3] = oak4
     scorer.players[0].board.board_grid[1][4] = oak5
@@ -253,11 +254,11 @@ def test_determine_winner_one_tree_one_path_each(scorer):
         "Oak 8": oak8,
     }
 
-    # Player 2 path
+    # Player 2 path - not scoring
     scorer.players[1].board.board_grid[1][2] = oak6
     scorer.players[1].board.board_grid[1][3] = oak7
 
-    winner = scorer.determine_winner()
+    winner, _ = scorer.determine_winner()
     assert winner.name == "Player 1"
 
 
@@ -287,7 +288,7 @@ def test_determine_winner_multiple_trees_and_paths(scorer):
     }
 
     # Player 1 path
-    # Oak Path -> 4
+    # Oak Path -> 3
     # Blue Spruce Path -> 3
     scorer.players[0].board.board_grid[1][2] = oak3
     scorer.players[0].board.board_grid[1][3] = blue4
@@ -309,5 +310,5 @@ def test_determine_winner_multiple_trees_and_paths(scorer):
     scorer.players[1].board.board_grid[1][3] = oak7
     scorer.players[1].board.board_grid[1][4] = jac8
 
-    winner = scorer.determine_winner()
+    winner, _ = scorer.determine_winner()
     assert winner.name == "Player 2"
