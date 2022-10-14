@@ -17,7 +17,7 @@ def test_establish_scoring_players_simple_case(player, player2, scorer):
         player2.cards_on_hand[card.card_name] = card
 
     scorer.players = [player, player2]
-    scorer_dict = scorer.calculate_scoring_players_by_tree()
+    scorer_dict = scorer.calculate_scoring_players()
     assert scorer_dict["Cassia"][0] is player2
     assert scorer_dict["Blue Spruce"][0] is player
     assert scorer_dict["Jacaranda"][0] is player2
@@ -40,7 +40,7 @@ def test_establish_scoring_players_both_score(player, player2, scorer):
         player2.cards_on_hand[card.card_name] = card
 
     scorer.players = [player, player2]
-    scorer_dict = scorer.calculate_scoring_players_by_tree()
+    scorer_dict = scorer.calculate_scoring_players()
     assert player in scorer_dict["Cassia"]
     assert player2 in scorer_dict["Cassia"]
     assert player in scorer_dict["Oak"]
@@ -53,7 +53,7 @@ def test_establish_scoring_players_empty_hands(player, player2, scorer):
     players = [player, player2]
     scorer.players = players
     scorer.trees = ["Cassia", "Blue Spruce", "Jacaranda", "Lilac", "Magnolia", "Maple", "Olive"]
-    scorer_dict = scorer.calculate_scoring_players_by_tree()
+    scorer_dict = scorer.calculate_scoring_players()
     for p in players:
         assert p in scorer_dict["Cassia"]
         assert p in scorer_dict["Blue Spruce"]
@@ -312,3 +312,31 @@ def test_determine_winner_multiple_trees_and_paths(scorer):
 
     winner, _ = scorer.determine_winner()
     assert winner.name == "Player 2"
+
+
+def test_calculate_scoring_players(player, player2, scorer):
+    player.cards_on_hand = {}
+    tree_types_1 = ["Cassia", "Cassia", "Oak", "Jacaranda", "Jacaranda"]
+    tree_vals_1 = [4, 3, 8, 1, 7]
+    for card_name in zip(tree_types_1, tree_vals_1):
+        card = Card(tree_type=card_name[0], tree_val=card_name[1])
+        player.cards_on_hand[card.card_name] = card
+
+    player2.cards_on_hand = {}
+    tree_types_2 = ["Oak", "Cassia", "Jacaranda"]
+    tree_vals_2 = [1, 7, 8]
+    for card_name in zip(tree_types_2, tree_vals_2):
+        card = Card(tree_type=card_name[0], tree_val=card_name[1])
+        player2.cards_on_hand[card.card_name] = card
+
+    scorer.players = [player, player2]
+
+    expected_dict = {"Player 1": ["Cassia", "Jacaranda", "Blue Spruce"], "Player 2": ["Cassia", "Blue Spruce",  "Oak"]}
+    actual_dict = scorer.calculate_scoring_players()
+    for p_name in ["Player 1", "Player 2"]:
+        actual = actual_dict[p_name]
+        actual.sort()
+        expected = expected_dict[p_name]
+        expected.sort()
+        assert(actual == expected)
+

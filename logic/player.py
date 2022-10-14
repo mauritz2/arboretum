@@ -13,6 +13,7 @@ class Player:
                  num_cards_starting_hand: int = config.NUM_CARDS_STARTING_HAND):
 
         self.name = name
+        # TODO - document why this is a dict instead of a list if I remember :-)
         self.cards_on_hand = {}
         # TODO - This inheritance doesn't make sense - why would each player have their own Deck?
         # It probably makes more sense to have the deck be owned by the GameManager?

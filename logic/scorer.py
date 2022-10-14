@@ -16,26 +16,65 @@ class Scorer:
         self.players = players
         self.trees = config.TREES if trees is None else trees
 
-    def calculate_scoring_players_by_tree(self) -> dict:
+    def calculate_scoring_players(self) -> dict[str: list[str]]:
         """
-        Returns a dict containing each tree type as key, and a list of scoring players as value
-        Who scores is established based on the sum of tree values each player has on hand
+        Determines who scores based on the sum of the cards on each player's hand at the end of the game
+        Multiple players can score for each type of tree, if the sum of the cards in their hand is equal for
+        that tree type
+        As per the rules, if a player has an 8, but another player has the 1 of the same tree type, the 8 counts as 0
+
+        Returns the format below:
+        {"Player 1": ["Cassia", "Jacaranda", "Blue Spruce", "Oak"], "Player 2": ["Cassia", "Blue Spruce"]}
         """
-        scorers_by_tree = {}
-        hand_sums = self._calculate_hand_sums()
-        for tree in self.trees:
-            top_score = self._find_top_score(hand_sums, tree)
-            top_scorers = self._find_scoring_players(hand_sums, top_score, tree)
-            # TODO - refactor so that player name is dict and then value is a list of trees they scored for?
-            # might be more natural to loop through players when tallying up scores
-            scorers_by_tree[tree] = top_scorers
-        return scorers_by_tree
+        scoring_players = {}
+
+        for tree_type in self.trees:
+            top_tree_score = 0
+            scorers = []
+            for player in self.players:
+                # Calculate the total sum for the current tree type (e.g. Oak)
+                cards = player.cards_on_hand.values()
+                card_values = [card.tree_val if card.tree_type == tree_type else 0 for card in cards]
+                score = sum(card_values)
+
+                # Make 8 count as 0, if an opposing player has the 1 with that same tree type
+                if 8 in card_values:
+                    one_card_name = Card(tree_type=tree_type, tree_val=1).card_name
+                    if self.is_in_opponents_hand(one_card_name, player_to_excl=player.name):
+                        score -= 8
+
+                # Check if the total sum for this tree is the highest, or tied with highest
+                if score > top_tree_score:
+                    top_tree_score = score
+                    scorers = [player.name]
+                elif score == top_tree_score:
+                    scorers.append(player.name)
+            # This loop is used to make the player the key in the return dict, which matches most other scoring dicts
+            for scorer in scorers:
+                if scorer in scoring_players:
+                    scoring_players[scorer].append(tree_type)
+                else:
+                    scoring_players[scorer] = [tree_type]
+
+        return scoring_players
+
+
+        # scorers_by_tree = {}
+        # hand_sums = self._calculate_hand_sums()
+        # for tree in self.trees:
+        #     top_score = self._find_top_score(hand_sums, tree)
+        #     top_scorers = self._find_scoring_players(hand_sums, top_score, tree)
+        #     # TODO - refactor so that player name is dict and then value is a list of trees they scored for?
+        #     # might be more natural to loop through players when tallying up scores
+        #     scorers_by_tree[tree] = top_scorers
+        # return scorers_by_tree
 
     def _calculate_hand_sums(self):
         """
-		Calculates the sum of the cards on each player's hand
-		Example: the sum of [Oak 2, Oak 3] is 5
-		"""
+        Calculates the sum of the cards on each player's hand
+        Example: the sum of [Oak 2, Oak 3] is 5
+        # TODO - should probbaly just return the Player Name as opposed to the full player call - it knows too much
+        """
         hand_sums = {}
         for player in self.players:
             player_sum_by_tree = {}
@@ -45,9 +84,9 @@ class Scorer:
                 for card_name, card in hand.items():
                     if card.tree_type == tree:
                         if card.tree_val == 8:
-                            another_player_has_the_1 = self._check_if_tree_on_hand(tree_type=tree,
-                                                                                   tree_num=1,
-                                                                                   player_to_excl=player.name)
+                            another_player_has_the_1 = self.is_in_opponents_hand(tree_type=tree,
+                                                                                 tree_num=1,
+                                                                                 player_to_excl=player.name)
                             if another_player_has_the_1:
                                 continue
                         total_sum += card.tree_val
@@ -56,17 +95,16 @@ class Scorer:
 
         return hand_sums
 
-    def _check_if_tree_on_hand(self, tree_type: str, tree_num: int, player_to_excl: list[str]):
+    def is_in_opponents_hand(self, card_name: str, player_to_excl: str) -> bool:
         """
         Check if a specific tree (e.g. Oak 8) exists in the hand of any players
         This is used to find if any players have 1s to negate the 8s when evaluating who scores
         Returns True if the specified card exists, otherwise returns False
         """
-        card = tree_type + " " + str(tree_num)
         for player in self.players:
             if player.name == player_to_excl:
-                break
-            if card in player.cards_on_hand:
+                continue
+            if card_name in player.cards_on_hand:
                 return True
         return False
 
@@ -198,7 +236,7 @@ class Scorer:
         winning_score = 0
         winner = None
 
-        scoring_players = self.calculate_scoring_players_by_tree()
+        scoring_players = self.calculate_scoring_players()
         for player in self.players:
             individual_scores = {}
             for tree in self.trees:
