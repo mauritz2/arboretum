@@ -2,3 +2,4 @@ logic/__pycache__
 tests/__pycache__
 __pycache__
 .idea/
+.pytest_cache

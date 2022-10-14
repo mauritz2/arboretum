@@ -7,6 +7,76 @@ app = Flask(__name__)
 app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
 
 
+@app.route("/", methods=["GET"])
+def main():
+    """
+    Gets the data to display in the UI and renders the main game screen
+    """
+    player_boards = {}
+    player_hands = {}
+    top_discard_cards = {}
+    for p in game_manager.scorer.players:
+        player_name = p.name
+        # TODO This sends a nested list with Cards() - send just the card name instead?
+        player_boards[player_name] = p.board.board_grid
+        player_hands[player_name] = p.get_player_card_names()
+        top_discard_cards[player_name] = p.graveyard.get_top_card(only_str=True)
+
+    current_player_name = game_manager.current_player.name
+    game_phase = game_manager.game_phase.value
+    num_cards_in_deck = game_manager.scorer.players[0].deck.get_amt_of_cards_left()
+
+    flash(player_game_state_messages[game_manager.game_phase])
+
+    return render_template(
+        'game.html',
+        player_hands=player_hands,
+        player_boards=player_boards,
+        game_phase=game_phase,
+        top_discard_cards=top_discard_cards,
+        current_player_name=current_player_name,
+        num_cards_in_deck=num_cards_in_deck,
+    )
+
+
+@app.route("/game_over", methods=["GET"])
+def game_over():
+    """
+    Gets the data to display in the UI on the game over screen and then renders the page
+    """
+    # TODO - this is repetition with main() - break out into function?
+    player_boards = {}
+    player_hands = {}
+    for p in game_manager.scorer.players:
+        player_name = p.name
+        # TODO This sends a nested list with Cards() - implement func in board to send just the card name instead?
+        player_boards[player_name] = p.board.board_grid
+        player_hands[player_name] = p.get_player_card_names()
+
+    winner, top_paths = game_manager.get_winner()
+
+    # TODO - should this be implemented as part of the scorer? It is a very specific id/coord structure
+    for player in top_paths:
+        for tree_dict in top_paths[player]:
+            list_of_coords = []
+            for card in top_paths[player][tree_dict]["Path"]:
+                player_instance = game_manager.scorer.get_player_instance(player)
+                (row, col) = player_instance.board.find_coords_of_card(card)
+                # If is player num, row, col (e.g. 111 is Player 1 row 1 column 1)
+                coords_id = str(player)[-1] + str(row) + str(col)
+                list_of_coords.append(coords_id)
+            top_paths[player][tree_dict]["Path"] = list_of_coords
+
+    print(top_paths)
+
+    return render_template("game_over.html",
+                           player_hands=player_hands,
+                           player_boards=player_boards,
+                           top_paths=top_paths,
+                           winner_name=winner.name
+                           )
+
+
 @app.route("/draw_card_from_deck", methods=["POST"])
 def draw_card_from_deck():
     """
@@ -65,7 +135,7 @@ def choose_coordinates():
     """
 
     if game_manager.game_phase != GameState.CHOOSE_WHERE_TO_PLAY:
-        flash(f"You can't choose where to place a card now. The current game phase is {game_manager.game_phase}.", "error")
+        flash(f"You can't place a card now. The current game phase is {game_manager.game_phase}.", "error")
         return redirect(url_for("main"))
 
     if game_manager.selected_card_to_play is None:
@@ -111,85 +181,5 @@ def discard_card():
     return redirect(url_for("main"))
 
 
-@app.route("/", methods=["GET"])
-def main():
-    """
-    Gets the data to display in the UI and renders the main game screen
-    """
-    player_boards = {}
-    player_hands = {}
-    top_discard_cards = {}
-    for p in game_manager.scorer.players:
-        player_name = p.name
-        # TODO This sends a nested list with Cards() - send just the card name instead?
-        player_boards[player_name] = p.board.board_grid
-        player_hands[player_name] = p.get_player_card_names()
-        top_discard_cards[player_name] = p.graveyard.get_top_card(only_str=True)
-
-    current_player_name = game_manager.current_player.name
-    game_phase = game_manager.game_phase.value
-    num_cards_in_deck = game_manager.scorer.players[0].deck.get_amt_of_cards_left()
-
-    flash(player_game_state_messages[game_manager.game_phase])
-
-    return render_template(
-        'game.html',
-        player_hands=player_hands,
-        player_boards=player_boards,
-        game_phase=game_phase,
-        top_discard_cards=top_discard_cards,
-        current_player_name=current_player_name,
-        num_cards_in_deck=num_cards_in_deck,
-    )
-
-@app.route("/game_over", methods=["GET"])
-def game_over():
-    """
-    Gets the data to display in the UI on the game over screen and then renders the page
-    """
-    # TODO - this is repetition with main() - break out into function?
-    player_boards = {}
-    player_hands = {}
-    for p in game_manager.scorer.players:
-        player_name = p.name
-        # TODO This sends a nested list with Cards() - implement func in board to send just the card name instead?
-        player_boards[player_name] = p.board.board_grid
-        player_hands[player_name] = p.get_player_card_names()
-
-    winner, top_paths = game_manager.get_winner()
-
-    # TODO - should this be implemented as part of the scorer? It is a very specific id/coord structure
-    for player in top_paths:
-        for tree_dict in top_paths[player]:
-            list_of_coords = []
-            for card in top_paths[player][tree_dict]["Path"]:
-                player_instance = game_manager.scorer.get_player_instance(player)
-                (row, col) = player_instance.board.find_coords_of_card(card)
-                # If is player num, row, col (e.g. 111 is Player 1 row 1 column 1)
-                coords_id = str(player)[-1] + str(row) + str(col)
-                list_of_coords.append(coords_id)
-            top_paths[player][tree_dict]["Path"] = list_of_coords
-
-    print(top_paths)
-
-    return render_template("game_over.html",
-                           player_hands=player_hands,
-                           player_boards=player_boards,
-                           top_paths=top_paths,
-                           winner_name=winner.name
-                           )
-
-
-
 if __name__ == "__main__":
     app.run(debug=True)
-
-# Next steps
-# Display amount  of cards left in deck
-# Dynamic "numbers" on cards
-# Cool "appear-on-hover" buttons on cards as opposed to ugly always-visible buttons
-# "Display Player 2 board"
-# Implement player turns - or design that system (e.g. does the front-end AND backend know whos turn it is?
-# I think the backend can know - or must know. And it passes this information to the front-end.
-
-
