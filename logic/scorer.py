@@ -204,7 +204,7 @@ class Scorer:
                 if player.score >= winning_score:
                     winning_score = player.score
                     winner = player
-
+        # TODO - get_winner should prob just return the winner and take top paths as input?
         return winner, top_paths
 
     def get_player_instance(self, name: str) -> Player:
