@@ -6,8 +6,13 @@ from logic.player import Player
 
 
 class Scorer:
+    """
+    Class to determine who scores and how much.
+    This class holds the players in the game.
+    """
     def __init__(self, players: list[Player], trees: list[str] = None):
         # TODO - should the Scorer have the players - or shouldn't that be managed by the GameManager?
+        # TODO - refactor Scorer to not be a class? Maybe everything here can be a static method. Or maybe not...
         self.players = players
         self.trees = config.TREES if trees is None else trees
 
@@ -52,6 +57,11 @@ class Scorer:
         return hand_sums
 
     def _check_if_tree_on_hand(self, tree_type: str, tree_num: int, player_to_excl: list[str]):
+        """
+        Check if a specific tree (e.g. Oak 8) exists in the hand of any players
+        This is used to find if any players have 1s to negate the 8s when evaluating who scores
+        Returns True if the specified card exists, otherwise returns False
+        """
         card = tree_type + " " + str(tree_num)
         for player in self.players:
             if player.name == player_to_excl:
@@ -62,8 +72,9 @@ class Scorer:
 
     def _find_top_score(self, scorer_dict: dict, tree: str) -> int:
         """
-		Find the top hand sum of a specified tree
-		"""
+        Find the top hand sum of a specified tree
+        TODO - is this function redundant? Seems like it's not doing much
+        """
         top_score = 0
         for player in scorer_dict:
             score = scorer_dict[player][tree]
@@ -73,8 +84,8 @@ class Scorer:
 
     def _find_scoring_players(self, scorer_dict: dict, top_score: int, tree: str) -> list:
         """
-		Find the players that have a score equal to the top score for a specified tree
-		"""
+        Find the players that have a score equal to the top score for a specified tree
+        """
         top_scorers = []
         for player in scorer_dict:
             if scorer_dict[player][tree] == top_score:
@@ -136,9 +147,11 @@ class Scorer:
 
         return valid_paths
 
-    def score_paths(self, paths_to_score: list[Card]) -> dict:
+    @staticmethod
+    def score_paths(paths_to_score: list[list[Card]]) -> (list[Card], int):
         """
-        Takes a list of valid paths as input and calculates the score for the top scoring path
+        Takes a list of lists containing all valid paths and calculates the score for the top scoring path
+        Returns the top scoring path and it's related score
         """
         top_path = []
         top_score = 0

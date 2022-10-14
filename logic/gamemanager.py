@@ -8,13 +8,13 @@ import logic.config as config
 
 
 class GameManager:
+    """
+    Class to manage the phases of the game, i.e. who's turn it is,
+    what phase in the current turn it is, when the game is over. The Game Manager also sets up the game,
+    e.g. creating the scorer with the right amount of players.
+    """
 
     def __init__(self, num_players: int) -> None:
-        # players
-        # deck
-        # scorer
-        # get_player_instance
-        # TODO - should players be owned by GameManager or Scorer_
         self.num_players = num_players
         self.scorer = self.setup_scorer()
         self.game_over = False
