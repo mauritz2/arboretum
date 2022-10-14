@@ -91,30 +91,27 @@
         {% endfor %}
         <table class="table-sm">
     </div>
-
 </div>
 
-<div class="row fixed-bottom mb-2">
-    <div class="col"></div>
-    {% for card in player_hands[current_player_name] %}
-    <div class="col">
-        <div class="overlay-button-container">
-            <img class="card_on_hand" src="../static/css/playing_cards/{{card}}.png">
-            {% if game_phase == "Choose Card" %}
-            <form action="/play_card" method="post">
-                <input name="card_name" type="hidden" value="{{card}}">
-                <input type="submit" class="btn btn-dark" value="Play card">
-            </form>
-            {% elif game_phase == "Choose Discard" %}
-            <form action="/discard_card" method="post">
-                <input name="card_name" type="hidden" value="{{card}}">
-                <input type="submit" class="btn btn-dark" value="Discard card">
-            </form>
-            {% endif %}
+<div class="row fixed-bottom justify-content-center mb-2">
+        {% for card in player_hands[current_player_name] %}
+        <div class="col-1">
+                <div class="overlay-button-container">
+                <img class="card_on_hand" src="../static/css/playing_cards/{{card}}.png">
+                {% if game_phase == "Choose Card" %}
+                    <form action="/play_card" method="post">
+                        <input name="card_name" type="hidden" value="{{card}}">
+                        <input type="submit" class="btn btn-dark" value="Play card">
+                    </form>
+                {% elif game_phase == "Choose Discard" %}
+                    <form action="/discard_card" method="post">
+                        <input name="card_name" type="hidden" value="{{card}}">
+                        <input type="submit" class="btn btn-dark" value="Discard card">
+                    </form>
+                {% endif %}
+                </div>
         </div>
-    </div>
     {% endfor %}
-    <div class="col"></div>
 </div>
 
 {% endblock %}
