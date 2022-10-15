@@ -58,43 +58,6 @@ class Scorer:
 
         return scoring_players
 
-
-        # scorers_by_tree = {}
-        # hand_sums = self._calculate_hand_sums()
-        # for tree in self.trees:
-        #     top_score = self._find_top_score(hand_sums, tree)
-        #     top_scorers = self._find_scoring_players(hand_sums, top_score, tree)
-        #     # TODO - refactor so that player name is dict and then value is a list of trees they scored for?
-        #     # might be more natural to loop through players when tallying up scores
-        #     scorers_by_tree[tree] = top_scorers
-        # return scorers_by_tree
-
-    def _calculate_hand_sums(self):
-        """
-        Calculates the sum of the cards on each player's hand
-        Example: the sum of [Oak 2, Oak 3] is 5
-        # TODO - should probbaly just return the Player Name as opposed to the full player call - it knows too much
-        """
-        hand_sums = {}
-        for player in self.players:
-            player_sum_by_tree = {}
-            hand = player.cards_on_hand
-            for tree in self.trees:
-                total_sum = 0
-                for card_name, card in hand.items():
-                    if card.tree_type == tree:
-                        if card.tree_val == 8:
-                            another_player_has_the_1 = self.is_in_opponents_hand(tree_type=tree,
-                                                                                 tree_num=1,
-                                                                                 player_to_excl=player.name)
-                            if another_player_has_the_1:
-                                continue
-                        total_sum += card.tree_val
-                player_sum_by_tree[tree] = total_sum
-            hand_sums[player] = player_sum_by_tree
-
-        return hand_sums
-
     def is_in_opponents_hand(self, card_name: str, player_to_excl: str) -> bool:
         """
         Check if a specific tree (e.g. Oak 8) exists in the hand of any players
@@ -108,27 +71,6 @@ class Scorer:
                 return True
         return False
 
-    def _find_top_score(self, scorer_dict: dict, tree: str) -> int:
-        """
-        Find the top hand sum of a specified tree
-        TODO - is this function redundant? Seems like it's not doing much
-        """
-        top_score = 0
-        for player in scorer_dict:
-            score = scorer_dict[player][tree]
-            if score > top_score:
-                top_score = score
-        return top_score
-
-    def _find_scoring_players(self, scorer_dict: dict, top_score: int, tree: str) -> list:
-        """
-        Find the players that have a score equal to the top score for a specified tree
-        """
-        top_scorers = []
-        for player in scorer_dict:
-            if scorer_dict[player][tree] == top_score:
-                top_scorers.append(player)
-        return top_scorers
 
     @staticmethod
     def get_possible_start_end_card_pairs(cards_of_type: list[Card]) -> list[tuple]:
@@ -240,7 +182,7 @@ class Scorer:
         for player in self.players:
             individual_scores = {}
             for tree in self.trees:
-                if player not in scoring_players[tree]:
+                if tree not in scoring_players[player.name]:
                     # The player did not score for this path so no need to calculate points
                     # Score = None indicates the player did not score
                     individual_scores[tree] = {"Path": [], "Score": None}
