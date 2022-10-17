@@ -1,10 +1,10 @@
 from logic import Card
 
 def test_find_paths_single_simple_path(scorer):
-    oak2 = Card(tree_type="Oak", tree_val=2)
-    cas4 = Card(tree_type="Cassia", tree_val=4)
-    jac6 = Card(tree_type="Jacaranda", tree_val=6)
-    oak7 = Card(tree_type="Oak", tree_val=7)
+    oak2 = Card(tree_type="Oak", tree_num=2)
+    cas4 = Card(tree_type="Cassia", tree_num=4)
+    jac6 = Card(tree_type="Jacaranda", tree_num=6)
+    oak7 = Card(tree_type="Oak", tree_num=7)
 
     scorer.players[0].board.board_grid[2][2] = oak2
     scorer.players[0].board.board_grid[2][3] = cas4
@@ -20,14 +20,14 @@ def test_find_paths_single_simple_path(scorer):
 
 
 def test_find_paths_two_simple_paths(scorer):
-    oak2 = Card(tree_type="Oak", tree_val=2)
-    cas4 = Card(tree_type="Cassia", tree_val=4)
-    blue3 = Card(tree_type="Blue Spruce", tree_val=3)
-    blue4 = Card(tree_type="Blue Spruce", tree_val=4)
-    blue6 = Card(tree_type="Blue Spruce", tree_val=6)
-    jac6 = Card(tree_type="Jacaranda", tree_val=6)
-    blue7 = Card(tree_type="Blue Spruce", tree_val=7)
-    oak8 = Card(tree_type="Oak", tree_val=8)
+    oak2 = Card(tree_type="Oak", tree_num=2)
+    cas4 = Card(tree_type="Cassia", tree_num=4)
+    blue3 = Card(tree_type="Blue Spruce", tree_num=3)
+    blue4 = Card(tree_type="Blue Spruce", tree_num=4)
+    blue6 = Card(tree_type="Blue Spruce", tree_num=6)
+    jac6 = Card(tree_type="Jacaranda", tree_num=6)
+    blue7 = Card(tree_type="Blue Spruce", tree_num=7)
+    oak8 = Card(tree_type="Oak", tree_num=8)
 
     # Path start
     scorer.players[0].board.board_grid[2][2] = oak2
@@ -58,12 +58,12 @@ def test_find_paths_two_simple_paths(scorer):
 
 
 def test_find_paths_short_medium_long(scorer):
-    oak2 = Card(tree_type="Oak", tree_val=2)
-    cas4 = Card(tree_type="Cassia", tree_val=4)
-    blue3 = Card(tree_type="Blue Spruce", tree_val=3)
-    jac6 = Card(tree_type="Jacaranda", tree_val=6)
-    blue7 = Card(tree_type="Blue Spruce", tree_val=7)
-    oak8 = Card(tree_type="Oak", tree_val=8)
+    oak2 = Card(tree_type="Oak", tree_num=2)
+    cas4 = Card(tree_type="Cassia", tree_num=4)
+    blue3 = Card(tree_type="Blue Spruce", tree_num=3)
+    jac6 = Card(tree_type="Jacaranda", tree_num=6)
+    blue7 = Card(tree_type="Blue Spruce", tree_num=7)
+    oak8 = Card(tree_type="Oak", tree_num=8)
 
     # Path start
     scorer.players[0].board.board_grid[2][2] = oak2
@@ -93,13 +93,13 @@ def test_find_paths_branching_paths(scorer):
     """
     Verify that we can find all paths when paths branch out multiple times
     """
-    oak2 = Card(tree_type="Oak", tree_val=2)
-    blue3 = Card(tree_type="Blue Spruce", tree_val=3)
-    oak4 = Card(tree_type="Oak", tree_val=4)
-    blue5 = Card(tree_type="Blue Spruce", tree_val=5)
-    blue6 = Card(tree_type="Blue Spruce", tree_val=6)
-    oak7 = Card(tree_type="Oak", tree_val=7)
-    oak8 = Card(tree_type="Oak", tree_val=8)
+    oak2 = Card(tree_type="Oak", tree_num=2)
+    blue3 = Card(tree_type="Blue Spruce", tree_num=3)
+    oak4 = Card(tree_type="Oak", tree_num=4)
+    blue5 = Card(tree_type="Blue Spruce", tree_num=5)
+    blue6 = Card(tree_type="Blue Spruce", tree_num=6)
+    oak7 = Card(tree_type="Oak", tree_num=7)
+    oak8 = Card(tree_type="Oak", tree_num=8)
 
     # Path start
     scorer.players[0].board.board_grid[0][0] = oak2
@@ -129,10 +129,10 @@ def test_find_paths_branching_paths(scorer):
 
 
 def test_get_possible_start_end_loc_pairs(scorer):
-    oak1 = Card(tree_type="Oak", tree_val=1)
-    oak2 = Card(tree_type="Oak", tree_val=2)
-    oak4 = Card(tree_type="Oak", tree_val=4)
-    oak8 = Card(tree_type="Oak", tree_val=8)
+    oak1 = Card(tree_type="Oak", tree_num=1)
+    oak2 = Card(tree_type="Oak", tree_num=2)
+    oak4 = Card(tree_type="Oak", tree_num=4)
+    oak8 = Card(tree_type="Oak", tree_num=8)
 
     cards = [oak1, oak2, oak4, oak8]
 
@@ -157,12 +157,12 @@ def test_get_possible_start_end_loc_pairs_empty(scorer):
 
 
 def test_score_paths_3_paths_and_ending_in_8(scorer):
-    oak2 = Card(tree_type="Oak", tree_val=2)
-    cas4 = Card(tree_type="Cassia", tree_val=4)
-    blue3 = Card(tree_type="Blue Spruce", tree_val=3)
-    jac6 = Card(tree_type="Jacaranda", tree_val=6)
-    blue7 = Card(tree_type="Blue Spruce", tree_val=7)
-    oak8 = Card(tree_type="Oak", tree_val=8)
+    oak2 = Card(tree_type="Oak", tree_num=2)
+    cas4 = Card(tree_type="Cassia", tree_num=4)
+    blue3 = Card(tree_type="Blue Spruce", tree_num=3)
+    jac6 = Card(tree_type="Jacaranda", tree_num=6)
+    blue7 = Card(tree_type="Blue Spruce", tree_num=7)
+    oak8 = Card(tree_type="Oak", tree_num=8)
 
     paths = [[oak2, oak8],
              [oak2, blue3, blue7, oak8],
@@ -181,10 +181,10 @@ def test_score_path_complex(scorer):
     """
     Tests a path where all trees are the same (i.e. double points) and that starts with 1 and ends with 8
     """
-    oak1 = Card(tree_type="Oak", tree_val=1)
-    oak3 = Card(tree_type="Oak", tree_val=3)
-    oak4 = Card(tree_type="Oak", tree_val=4)
-    oak8 = Card(tree_type="Oak", tree_val=8)
+    oak1 = Card(tree_type="Oak", tree_num=1)
+    oak3 = Card(tree_type="Oak", tree_num=3)
+    oak4 = Card(tree_type="Oak", tree_num=4)
+    oak8 = Card(tree_type="Oak", tree_num=8)
 
     paths = [[oak1, oak3, oak4, oak8]]
 
@@ -204,14 +204,14 @@ def test_determine_winner_one_tree_one_path_each(scorer):
     can score for their Oak path
     TODO - improve these test cases since this func now returns multiple values
     """
-    oak1 = Card(tree_type="Oak", tree_val=1)
-    oak2 = Card(tree_type="Oak", tree_val=2)
-    oak3 = Card(tree_type="Oak", tree_val=3)
-    oak4 = Card(tree_type="Oak", tree_val=4)
-    oak5 = Card(tree_type="Oak", tree_val=5)
-    oak6 = Card(tree_type="Oak", tree_val=6)
-    oak7 = Card(tree_type="Oak", tree_val=7)
-    oak8 = Card(tree_type="Oak", tree_val=8)
+    oak1 = Card(tree_type="Oak", tree_num=1)
+    oak2 = Card(tree_type="Oak", tree_num=2)
+    oak3 = Card(tree_type="Oak", tree_num=3)
+    oak4 = Card(tree_type="Oak", tree_num=4)
+    oak5 = Card(tree_type="Oak", tree_num=5)
+    oak6 = Card(tree_type="Oak", tree_num=6)
+    oak7 = Card(tree_type="Oak", tree_num=7)
+    oak8 = Card(tree_type="Oak", tree_num=8)
 
     # Player 1 hand
     scorer.players[0].cards_on_hand = {
@@ -242,18 +242,18 @@ def test_determine_winner_multiple_trees_and_paths(scorer):
     Verify that player 2 wins when they have one great path vs. player two's two
     less good scoring paths
     """
-    oak1 = Card(tree_type="Oak", tree_val=1)
-    oak2 = Card(tree_type="Oak", tree_val=2)
-    oak3 = Card(tree_type="Oak", tree_val=3)
-    oak5 = Card(tree_type="Oak", tree_val=5)
-    oak6 = Card(tree_type="Oak", tree_val=6)
-    oak7 = Card(tree_type="Oak", tree_val=7)
-    oak8 = Card(tree_type="Oak", tree_val=8)
-    blue4 = Card(tree_type="Blue Spruce", tree_val=4)
-    blue6 = Card(tree_type="Blue Spruce", tree_val=6)
-    jac1 = Card(tree_type="Jacaranda", tree_val=1)
-    jac2 = Card(tree_type="Jacaranda", tree_val=2)
-    jac8 = Card(tree_type="Jacaranda", tree_val=8)
+    oak1 = Card(tree_type="Oak", tree_num=1)
+    oak2 = Card(tree_type="Oak", tree_num=2)
+    oak3 = Card(tree_type="Oak", tree_num=3)
+    oak5 = Card(tree_type="Oak", tree_num=5)
+    oak6 = Card(tree_type="Oak", tree_num=6)
+    oak7 = Card(tree_type="Oak", tree_num=7)
+    oak8 = Card(tree_type="Oak", tree_num=8)
+    blue4 = Card(tree_type="Blue Spruce", tree_num=4)
+    blue6 = Card(tree_type="Blue Spruce", tree_num=6)
+    jac1 = Card(tree_type="Jacaranda", tree_num=1)
+    jac2 = Card(tree_type="Jacaranda", tree_num=2)
+    jac8 = Card(tree_type="Jacaranda", tree_num=8)
 
     # Player 1 hand
     scorer.players[0].cards_on_hand = {
@@ -294,17 +294,17 @@ def test_determine_winner_tie(scorer):
     Verify that player 2 wins when they have one great path vs. player two's two
     less good scoring paths
     """
-    oak1 = Card(tree_type="Oak", tree_val=1)
-    oak2 = Card(tree_type="Oak", tree_val=2)
-    oak3 = Card(tree_type="Oak", tree_val=3)
-    oak5 = Card(tree_type="Oak", tree_val=5)
-    oak7 = Card(tree_type="Oak", tree_val=7)
-    oak8 = Card(tree_type="Oak", tree_val=8)
-    blue4 = Card(tree_type="Blue Spruce", tree_val=4)
-    blue6 = Card(tree_type="Blue Spruce", tree_val=6)
-    jac2 = Card(tree_type="Jacaranda", tree_val=2)
-    jac3 = Card(tree_type="Jacaranda", tree_val=3)
-    jac8 = Card(tree_type="Jacaranda", tree_val=8)
+    oak1 = Card(tree_type="Oak", tree_num=1)
+    oak2 = Card(tree_type="Oak", tree_num=2)
+    oak3 = Card(tree_type="Oak", tree_num=3)
+    oak5 = Card(tree_type="Oak", tree_num=5)
+    oak7 = Card(tree_type="Oak", tree_num=7)
+    oak8 = Card(tree_type="Oak", tree_num=8)
+    blue4 = Card(tree_type="Blue Spruce", tree_num=4)
+    blue6 = Card(tree_type="Blue Spruce", tree_num=6)
+    jac2 = Card(tree_type="Jacaranda", tree_num=2)
+    jac3 = Card(tree_type="Jacaranda", tree_num=3)
+    jac8 = Card(tree_type="Jacaranda", tree_num=8)
 
     # Player 1 hand
     scorer.players[0].cards_on_hand = {
@@ -343,15 +343,15 @@ def test_calculate_scoring_players(player, player2, scorer):
     tree_types_1 = ["Cassia", "Cassia", "Oak", "Jacaranda", "Jacaranda"]
     tree_vals_1 = [4, 3, 8, 1, 7]
     for card_name in zip(tree_types_1, tree_vals_1):
-        card = Card(tree_type=card_name[0], tree_val=card_name[1])
-        player.cards_on_hand[card.card_name] = card
+        card = Card(tree_type=card_name[0], tree_num=card_name[1])
+        player.cards_on_hand[card.name] = card
 
     player2.cards_on_hand = {}
     tree_types_2 = ["Oak", "Cassia", "Jacaranda"]
     tree_vals_2 = [1, 7, 8]
     for card_name in zip(tree_types_2, tree_vals_2):
-        card = Card(tree_type=card_name[0], tree_val=card_name[1])
-        player2.cards_on_hand[card.card_name] = card
+        card = Card(tree_type=card_name[0], tree_num=card_name[1])
+        player2.cards_on_hand[card.name] = card
 
     scorer.players = [player, player2]
 

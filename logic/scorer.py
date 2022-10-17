@@ -32,12 +32,12 @@ class Scorer:
             for player in self.players:
                 # Calculate the total sum for the current tree type (e.g. Oak)
                 cards = player.cards_on_hand.values()
-                card_values = [card.tree_val if card.tree_type == tree_type else 0 for card in cards]
+                card_values = [card.tree_num if card.tree_type == tree_type else 0 for card in cards]
                 score = sum(card_values)
 
                 # Make 8 count as 0, if an opposing player has the 1 with that same tree type
                 if 8 in card_values:
-                    one_card_name = Card(tree_type=tree_type, tree_val=1).card_name
+                    one_card_name = Card(tree_type=tree_type, tree_num=1).name
                     if self.is_in_opponents_hand(one_card_name, player_to_excl=player.name):
                         score -= 8
 
@@ -79,7 +79,7 @@ class Scorer:
         start_end_combos = []
         for card in cards_of_type:
             for comparison_card in cards_of_type:
-                if card.tree_val < comparison_card.tree_val:
+                if card.tree_num < comparison_card.tree_num:
                     start_end_combo = (card, comparison_card)
                     start_end_combos.append(start_end_combo)
 
@@ -130,7 +130,7 @@ class Scorer:
 
                 # Find the coordinates of the start card and then all adjacent incrementing cards
                 row_num, col_num = player.board.find_coords_of_card(start_end_combo[0])
-                next_adjs = player.board.get_adjacent_cards(row=row_num, column=col_num, ignore_tree_val=False)
+                next_adjs = player.board.get_adjacent_cards(row=row_num, column=col_num, ignore_tree_num=False)
 
                 # Continue until there are no more incremental adjacencies (i.e. no path continuation)
                 while len(next_adjs) > 0:
@@ -144,7 +144,7 @@ class Scorer:
                             break
                     # If path not valid yet, find next set of adjacencies to continue building path
                     row_num, col_num = player.board.find_coords_of_card(current_adjacency)
-                    next_adjs = player.board.get_adjacent_cards(row=row_num, column=col_num, ignore_tree_val=False)
+                    next_adjs = player.board.get_adjacent_cards(row=row_num, column=col_num, ignore_tree_num=False)
 
         return valid_paths
 
@@ -164,11 +164,11 @@ class Scorer:
             path_score += len(path)
 
             # If the path starts with a 1 the player gets +1 point
-            if path[0].tree_val == 1:
+            if path[0].tree_num == 1:
                 path_score += 1
 
             # If path ends in 8 the player gets +2 points
-            if path[-1].tree_val == 8:
+            if path[-1].tree_num == 8:
                 path_score += 2
 
             # Player gets 1 additional point for each card in the path if the path is at least 4 cards

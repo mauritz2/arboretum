@@ -22,7 +22,7 @@ class Discard:
             return None
         top_card = self.cards[-1]
         if only_str:
-            return top_card.card_name
+            return top_card.name
         else:
             return top_card
 

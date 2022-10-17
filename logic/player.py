@@ -13,10 +13,7 @@ class Player:
                  num_cards_starting_hand: int = config.NUM_CARDS_STARTING_HAND):
 
         self.name = name
-        # TODO - document why this is a dict instead of a list if I remember :-)
         self.cards_on_hand = {}
-        # TODO - This inheritance doesn't make sense - why would each player have their own Deck?
-        # It probably makes more sense to have the deck be owned by the GameManager?
         self.deck = deck
         self.discard = discard
         self.board = board
@@ -51,7 +48,7 @@ class Player:
     def draw_card_from_deck(self) -> None:
         # TODO - remove inconsistency where card[0] is top card in deck, but bottom card in discard
         card = self.deck.cards[0]
-        self.cards_on_hand[card.card_name] = card
+        self.cards_on_hand[card.name] = card
         self.deck.remove_top_card()
 
     def draw_card_from_discard(self, player_to_draw_from: 'Player') -> None:
@@ -65,7 +62,7 @@ class Player:
         if len(player_to_draw_from.discard.cards) <= 0:
             raise ValueError(f"The targeted discard pile of {player_to_draw_from.name} is empty. Try drawing from another discard pile or the deck.")
         card = player_to_draw_from.discard.get_top_card(only_str=False)
-        self.cards_on_hand[card.card_name] = card
+        self.cards_on_hand[card.name] = card
         player_to_draw_from.discard.remove_top_card()
 
     def discard_card(self, card_name: str, to_discard: bool) -> None:

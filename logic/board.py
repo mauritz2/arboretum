@@ -13,16 +13,16 @@ class Board:
         self.num_columns = num_columns
         self.board_grid = self._create_empty_board_grid()
 
-    def _create_empty_board_grid(self):
+    def _create_empty_board_grid(self) -> list[list[Card]]:
         """
         Sets up an empty board which consists of empty lists.
         Board locations are referenced as [row][column]
         """
-        empty_tile = Card(tree_type=None, tree_val=None)
+        empty_tile = Card(tree_type=None, tree_num=None)
         empty_board_grid = [([empty_tile] * self.num_columns) for i in range(self.num_rows)]
         return empty_board_grid
 
-    def is_valid_board_location(self, row, column, check_if_occupied=True):
+    def is_valid_board_location(self, row: int, column: int, check_if_occupied=True) -> (bool, str):
         """
         Checks if a location falls within the board boundaries. Can also check that it's empty (optional).
         Returns True if valid board location, False otherwise.
@@ -43,11 +43,11 @@ class Board:
             if self.board_grid[row][column].tree_type is not None:
                 is_valid_board_loc = False
                 error_msg = f"Board space at ({row},{column}) is already occupied by " \
-                            f"{self.board_grid[row][column].card_name}"
+                            f"{self.board_grid[row][column].name}"
 
         return is_valid_board_loc, error_msg
 
-    def get_adjacent_cards(self, row: int, column: int, ignore_tree_val=True) -> list[Card]:
+    def get_adjacent_cards(self, row: int, column: int, ignore_tree_num=True) -> list[Card]:
         """
         Returns all cards adjacent to a specified location on the board.
         Returns all adjacencies by default, but can be set to return incremental (i.e. only cards with a higher
@@ -56,9 +56,9 @@ class Board:
         """
         confirmed_adjacencies = []
 
-        if not ignore_tree_val:
-            center_tree_value = self.board_grid[row][column].tree_val
-            if center_tree_value is None:
+        if not ignore_tree_num:
+            center_tree_num = self.board_grid[row][column].tree_num
+            if center_tree_num is None:
                 raise ValueError(f"Can't find incrementing adjacent cards since location at ({row},{column}) is empty")
 
         coords_to_check = [(row - 1, column), (row + 1, column), (row, column + 1), (row, column - 1)]
@@ -74,8 +74,9 @@ class Board:
             if potential_adjacency.tree_type is None:
                 continue
 
-            if not ignore_tree_val:
-                if potential_adjacency.tree_val <= center_tree_value:
+            if not ignore_tree_num:
+                # The adjacent tree has an equal or lower value to the center card - i.e. not a valid path
+                if potential_adjacency.tree_num <= center_tree_num:
                     continue
 
             confirmed_adjacencies.append(potential_adjacency)
@@ -99,14 +100,13 @@ class Board:
 
         return cards_of_type_played
 
-    def find_coords_of_card(self, card: Card):
+    def find_coords_of_card(self, card: Card) -> (int, int):
         """
-        Searches the board for a specific card and returns its' row and column coordinates
+        Searches the board for a specific card and returns its row and column coordinates
         Returns None if the Card isn't found
         I think the comparison "if value is card" works here because since Card is a dataclass
         it automatically implements eq() - maybe ?
         """
-        # TODO - this type of nested for loop search is pretty common across the code - possible to vectorize?
         for row_coord, row in enumerate(self.board_grid):
             for col_coord, value in enumerate(row):
                 if value is card:
