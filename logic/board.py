@@ -8,83 +8,79 @@ class Board:
     Class to hold the board attributes, state (i.e. what cards have been placed) and methods to validate card placement
     """
 
-    def __init__(self, num_rows: int = config.BOARD_ROWS,
-                 num_columns: int = config.BOARD_COLUMNS,
-                 empty_loc_symbol: str = "[  ]"):
-        self.empty_loc_symbol = empty_loc_symbol
+    def __init__(self, num_rows: int = config.BOARD_ROWS, num_columns: int = config.BOARD_COLUMNS):
         self.num_rows = num_rows
         self.num_columns = num_columns
         self.board_grid = self._create_empty_board_grid()
 
     def _create_empty_board_grid(self):
+        """
+        Sets up an empty board which consists of empty lists.
+        Board locations are referenced as [row][column]
+        """
         empty_tile = Card(tree_type=None, tree_val=None)
         empty_board_grid = [([empty_tile] * self.num_columns) for i in range(self.num_rows)]
         return empty_board_grid
 
-    def print_board(self):
+    def is_valid_board_location(self, row, column, check_if_occupied=True):
         """
-        Creates the visual representation of the board
-        (i.e. using the visual shorthands for each card) and prints the result
+        Checks if a location falls within the board boundaries. Can also check that it's empty (optional).
+        Returns True if valid board location, False otherwise.
         """
-        # Create the visual representation of the board
-        board_to_display = []
-        # TODO - could be more efficient with list comprehension + getattr, but would need to deal with nested list
-        for row in self.board_grid:
-            display_row = []
-            for value in row:
-                display_shorthand = value.visual_shorthand
-                display_shorthand = config.EMPTY_SLOT_DISPLAY_SHORTHAND if display_shorthand is None else display_shorthand
-                display_row.append(display_shorthand)
-            board_to_display.append(display_row)
+        is_valid_board_loc = True
+        error_msg = ""
 
-        # Print the board
-        for row in board_to_display:
-            print(config.BOARD_SLOT_DIVIDER.join(row))
-
-    def _check_if_occupied_loc(self, row, column):
-        """
-        Checks if a location on the board already has a card placed there or not
-        Returns True if occupied, otherwise False
-        """
-        if self.board_grid[row][column].tree_type is not None:
-            return True
-        else:
-            return False
-
-    def check_if_valid_board_location(self, row, column):
-        """
-        Checks if a location falls within the board boundaries and that it's empty
-        """
-        # TODO - refactor so row, column are a coordinates tuple (x, y)
         if row < 0 or column < 0:
-            raise ValueError("Row and column locations need to be >= 0")
-        if row > self.num_rows:
-            raise ValueError(f"Provided row index {row} is outside of board max {self.num_rows}")
-        if column > self.num_columns:
-            raise ValueError(f"Provided column index {column} is outside of board max {self.num_columns}")
-        if self._check_if_occupied_loc(row, column):
-            raise ValueError(f"Board space at ({row},{column}) is already occupied by {self.board_grid[row][column].card_name}")
+            is_valid_board_loc = False
+            error_msg = "Row and column locations need to be >= 0"
+        if row >= self.num_rows:
+            is_valid_board_loc = False
+            error_msg = f"Provided row index {row} is outside of board max {self.num_rows}"
+        if column >= self.num_columns:
+            is_valid_board_loc = False
+            error_msg = f"Provided column index {column} is outside of board max {self.num_columns}"
+        if check_if_occupied:
+            if self.board_grid[row][column].tree_type is not None:
+                is_valid_board_loc = False
+                error_msg = f"Board space at ({row},{column}) is already occupied by " \
+                            f"{self.board_grid[row][column].card_name}"
 
-    def check_if_slot_has_adjacent_tree(self, row, column):
+        return is_valid_board_loc, error_msg
+
+    def get_adjacent_cards(self, row: int, column: int, ignore_tree_val=True) -> list[Card]:
         """
-        Checks if a specific location on the board has an adjacently placed tree
+        Returns all cards adjacent to a specified location on the board.
+        Returns all adjacencies by default, but can be set to return incremental (i.e. only cards with a higher
+        tree values than the specified card). Returns a ValueError if tree values are considered, but the provided
+        location on the board is empty (i.e. there's no value to compare adjacent tree values to).
         """
-        has_adjacent_tree = False
-        # TODO - Refactor to define dirs = [(-1,0), (1,0), (0,1), (0,-1)]
-        # and then for x, y in dirs + a check if it's out of bounds to do nothing
-        if column - 1 >= 0:
-            if self._check_if_occupied_loc(row, column - 1):
-                has_adjacent_tree = True
-        if column + 1 < self.num_columns:
-            if self._check_if_occupied_loc(row, column + 1):
-                has_adjacent_tree = True
-        if row - 1 >= 0:
-            if self._check_if_occupied_loc(row - 1, column):
-                has_adjacent_tree = True
-        if row + 1 < self.num_rows:
-            if self._check_if_occupied_loc(row + 1, column):
-                has_adjacent_tree = True
-        return has_adjacent_tree
+        confirmed_adjacencies = []
+
+        if not ignore_tree_val:
+            center_tree_value = self.board_grid[row][column].tree_val
+            if center_tree_value is None:
+                raise ValueError(f"Can't find incrementing adjacent cards since location at ({row},{column}) is empty")
+
+        coords_to_check = [(row - 1, column), (row + 1, column), (row, column + 1), (row, column - 1)]
+
+        for coords in coords_to_check:
+            is_valid_board_loc, _ = self.is_valid_board_location(coords[0], coords[1], check_if_occupied=False)
+            if not is_valid_board_loc:
+                continue
+
+            potential_adjacency = self.board_grid[coords[0]][coords[1]]
+
+            # tree_type = None indicates it's a blank slot on the board - i.e. not an adjacent card
+            if potential_adjacency.tree_type is None:
+                continue
+
+            if not ignore_tree_val:
+                if potential_adjacency.tree_val <= center_tree_value:
+                    continue
+
+            confirmed_adjacencies.append(potential_adjacency)
+
+        return confirmed_adjacencies
 
     def get_played_cards_of_type(self, tree_type: Literal[config.TREES]) -> list[str]:
         """
@@ -103,55 +99,17 @@ class Board:
 
         return cards_of_type_played
 
-    def find_adj_increment_cards(self, row: int, column: int) -> list[Card]:
-        """
-        Given a location on the board, return a list of all adjacent played cards
-        with a higher value than the card at the given location. Returns an error if the specified loc is empty
-        This is used to find paths that consist of adjacent incrementing cards
-        """
-        center_tree_value = self.board_grid[row][column].tree_val
-
-        if center_tree_value is None:
-            raise ValueError(f"Can't find incrementing adjacent cards since location at ({row},{column}) is empty")
-
-        incrementing_adjacent = []
-        coords_to_check = [(row-1, column),
-                         (row+1, column),
-                         (row, column+1),
-                         (row, column-1)]
-        for coords in coords_to_check:
-            # Check that the index isn't out of range which would cause an error
-            if (coords[0] >= config.BOARD_ROWS) or (coords[1] >= config.BOARD_COLUMNS):
-                continue
-            if (coords[0] < 0) or (coords[1] < 0):
-                continue
-
-            card_at_loc = self.board_grid[coords[0]][coords[1]]
-
-            if card_at_loc.tree_type is None:
-                continue
-            if card_at_loc.tree_val <= center_tree_value:
-                # Adjacent tree doesn't have a higher val than center card, i.e. no valid path this way
-                continue
-
-            # The current coord location contains a tree that has a higher value than the center value
-            # (i.e. indicating a possible path)
-            incrementing_adjacent.append(card_at_loc)
-
-        return incrementing_adjacent
-
-    def find_coords_of_card(self, card:Card):
+    def find_coords_of_card(self, card: Card):
         """
         Searches the board for a specific card and returns its' row and column coordinates
         Returns None if the Card isn't found
         I think the comparison "if value is card" works here because since Card is a dataclass
         it automatically implements eq() - maybe ?
-        # TODO - maybe rename row_coords and column_coord to x and y across the logic
         """
         # TODO - this type of nested for loop search is pretty common across the code - possible to vectorize?
         for row_coord, row in enumerate(self.board_grid):
             for col_coord, value in enumerate(row):
                 if value is card:
-                    return (row_coord, col_coord)
+                    return row_coord, col_coord
         else:
             return None

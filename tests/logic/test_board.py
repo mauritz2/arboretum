@@ -8,17 +8,6 @@ def test_shape_create_empty_board_grid(board):
 def test_tiles_create_empty_board_grid(board):
     assert isinstance(board.board_grid[0][0], Card)
 
-
-def test_check_if_occupied_loc(board):
-    row = 1
-    column = 1
-    check_occupied = board._check_if_occupied_loc(row, column)
-    assert (check_occupied is False)
-    board.board_grid[row][column] = Card(tree_type="Oak", tree_val=2)
-    check_occupied = board._check_if_occupied_loc(row, column)
-    assert (check_occupied is True)
-
-
 def test_get_played_cards_by_type_empty_board(board):
 	oak_trees_played = board.get_played_cards_of_type("Oak")
 	assert oak_trees_played == []
@@ -67,7 +56,7 @@ def test_find_adjacent_incrementing_cards(board):
     board.board_grid[1][1] = oak4
     board.board_grid[3][3] = jac6
 
-    incremental_adjacent = board.find_adj_increment_cards(row=2, column=2)
+    incremental_adjacent = board.get_adjacent_cards(row=2, column=2, ignore_tree_val=False)
     incremental_adj_expected = [blue7, blue8]
 
     incremental_adjacent.sort()
@@ -85,7 +74,7 @@ def test_find_adjacent_incrementing_cards_no_adjacencies(board):
     board.board_grid[4][4] = Card(tree_type="Jacaranda", tree_val=6)
     board.board_grid[5][5] = Card(tree_type="Blue Spruce", tree_val=7)
 
-    incremental_adjacent = board.find_adj_increment_cards(row=2, column=2)
+    incremental_adjacent = board.get_adjacent_cards(row=2, column=2, ignore_tree_val=False)
     assert len(incremental_adjacent) == 0
 
 
@@ -98,12 +87,10 @@ def test_find_adjacent_incrementing_cards_out_of_bounds_check(board):
     board.board_grid[0][9] = Card(tree_type="Oak", tree_val=4)
     board.board_grid[0][8] = Card(tree_type="Blue Spruce", tree_val=7)
 
-    incremental_adjacent = board.find_adj_increment_cards(row=5, column=0)
+    incremental_adjacent = board.get_adjacent_cards(row=5, column=0, ignore_tree_val=False)
     assert incremental_adjacent == [Card(tree_type="Jacaranda", tree_val=6)]
-    incremental_adjacent = board.find_adj_increment_cards(row=0, column=9)
+    incremental_adjacent = board.get_adjacent_cards(row=0, column=9, ignore_tree_val=False)
     assert incremental_adjacent == [Card(tree_type="Blue Spruce", tree_val=7)]
-
-
 
 def test_find_adjacent_incrementing_cards_no_card(board):
     """
@@ -111,7 +98,7 @@ def test_find_adjacent_incrementing_cards_no_card(board):
     if incremental without a card at the specified location
     """
     with pytest.raises(ValueError):
-        board.find_adj_increment_cards(row=2, column=2)
+        board.get_adjacent_cards(row=2, column=2, ignore_tree_val=False)
 
 
 def test_find_coords_of_card(board):

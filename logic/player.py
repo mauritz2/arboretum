@@ -35,10 +35,13 @@ class Player:
         if card_name not in self.cards_on_hand:
             raise ValueError(f"You cannot play card {card_name} you don't have in your hand: {self.cards_on_hand}")
 
-        self.board.check_if_valid_board_location(row, column)
+        is_valid_board_location, error_msg = self.board.is_valid_board_location(row, column)
+
+        if not is_valid_board_location:
+            raise ValueError(error_msg)
 
         if self.first_tree_placed:
-            if not self.board.check_if_slot_has_adjacent_tree(row, column):
+            if len(self.board.get_adjacent_cards(row, column)) == 0:
                 raise ValueError(f"You cannot place a tree at ({row}, {column}) since it's not adjacent to an existing tree.")
 
         self.board.board_grid[row][column] = self.cards_on_hand[card_name]

@@ -130,7 +130,7 @@ class Scorer:
 
                 # Find the coordinates of the start card and then all adjacent incrementing cards
                 row_num, col_num = player.board.find_coords_of_card(start_end_combo[0])
-                next_adjs = player.board.find_adj_increment_cards(row=row_num, column=col_num)
+                next_adjs = player.board.get_adjacent_cards(row=row_num, column=col_num, ignore_tree_val=False)
 
                 # Continue until there are no more incremental adjacencies (i.e. no path continuation)
                 while len(next_adjs) > 0:
@@ -144,7 +144,7 @@ class Scorer:
                             break
                     # If path not valid yet, find next set of adjacencies to continue building path
                     row_num, col_num = player.board.find_coords_of_card(current_adjacency)
-                    next_adjs = player.board.find_adj_increment_cards(row=row_num, column=col_num)
+                    next_adjs = player.board.get_adjacent_cards(row=row_num, column=col_num, ignore_tree_val=False)
 
         return valid_paths
 
