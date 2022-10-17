@@ -16,7 +16,7 @@ class Deck:
 
     @staticmethod
     def _generate_deck(tree_types: list[str], num_cards_per_type: int) -> list[Card]:
-        return [Card(tpl[0], tpl[1]) for tpl in itertools.product(tree_types, range(num_cards_per_type))]
+        return [Card(tpl[0], tpl[1]) for tpl in itertools.product(tree_types, range(1, num_cards_per_type + 1))]
 
     def remove_top_card(self) -> None:
         del self.cards[-1]

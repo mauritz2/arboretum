@@ -19,6 +19,8 @@ def test_generate_deck(deck):
     assert len(deck.cards) == 32
     assert type(deck.cards) == list
     assert isinstance(deck.cards[0], Card)
+    for card in deck.cards:
+        assert card.tree_num in range(1, 9)
 
 
 def test_get_top_card(deck):

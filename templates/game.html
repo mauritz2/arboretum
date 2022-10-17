@@ -47,9 +47,9 @@
                     {% for card in row %}
                         {% set inner_loop = loop.index - 1 %}
                         <td>
-                            {% if card.card_name != None %}
+                            {% if card.name != None %}
                             <!-- TODO - address that IDs are 11, but values are (1,2). Make consistently 11?-->
-                            <img class="card_on_board zoom" id="{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.card_name}}.png">
+                            <img class="card_on_board zoom" id="{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.name}}.png">
                             {% else %}
                             {% if game_phase == "Choose Coords" %}
                             <form action="/choose_coordinates" method="post">
@@ -80,16 +80,16 @@
                     <tr>
                     {% for card in row %}
                         <td>
-                        {% if card.card_name != None %}
-                            <img class="card_on_mini_board zoom-larger" src="../static/css/playing_cards/{{card.card_name}}.png">
+                        {% if card.name != None %}
+                            <img class="card_on_mini_board zoom-larger" src="../static/css/playing_cards/{{card.name}}.png">
                         {% else %}
                             <img class="card_on_mini_board blank" src="../static/css/other/blank-w-border.png">
                         {% endif %}
                     {% endfor %}
                 {% endfor %}
+                </table>
             {% endif %}
         {% endfor %}
-        <table class="table-sm">
     </div>
 </div>
 
@@ -100,12 +100,12 @@
                 <img class="card_on_hand" src="../static/css/playing_cards/{{card}}.png">
                 {% if game_phase == "Choose Card" %}
                     <form action="/choose_card_to_play" method="post">
-                        <input name="card_name" type="hidden" value="{{card}}">
+                        <input name="name" type="hidden" value="{{card}}">
                         <input type="submit" class="btn btn-dark" value="Play card">
                     </form>
                 {% elif game_phase == "Choose Discard" %}
                     <form action="/discard_card" method="post">
-                        <input name="card_name" type="hidden" value="{{card}}">
+                        <input name="name" type="hidden" value="{{card}}">
                         <input type="submit" class="btn btn-dark" value="Discard card">
                     </form>
                 {% endif %}

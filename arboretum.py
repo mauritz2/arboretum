@@ -27,6 +27,9 @@ def main():
     num_cards_in_deck = game_manager.scorer.players[0].deck.get_amt_of_cards_left()
 
     flash(player_game_state_messages[game_manager.game_phase])
+    print("Player hands!")
+    print(player_boards)
+    print("End of player hands")
 
     return render_template(
         'game.html',

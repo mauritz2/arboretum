@@ -47,10 +47,10 @@
                 {% for card in row %}
                 {% set inner_loop = loop.index - 1 %}
                 <td>
-                    {% if card.card_name != None %}
+                    {% if card.name != None %}
                     <!-- TODO - address that IDs are 11, but values are (1,2). Make consistently 11?-->
                     <!--ID syntax: player_num + row_num + col_num. Example: 111 means (Player 1, Row 1, Column 1)-->
-                    <img class="card_on_board zoom" id="{{player_index}}{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.card_name}}.png">
+                    <img class="card_on_board zoom" id="{{player_index}}{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.name}}.png">
                     {% else %}
                     {% if game_phase == "Choose Coords" %}
                     <form action="/choose_coordinates" method="post">
