@@ -21,6 +21,9 @@ class Deck:
     def remove_top_card(self) -> None:
         del self.cards[-1]
 
+    def get_top_card(self) -> Card:
+        return self.cards[-1] if self.get_amt_of_cards_left() > 0 else None
+
     def shuffle_deck(self) -> None:
         random.shuffle(self.cards)
 

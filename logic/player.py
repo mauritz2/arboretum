@@ -47,7 +47,7 @@ class Player:
 
     def draw_card_from_deck(self) -> None:
         # TODO - remove inconsistency where card[0] is top card in deck, but bottom card in discard
-        card = self.deck.cards[0]
+        card = self.deck.get_top_card()
         self.cards_on_hand[card.name] = card
         self.deck.remove_top_card()
 

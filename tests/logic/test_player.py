@@ -1,6 +1,6 @@
 import pytest
 from logic import Card
-from conftest import cards
+from conftest import cards as c
 
 
 def test_place_tree(player):
@@ -8,7 +8,7 @@ def test_place_tree(player):
     Verify that placing a card places it on the board at the designated coords
     """
     player.play_card(card_name="Oak 1", row=0, column=1)
-    assert player.board.board_grid[0][1] == cards["Oak 1"]
+    assert player.board.board_grid[0][1] == c["Oak 1"]
 
 
 def test_place_tree_not_in_hand(player):
@@ -46,7 +46,7 @@ def test_add_drawn_card_to_hand(player):
     """
     Verify drawn cards are added to the player's hand
     """
-    card_to_draw = player.deck.cards[0].name
+    card_to_draw = player.deck.get_top_card().name
     assert card_to_draw not in player.cards_on_hand
     player.draw_card_from_deck()
     assert card_to_draw in player.cards_on_hand
@@ -56,7 +56,7 @@ def test_remove_drawn_card_from_deck(player):
     """
     Verify that drawn cards get removed from the deck
     """
-    card_to_draw = player.deck.cards[0]
+    card_to_draw = player.deck.get_top_card()
     assert card_to_draw in player.deck.cards
     player.draw_card_from_deck()
     assert card_to_draw not in player.deck.cards
@@ -93,17 +93,17 @@ def test_draw_card_from_discard(player):
     """
     # discard contains Cassia 1 and Cassia 2 by default with Cassia 2 as the top card
     assert "Cassia 2" not in player.cards_on_hand
-    assert "Cassia 2" in [c.name for c in player.discard.cards]
+    assert "Cassia 2" in [crd.name for crd in player.discard.cards]
     player.draw_card_from_discard(player)
     assert "Cassia 2" in player.cards_on_hand
-    assert "Cassia 2" not in [c.name for c in player.discard.cards]
+    assert "Cassia 2" not in [crd.name for crd in player.discard.cards]
 
 
 def test_draw_card_from_discard_draw_from_other_player(player, player2):
     """
     Verify that drawing from other players' discard piles works
     """
-    player2.discard.cards = [Card(tree_type="Jacaranda", tree_num=8)]
+    player2.discard.cards = [c["Jacaranda 8"]]
     player.draw_card_from_discard(player2)
     assert "Jacaranda 8" in player.cards_on_hand.keys()
-    assert "Jacaranda 8" not in [c.name for c in player2.discard.cards]
+    assert "Jacaranda 8" not in [crd.name for crd in player2.discard.cards]
