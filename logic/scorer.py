@@ -11,8 +11,6 @@ class Scorer:
     This class holds the players in the game.
     """
     def __init__(self, players: list[Player], trees: list[str] = None):
-        # TODO - should the Scorer have the players - or shouldn't that be managed by the GameManager?
-        # TODO - refactor Scorer to not be a class? Maybe everything here can be a static method. Or maybe not...
         self.players = players
         self.trees = config.TREES if trees is None else trees
 
@@ -128,7 +126,7 @@ class Scorer:
         return valid_paths
 
     @staticmethod
-    def score_paths(paths_to_score: list[list[Card]]) -> (list[Card], int):
+    def _score_paths(paths_to_score: list[list[Card]]) -> (list[Card], int):
         """
         Takes a list of lists containing all valid paths and calculates the score for the top scoring path
         Returns the top scoring path and it's related score
@@ -164,41 +162,41 @@ class Scorer:
 
         return top_path, top_score
 
-    def determine_winner(self):
+    def determine_winner(self) -> (list[str], dict[str, dict]):
         """
         Determines what player won by determining who scores for each tree, and then calculating path scores
         Returns the scoring player
-        TODO - incorporate possibility of ties
+        # TODO - implement better draw rules - e.g. player that can play the highest card from their hand wins
+        # if scores are tied
         """
-        # TODO - this function is doing a lot (e.g. getting top-paths data structure) - break out
-        # TODO - the best return data format would be the below - None could mean you didn't score - otherwise path and points
-        # {"Player 1: {"Cassia: {"Path": None, "Score": None}, {"Oak: {"Path": [Card(...), Card(...)], "Score":4}.. "Player 2" ...
-        # TODO - make a function that returns the data structure above and yo can specify the card attribute you want (?) e.g. coords
         top_paths = {}
         winning_score = 0
-        winner = None
+        winners = []
 
         scoring_players = self.calculate_scoring_players()
         for player in self.players:
-            individual_scores = {}
+            score_by_tree = {}
             for tree in self.trees:
                 if tree not in scoring_players[player.name]:
-                    # The player did not score for this path so no need to calculate points
-                    # Score = None indicates the player did not score
-                    individual_scores[tree] = {"Path": [], "Score": None}
+                    # Score = None indicates the player did not score for this path
+                    # This distinction between a score of 0 and None is useful because when
+                    # visualizing in the UI the top_paths dict can show who scored,
+                    # with what path, and what the score was
+                    score_by_tree[tree] = {"Path": [], "Score": None}
                 else:
                     # The player scored - calculate the highest-scoring path and add it to the total
                     paths = self.find_paths_for_tree_type(tree, player)
-                    top_path, top_score = self.score_paths(paths)
-                    individual_scores[tree] = {"Path": top_path, "Score": top_score}
+                    top_path, top_score = self._score_paths(paths)
+                    score_by_tree[tree] = {"Path": top_path, "Score": top_score}
                     player.score += top_score
             else:
-                top_paths[player.name] = individual_scores
-                if player.score >= winning_score:
+                top_paths[player.name] = score_by_tree
+                if player.score > winning_score:
                     winning_score = player.score
-                    winner = player
-        # TODO - get_winner should prob just return the winner and take top paths as input?
-        return winner, top_paths
+                    winners = [player.name]
+                elif player.score == winning_score:
+                    winners.append(player.name)
+        return winners, top_paths
 
     def get_player_instance(self, name: str) -> Player:
         """

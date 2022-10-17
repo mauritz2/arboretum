@@ -53,7 +53,7 @@ def game_over():
         player_boards[player_name] = p.board.board_grid
         player_hands[player_name] = p.get_player_card_names()
 
-    winner, top_paths = game_manager.get_winner()
+    winners, top_paths = game_manager.get_winner()
 
     # TODO - should this be implemented as part of the scorer? It is a very specific id/coord structure
     for player in top_paths:
@@ -68,12 +68,13 @@ def game_over():
             top_paths[player][tree_dict]["Path"] = list_of_coords
 
     print(top_paths)
+    print(winners)
 
     return render_template("game_over.html",
                            player_hands=player_hands,
                            player_boards=player_boards,
                            top_paths=top_paths,
-                           winner_name=winner.name
+                           winners=winners
                            )
 
 

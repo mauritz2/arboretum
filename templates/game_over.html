@@ -6,7 +6,15 @@
     <div class="col-2">
         <div class="row">
             <div class="col">
-                <h5 class="text-warning my-5">The winner is <u>{{winner_name}}</u></h5>
+                {% if winners|length > 1 %}
+                    <h5 class="text-warning my-5">The game is a tie between:
+                    {% for winner in winners %}
+                        <u>{{winner}}</u>
+                    {% endfor %}
+                    </h5>
+                {% else %}
+                    <h5 class="text-warning my-5">The winner is <u>{{winners[0]}}</u></h5>
+                {% endif %}
             </div>
         </div>
         <div class="row align-items-center">
@@ -88,9 +96,7 @@
 
 <script>
     var top_paths = ({{ top_paths|tojson|safe }})
-
     dim_all_cards();
-
 </script>
 
 {% endblock %}

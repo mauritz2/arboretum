@@ -133,7 +133,7 @@ def test_score_paths_3_paths_and_ending_in_8(scorer):
     # 6 from path length, 2 from ending on an 8
     expected_score = 8
 
-    top_path, score = scorer.score_paths(paths)
+    top_path, score = scorer._score_paths(paths)
     assert top_path == expected_best_path
     assert score == expected_score
 
@@ -154,7 +154,7 @@ def test_score_path_complex(scorer):
     # 12 from path length (all Oaks), 1 from starting with 1
     expected_score = 11
 
-    top_path, score = scorer.score_paths(paths)
+    top_path, score = scorer._score_paths(paths)
     assert top_path == expected_best_path
     assert score == expected_score
 
@@ -195,12 +195,12 @@ def test_determine_winner_one_tree_one_path_each(scorer):
     scorer.players[1].board.board_grid[1][3] = oak7
 
     winner, _ = scorer.determine_winner()
-    assert winner.name == "Player 1"
+    assert winner == ["Player 1"]
 
 
 def test_determine_winner_multiple_trees_and_paths(scorer):
     """
-    Verify  that player 2 wins when they have one great path vs. player two's two
+    Verify that player 2 wins when they have one great path vs. player two's two
     less good scoring paths
     """
     oak1 = Card(tree_type="Oak", tree_val=1)
@@ -247,7 +247,56 @@ def test_determine_winner_multiple_trees_and_paths(scorer):
     scorer.players[1].board.board_grid[1][4] = jac8
 
     winner, _ = scorer.determine_winner()
-    assert winner.name == "Player 2"
+    assert winner == ["Player 2"]
+
+
+def test_determine_winner_tie(scorer):
+    """
+    Verify that player 2 wins when they have one great path vs. player two's two
+    less good scoring paths
+    """
+    oak1 = Card(tree_type="Oak", tree_val=1)
+    oak2 = Card(tree_type="Oak", tree_val=2)
+    oak3 = Card(tree_type="Oak", tree_val=3)
+    oak5 = Card(tree_type="Oak", tree_val=5)
+    oak7 = Card(tree_type="Oak", tree_val=7)
+    oak8 = Card(tree_type="Oak", tree_val=8)
+    blue4 = Card(tree_type="Blue Spruce", tree_val=4)
+    blue6 = Card(tree_type="Blue Spruce", tree_val=6)
+    jac2 = Card(tree_type="Jacaranda", tree_val=2)
+    jac3 = Card(tree_type="Jacaranda", tree_val=3)
+    jac8 = Card(tree_type="Jacaranda", tree_val=8)
+
+    # Player 1 hand
+    scorer.players[0].cards_on_hand = {
+        "Oak 1": oak1,
+        "Oak 2": oak2,
+        "Dog 4": blue4
+    }
+
+    # Player 1 path
+    # Oak Path -> 3
+    # Blue Spruce Path -> 3
+    scorer.players[0].board.board_grid[1][2] = oak3
+    scorer.players[0].board.board_grid[1][3] = blue4
+    scorer.players[0].board.board_grid[1][4] = oak5
+    scorer.players[0].board.board_grid[1][5] = blue6
+
+
+    # Player 2 hand
+    scorer.players[1].cards_on_hand = {
+        "Oak 8": oak8,
+    }
+
+    # Player 2 path
+    # Jac path -> 8
+    scorer.players[1].board.board_grid[1][0] = jac2
+    scorer.players[1].board.board_grid[1][1] = jac3
+    scorer.players[1].board.board_grid[1][2] = oak7
+    scorer.players[1].board.board_grid[1][3] = jac8
+
+    winner, _ = scorer.determine_winner()
+    assert winner == ["Player 1", "Player 2"]
 
 
 def test_calculate_scoring_players(player, player2, scorer):

@@ -80,8 +80,8 @@ class GameManager:
         return i
 
     def get_winner(self):
-        winner, top_paths = self.scorer.determine_winner()
-        return winner, top_paths
+        winners, top_paths = self.scorer.determine_winner()
+        return winners, top_paths
 
 
 class GameState(Enum):
