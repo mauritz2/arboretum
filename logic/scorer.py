@@ -69,7 +69,6 @@ class Scorer:
                 return True
         return False
 
-
     @staticmethod
     def get_possible_start_end_card_pairs(cards_of_type: list[Card]) -> list[tuple]:
         """
@@ -80,15 +79,13 @@ class Scorer:
         start_end_combos = []
         for card in cards_of_type:
             for comparison_card in cards_of_type:
-                if card.card_name == comparison_card.card_name:
-                    continue
                 if card.tree_val < comparison_card.tree_val:
                     start_end_combo = (card, comparison_card)
                     start_end_combos.append(start_end_combo)
 
         return start_end_combos
 
-    def find_paths_for_tree_type(self, tree_type: str, player: Player) -> list[Card]:
+    def find_paths_for_tree_type(self, tree_type: str, player: Player) -> list[list[Card]]:
         """
         Finds all the valid paths for a specific tree type on a player's board and returns
         a list where each entry is a list with a valid path. Each step in the path is represented
@@ -109,15 +106,23 @@ class Scorer:
         start_end_combos = self.get_possible_start_end_card_pairs(cards_of_type=cards_of_type)
 
         # TODO - make this deterministic (i.e. we need to know when all possible paths have been traversed)
+        # Keeping thoughts below for traceability:
         # The main challenge is knowing when all paths have been traversed
-        # At each time the paths cross we check which path we took last time, and take the other route, that wouldn't
-        # ensure we pick all paths. Because the path could be branching again further out.
-        # We would try to keep a dict of all the intersections that we find and store them in a dict. And then go back
+        # Even if at each time there are multiple valid adjacencies we check which path we took last time, and take
+        # the other route, that wouldn't ensure we pick all paths.
+        # Because the path could be branching again further out.
+        # We could try to keep a dict of all the intersections that we find and store them in a dict. And then go back
         # to them and indicate when everything has been followed? Maybe that's the best approach
-        # Then change the for i in range(20) to a while loop that tracks whether all options at crossroads have been followed
-        # What's the best data structure to keep track of the cross-roads?
+        # Then change the for i in range(20) to a while loop that tracks whether all options at crossroads
+        # have been followed. What's the best data structure to keep track of the cross-roads?
         # {cross_road_tuple: {adj_tuple:traversed_bool} --> {"(1,1"): {"1,1": True, ... }
-        
+        # We would need a function is_any_crossroad_unexplored() that traverses this dict and finds any remaining
+        # Still we will end up looping through many times to find all the paths...
+        # Not a great solution either. Leaving this as-is for now. Most commonly there are no branches
+        # And with 20 iterations through the tree, if there's one branch the probability of not finding it would be
+        # 0.5^20 = 9.53674316e-7. If there would be a million games played that would be an issue, but don't see that
+        # happening. If it is, either we'd need to make this deterministic or increase 20 to a higher number.
+
         for i in range(20):
             for start_end_combo in start_end_combos:
                 # Start the path with the starting card
@@ -129,9 +134,7 @@ class Scorer:
 
                 # Continue until there are no more incremental adjacencies (i.e. no path continuation)
                 while len(next_adjs) > 0:
-                    # TODO - refactor to remove this non-determinism - func has to know when all paths have been found
-                    # Register this as a choice
-                    #
+                    # TODO - refactor to remove this non-determinism (see comments above)
                     current_adjacency = random.choice(next_adjs)
                     current_path.append(current_adjacency)
                     if current_adjacency == start_end_combo[1]:
@@ -149,7 +152,7 @@ class Scorer:
     def _score_paths(paths_to_score: list[list[Card]]) -> (list[Card], int):
         """
         Takes a list of lists containing all valid paths and calculates the score for the top scoring path
-        Returns the top scoring path and it's related score
+        Returns the top scoring path, and it's related score
         """
         top_path = []
         top_score = 0
