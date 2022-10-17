@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block game %}
+
+<div class="row text-center">
+    <div class="col mb-5">
+        <h1>Sit down at the table and start the game</h1>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-4 mb-5">
+        {% for i in range(num_players) %}
+        <form action="joinGame()">
+            <input type="hidden" value="Player {{i}}">
+            <input type="submit" class="btn btn-dark mb-3" value="Player {{i}}">
+        </form>
+        {% endfor %}
+    </div>
+<div>
+<div class="row justify-content-center">
+    <div class="col-4">
+            <input type="submit" class="btn btn-warning mb-3" value="Start game">
+    </div>
+<div>
+
+<script type="text/javascript" charset="utf-8">
+    console.log("I am running!")
+    var socket = io();
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+    });
+
+$(document).ready(function(){
+$(".btn").click(function() {
+    socket.emit('sitdown', {player: $(this).val()});
+    $(this).val("Claimed Seat")
+    });
+});
+
+$("form").serializeArray()
+
+</script>
+
+{% endblock %}

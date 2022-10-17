@@ -1,13 +1,36 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from logic import game_manager
-from logic import GameState, player_game_state_messages
+from logic import game_manager, GameState, player_game_state_messages
+from flask_socketio import SocketIO
 
 # Flask config
 app = Flask(__name__)
 app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
+socketio = SocketIO(app)
+app.debug = True
 
 
-@app.route("/", methods=["GET"])
+@app.route("/lobby", methods=["GET"])
+def lobby():
+
+    num_players = game_manager.num_players
+
+    return render_template("lobby.html",
+                           num_players=num_players)
+
+
+@socketio.on('my event')
+def handle_my_custom_event(json):
+    return("I am here. Standin by! \n\n")
+
+
+@socketio.on('sitdown')
+def on_sitdown(data):
+    username = data["player"]
+    print(f"{username} has connected!")
+
+
+
+@app.route("/game", methods=["GET"])
 def main():
     """
     Gets the data to display in the UI and renders the main game screen
@@ -186,4 +209,4 @@ def discard_card():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    socketio.run(app)
