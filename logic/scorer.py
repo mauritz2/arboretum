@@ -93,12 +93,31 @@ class Scorer:
         Finds all the valid paths for a specific tree type on a player's board and returns
         a list where each entry is a list with a valid path. Each step in the path is represented
         by its Card instance
+
+        Steps to get all the paths:
+        1. Find all the played cards of a specific type (e.g. Oak)
+        2. Generate all possible valid combos, e.g. Oak 1 could be start card and Oak 3 could be an end card. But
+        Oak 3 could never be a start and Oak 1 an end since each card in a path needs to have an incremental value.
+        3. Loop through all the possible start-end pairs
+        4. For each start card - find all adjacent cards with higher values than the center card (i.e. possible path)
+        5. Repeat finding new adjacencies for all identified adjacencies. Stop if you reach the end card.
+        If you find it you have a valid path. If you didn't find it,
+        no path exists between this start and end combination.
         """
         valid_paths = []
         cards_of_type = player.board.get_played_cards_of_type(tree_type)
         start_end_combos = self.get_possible_start_end_card_pairs(cards_of_type=cards_of_type)
 
         # TODO - make this deterministic (i.e. we need to know when all possible paths have been traversed)
+        # The main challenge is knowing when all paths have been traversed
+        # At each time the paths cross we check which path we took last time, and take the other route, that wouldn't
+        # ensure we pick all paths. Because the path could be branching again further out.
+        # We would try to keep a dict of all the intersections that we find and store them in a dict. And then go back
+        # to them and indicate when everything has been followed? Maybe that's the best approach
+        # Then change the for i in range(20) to a while loop that tracks whether all options at crossroads have been followed
+        # What's the best data structure to keep track of the cross-roads?
+        # {cross_road_tuple: {adj_tuple:traversed_bool} --> {"(1,1"): {"1,1": True, ... }
+        
         for i in range(20):
             for start_end_combo in start_end_combos:
                 # Start the path with the starting card
@@ -106,17 +125,18 @@ class Scorer:
 
                 # Find the coordinates of the start card and then all adjacent incrementing cards
                 row_num, col_num = player.board.find_coords_of_card(start_end_combo[0])
-                next_adjs = player.board.find_adj_increment_cards(
-                    row=row_num, column=col_num)
+                next_adjs = player.board.find_adj_increment_cards(row=row_num, column=col_num)
 
                 # Continue until there are no more incremental adjacencies (i.e. no path continuation)
                 while len(next_adjs) > 0:
                     # TODO - refactor to remove this non-determinism - func has to know when all paths have been found
+                    # Register this as a choice
+                    #
                     current_adjacency = random.choice(next_adjs)
                     current_path.append(current_adjacency)
                     if current_adjacency == start_end_combo[1]:
                         if current_path not in valid_paths:
-                            # We have reached the targeted end card - we've found a valid path
+                            # We've found a valid path that we haven't found before
                             valid_paths.append(current_path)
                             break
                     # If path not valid yet, find next set of adjacencies to continue building path

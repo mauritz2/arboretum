@@ -115,22 +115,27 @@ class Board:
             raise ValueError(f"Can't find incrementing adjacent cards since location at ({row},{column}) is empty")
 
         incrementing_adjacent = []
-        locs_to_check = [(row-1, column),
+        coords_to_check = [(row-1, column),
                          (row+1, column),
                          (row, column+1),
                          (row, column-1)]
-        for loc in locs_to_check:
-            # There was an index out of range error here - adding check and also test case
-            if (loc[0] >= config.BOARD_ROWS) or (loc[1] >= config.BOARD_COLUMNS):
+        for coords in coords_to_check:
+            # Check that the index isn't out of range which would cause an error
+            if (coords[0] >= config.BOARD_ROWS) or (coords[1] >= config.BOARD_COLUMNS):
                 continue
-            if (loc[0] < 0) or (loc[1] < 0):
+            if (coords[0] < 0) or (coords[1] < 0):
                 continue
 
-            card_at_loc = self.board_grid[loc[0]][loc[1]]
+            card_at_loc = self.board_grid[coords[0]][coords[1]]
+
             if card_at_loc.tree_type is None:
                 continue
             if card_at_loc.tree_val <= center_tree_value:
+                # Adjacent tree doesn't have a higher val than center card, i.e. no valid path this way
                 continue
+
+            # The current coord location contains a tree that has a higher value than the center value
+            # (i.e. indicating a possible path)
             incrementing_adjacent.append(card_at_loc)
 
         return incrementing_adjacent

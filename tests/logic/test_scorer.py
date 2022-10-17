@@ -89,6 +89,45 @@ def test_find_paths_short_medium_long(scorer):
     assert path == path_expected
 
 
+def test_find_paths_branching_paths(scorer):
+    """
+    Verify that we can find all paths when paths branch out multiple times
+    """
+    oak2 = Card(tree_type="Oak", tree_val=2)
+    blue3 = Card(tree_type="Blue Spruce", tree_val=3)
+    oak4 = Card(tree_type="Oak", tree_val=4)
+    blue5 = Card(tree_type="Blue Spruce", tree_val=5)
+    blue6 = Card(tree_type="Blue Spruce", tree_val=6)
+    oak7 = Card(tree_type="Oak", tree_val=7)
+    oak8 = Card(tree_type="Oak", tree_val=8)
+
+    # Path start
+    scorer.players[0].board.board_grid[0][0] = oak2
+
+    # Original path
+    scorer.players[0].board.board_grid[1][0] = blue3
+    scorer.players[0].board.board_grid[2][0] = oak4
+
+    # Branch # 1
+    scorer.players[0].board.board_grid[1][1] = blue5
+    scorer.players[0].board.board_grid[1][2] = blue6
+    scorer.players[0].board.board_grid[1][3] = oak7
+
+    # Branch 2
+    scorer.players[0].board.board_grid[2][2] = oak8
+
+    player = scorer.players[0]
+
+    path = scorer.find_paths_for_tree_type("Oak", player)
+    path_expected = [[oak2, blue3, oak4],
+                     [oak2, blue3, blue5, blue6, oak7],
+                     [oak2, blue3, blue5, blue6, oak8]]
+    path.sort()
+    path_expected.sort()
+
+    assert path == path_expected
+
+
 def test_get_possible_start_end_loc_pairs(scorer):
     oak1 = Card(tree_type="Oak", tree_val=1)
     oak2 = Card(tree_type="Oak", tree_val=2)
