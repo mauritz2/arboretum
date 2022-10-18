@@ -14,39 +14,50 @@ app.debug = True
 sid_to_player_map = {}
 
 
+@socketio.on("connect")
+def emit_players():
+    players = {"Players": list(sid_to_player_map.values())}
+    socketio.emit("player change", json.dumps(players), broadcast=True)
+
+
 def flash_io(text: str, category: str = "dark") -> None:
     """Send "message" to the client with the given error category"""
     emit('message', json.dumps({"text": text, "category": category}))
 
+
 @app.route("/lobby", methods=["GET"])
 def lobby():
     num_players = game_manager.num_players
-
     return render_template("lobby.html",
                            num_players=num_players)
 
-
 @socketio.on('sit_down')
 def on_sit_down(data):
+    print("JOINING")
     if request.sid in sid_to_player_map:
-        flash_io(f"Can't join. You've already joined.")
+        flash_io(f"Can't join. You've already joined.", "warning")
     else:
         player_name = data["player_name"]
-        sid_to_player_map[request.sid] = player_name
-        players = {"Players": list(sid_to_player_map.values())}
-        emit("new player", json.dumps(players))
-        flash_io("You've joined the game")
+
+        if len(player_name) == 0:
+            flash_io(f"Please enter a name before joining", "warning")
+        else:
+            sid_to_player_map[request.sid] = player_name
+            players = {"Players": list(sid_to_player_map.values())}
+            emit("player change", json.dumps(players), broadcast=True)
+            flash_io(f"You've joined the game with {request.sid}")
 
 
 @socketio.on('stand_up')
 def on_stand_up():
+    # TODO - add in cookie to track users. Currently refreshing page results in a new SID/users
     if request.sid not in sid_to_player_map:
         flash_io(f"Can't leave. You haven't joined.")
     else:
         flash_io(f'Player "{sid_to_player_map[request.sid]}" has left the game.')
         del sid_to_player_map[request.sid]
         players = {"Players": list(sid_to_player_map.values())}
-        emit("new player", json.dumps(players))
+        emit("player change", json.dumps(players), broadcast=True)
 
 
 @app.route("/game", methods=["GET"])

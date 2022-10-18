@@ -85,19 +85,9 @@ body {
   opacity: 1;
 }
 
-input.selector_highlight:hover
-{
-    content : url("");
-}
-
 .deck-full
 {
     content : url("other/deck-full.png");
     height: 180px;
     width: 120px;
-}
-
-connection {
-    border: 10px solid #b51c29;
-    border-radius: 50px;
 }

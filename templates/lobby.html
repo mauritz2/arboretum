@@ -3,22 +3,27 @@
 
 <div class="row text-center">
     <div class="col mb-5">
-        <h1>Sit down at the table and start the game</h1>
+        <h2>Sit down at the table and start the game</h2>
     </div>
 </div>
 <div class="row justify-content-center">
-    <div class="col-5 offset-1">
-        <form class="form sit_down_form">
-            <div>
-                <textarea class="form-control" id="player_name_input">Enter player name...</textarea>
-                <input type="submit" class="btn btn-dark mb-3" value="Join game">
-            </div>
+    <div class="col-3 offset-2">
+        <form>
+            <label for="player_name_input">Player name</label>
+            <textarea class="form-control mb-3" id="player_name_input" rows="1" placeholder="Enter player name here..."></textarea>
+            <input class="form-control mb-3 btn btn-dark" id="join_game" type="submit" value="Join game">
+            <input class="form-control btn btn-dark mb-3" id="leave_game" value="Leave game">
         </form>
-        <input class="btn btn-dark mb-3" id="leave_game" value="Leave game">
     </div>
-    <div class="col-6">
+    <div class="col-5 offset-1">
         <h2>Player's in the game</h2>
-        <ul id="player_list"></ul>
+        <ul id="player_list">
+            <i>Currently no players connected...</i>
+        </ul>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-5 offset-6">
         <input class="btn btn-warning" value="Start game">
     </div>
 </div>
