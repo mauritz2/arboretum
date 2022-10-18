@@ -1,33 +1,52 @@
+import json
 from flask import Flask, render_template, request, redirect, url_for, flash
 from logic import game_manager, GameState, player_game_state_messages
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, emit
+
 
 # Flask config
 app = Flask(__name__)
 app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
-socketio = SocketIO(app)
+socketio = SocketIO(app, logger=True)
 app.debug = True
+#app.host="0.0.0.0"
 
+sid_to_player_map = {}
+
+
+def flash_io(text: str, category: str = "dark") -> None:
+    """Send "message" to the client with the given error category"""
+    emit('message', json.dumps({"text": text, "category": category}))
 
 @app.route("/lobby", methods=["GET"])
 def lobby():
-
     num_players = game_manager.num_players
 
     return render_template("lobby.html",
                            num_players=num_players)
 
 
-@socketio.on('my event')
-def handle_my_custom_event(json):
-    return("I am here. Standin by! \n\n")
+@socketio.on('sit_down')
+def on_sit_down(data):
+    if request.sid in sid_to_player_map:
+        flash_io(f"Can't join. You've already joined.")
+    else:
+        player_name = data["player_name"]
+        sid_to_player_map[request.sid] = player_name
+        players = {"Players": list(sid_to_player_map.values())}
+        emit("new player", json.dumps(players))
+        flash_io("You've joined the game")
 
 
-@socketio.on('sitdown')
-def on_sitdown(data):
-    username = data["player"]
-    print(f"{username} has connected!")
-
+@socketio.on('stand_up')
+def on_stand_up():
+    if request.sid not in sid_to_player_map:
+        flash_io(f"Can't leave. You haven't joined.")
+    else:
+        flash_io(f'Player "{sid_to_player_map[request.sid]}" has left the game.')
+        del sid_to_player_map[request.sid]
+        players = {"Players": list(sid_to_player_map.values())}
+        emit("new player", json.dumps(players))
 
 
 @app.route("/game", methods=["GET"])
@@ -210,3 +229,4 @@ def discard_card():
 
 if __name__ == "__main__":
     socketio.run(app)
+    #app.run(host="0.0.0.0")
