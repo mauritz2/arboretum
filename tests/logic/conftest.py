@@ -1,8 +1,5 @@
 import pytest
-from logic import Board, Deck, Scorer, Player, Card, Discard
-
-
-# TODO - add in a dict/fixture that hold all possible Card() types - they are static and have to be re-created in many tests
+from logic import Board, Deck, Scorer, Player, Card, Discard, GameManager
 
 
 @pytest.fixture
@@ -61,6 +58,10 @@ def player2(board2, deck, discard):
 @pytest.fixture
 def scorer(player, player2):
     return Scorer(players=[player, player2], trees=["Cassia", "Blue Spruce", "Jacaranda", "Oak"])
+
+@pytest.fixture
+def gamemanager():
+    return GameManager(2);
 
 
 # Define all cards, so they can be used across test cases

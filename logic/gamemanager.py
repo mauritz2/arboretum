@@ -34,10 +34,10 @@ class GameManager:
         players = []
         deck = Deck()
         for i in range(self.num_players):
-            player_name = f"Player {i + 1}"
             discard = Discard(cards=[])
             board = Board(num_rows=config.BOARD_ROWS, num_columns=config.BOARD_COLUMNS)
-
+            existing_names = [player.name for player in players]
+            player_name = self.get_next_player_id(existing_names)
             player = Player(name=player_name,
                             deck=deck,
                             discard=discard,
@@ -47,6 +47,24 @@ class GameManager:
 
         scorer = Scorer(players=players)
         return scorer
+
+    def get_next_player_id(self, player_names: list[str]) -> str:
+        """
+        Returns the next free player name in the format: "Player {num}".
+        Returns ValueError if trying to get the next player name when the game is already full
+        This method takes player_names as input as opposed to self.scorer.players since it's
+        used to assess next names before the scorer has been instantiated
+        """
+        # Gets the last digit of all current players and puts them in a set
+        nums_in_use = set([int(player_name[-1]) for player_name in player_names])
+        possible_nums = set([i + 1 for i in range(self.num_players)])
+        available_nums = possible_nums - nums_in_use
+        if len(available_nums) == 0:
+            raise ValueError("Can't find next player name. Game is already full")
+        lowest_available_num = min(available_nums)
+        next_num = lowest_available_num
+
+        return f"Player {next_num}"
 
     def start_next_round(self):
         """
