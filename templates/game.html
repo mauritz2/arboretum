@@ -6,11 +6,11 @@
             <p class="mb-0"><strong>Deck</strong></p>
             <p id="cards_left"></p>
             <!--Deck-->
-            <form action="/draw_card_from_deck" method="post">
+            <form>
                 <div class="overlay-button-container">
                     <img class="card_on_hand" src="../static/css/other/deck-full.png">
-                    <div id="draw_button_placeholder">
-                        <!-- Placeholder for the draw card button-->
+                    <div class="hide_button" id="draw_button_container">
+                        <input class="btn btn-dark" id="draw_button" type="button" value='Draw card'>"
                     </div>
                 </div>
             </form>
@@ -100,9 +100,9 @@
 <script>
     // This runs everytime on submit, which is why drawing cards is currently working
     // Drawing a card should emit an event - not post something
-    socket.emit("get current player")
-    socket.emit("get game phase")
-    socket.emit("get hand")
+    socket.emit("get game phase");
+    //socket.emit("get hand");
+    //socket.emit("get current player");
 
 </script>
 
@@ -113,6 +113,16 @@
 <!--                    {% if game_phase == "Draw" %}-->
 <!--                    <input class="btn btn-dark" type="submit" value="Draw card">-->
 <!--                    {% endif %}-->
+<!--                </div>-->
+<!--            </form>-->
+
+<!--Deck-->
+<!--            <form action="/draw_card_from_deck" method="post">-->
+<!--                <div class="overlay-button-container">-->
+<!--                    <img class="card_on_hand" src="../static/css/other/deck-full.png">-->
+<!--                    <div id="draw_button_placeholder">-->
+<!--                        &lt;!&ndash; Placeholder for the draw card button&ndash;&gt;-->
+<!--                    </div>-->
 <!--                </div>-->
 <!--            </form>-->
 

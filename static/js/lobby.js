@@ -1,5 +1,5 @@
 let socket = io();
-let current_player = null;
+let is_current_player = null;
 let game_phase = null;
 
 function join_game(player_name){
@@ -30,9 +30,6 @@ function update_players(current_players) {
     $("#player_list").empty();
 
     $.each(current_players, function (i, item) {
-        console.log(item)
-        console.log(item["player_id"])
-        console.log(item["player_name"])
         let player_id = item["player_id"]
         let player_name = item["player_name"]
         $("#player_list").append("<li>" + player_id + " - " + player_name + "</li>");
@@ -47,66 +44,132 @@ function show_message(text, category) {
   message_div.innerHTML = text;
 }
 
-function update_current_player(player_name){
-    current_player = player_name;
-    console.log("Within update_cur-player" + current_player)
-}
+// function update_current_player(player_name){
+//     current_player = player_name;
+//     console.log("Within update_cur-player" + current_player)
+// }
 
-function update_game_phase(g_phase){
-    console.log("Updating game phase!")
+function update_game_phase(g_phase, is_cur_player){
+    //console.log(game_phase_dict)
+    console.log("Updating game phase to " + g_phase)
+    console.log("Updating is current player to " + is_cur_player)
+    
     game_phase = g_phase
+    is_current_player = is_cur_player
+    
+    //socket.emit("get current player")
+
+    console.log(is_cur_player)
+    console.log(typeof(is_cur_player))
+
+
+    console.log("Evaluating what buttons to show")
+    // Draw button!
+    if (is_current_player == true && game_phase === "Choose Card"){
+        console.log("Showing play button")
+        $(".card_to_play").removeClass("hide_button");
+    }
+    else{
+        $(".card_to_play").addClass("hide_button");
+    }
+
+    // Discard button
+    if(is_current_player === true && game_phase === "Choose Discard"){
+        console.log("Showing discard button")
+        $(".discard_btn").removeClass("hide_button");
+    }
+    else{
+        $(".discard_btn").addClass("hide_button");
+    }
+
+    // Draw button
+    if(is_current_player === true && game_phase === "Draw"){
+        console.log("Showing draw button")
+        $("#draw_button_container").removeClass("hide_button");
+    }
+    else{
+        console.log("Hiding draw button")
+        $("#draw_button_container").addClass("hide_button");
+    }
+
+    $(".card_to_play").submit(function (event){
+        console.log("Playing card" + event.currentTarget[0].value)
+        let card_to_play = event.currentTarget[0].value
+        socket.emit("choose card to play", card_to_play);
+    });
 }
 
 function update_hand(cards_on_hand) {
-    console.log("The current player value is " + current_player);
+    console.log(cards_on_hand)
+    console.log("The current player value is " + is_current_player);
     console.log("The current game phase is " + game_phase);
 
-    cards_on_hand.forEach(function (card) {
+    $("#player_hand_div").empty();
 
+    cards_on_hand.forEach(function (card) {
         $("#player_hand_div").append("" +
             "<div class='col-1'>" +
             "<div class='overlay-button-container'>" +
             "<img class='card_on_hand' src='../static/css/playing_cards/" + card + ".png'>" +
-            "<div class='button_placeholder hide_button'>" +
-            "<form class='card_to_play'>" +
+            "<form class='card_to_play hide_button'>" +
             "<input name='card_name' type='hidden' value='" + card + "'>" +
             "<input type='submit' class='btn btn-dark' value='Play card'>" +
             "</form>" +
-            "</div>" +
+            "<form class='discard_btn hide_button' action='/discard_card' method='post'>" +
+            "<input name='card_name' type='hidden' value='" + card + "'>" +
+            "<input type='submit' class='btn btn-dark' value='Discard card'>" +
+            "</form>" +
             "</div>" +
             "</div>")
 
-        if(current_player === true && game_phase == "Choose Discard"){
-            console.log("Time to discard")
-            $(".button_placeholder").append(""+
-                    "<form action='/discard_card' method='post'>" +
-                    "<input name='card_name' type='hidden' value='" + card + "'>" +
-                    "<input type='submit' class='btn btn-dark' value='Discard card'>" +
-                    "</form>")
-        }
-
-        else if(current_player === true && game_phase == "Draw"){
-            console.log("Time to draw")
-            $("#draw_button_placeholder").append("<input class='btn btn-dark' type='submit' value='Draw card'>")
-        }
     })
-    console.log("Evaluating if you should be shown draw")
-    if (current_player == true && game_phase == "Choose Card"){
-        $(".button_placeholder").removeClass("hide_button");
-    }
-    else{
-        $(".button_placeholder").addClass("hide_button");
-    }
-
+    // console.log("Evaluating what buttons to show")
+    // // Draw button!
+    // if (current_player == true && game_phase === "Choose Card"){
+    //     console.log("Showing play button")
+    //     $(".card_to_play").removeClass("hide_button");
+    // }
+    // else{
+    //     $(".card_to_play").addClass("hide_button");
+    // }
+    //
+    // // Discard button
+    // if(current_player === true && game_phase === "Choose Discard"){
+    //     console.log("Showing discard button")
+    //     $(".discard_btn").removeClass("hide_button");
+    // }
+    // else{
+    //     $(".discard_btn").addClass("hide_button");
+    // }
+    //
+    // // Draw button
+    // if(current_player === true && game_phase === "Draw"){
+    //     console.log("Showing draw button")
+    //     $("#draw_button_container").removeClass("hide_button");
+    // }
+    // else{
+    //     console.log("Hiding draw button")
+    //     $("#draw_button_container").addClass("hide_button");
+    // }
+    //
     $(".card_to_play").submit(function (event){
-        console.log(event.currentTarget[0].value)
-        socket.emit("play card");
+        console.log("Playing card" + event.currentTarget[0].value)
+        let card_to_play = event.currentTarget[0].value
+        socket.emit("choose card to play", card_to_play);
     });
 }
 
 function update_cards_left(cards_left){
     $("#cards_left").text(cards_left + " cards remain");
 }
+
+$(function(){
+    $("#draw_button").on("click",function ()
+    {
+        console.log("Drawing button was clicked!")
+        socket.emit("draw card")
+    });
+});
 
 
 // Used only for generating test data
@@ -138,20 +201,20 @@ function update_cards_left(cards_left){
 // Message listeners
 socket.on("message", (message) => show_message(JSON.parse(message).text, JSON.parse(message).category));
 socket.on("update player list", (current_players) => update_players(JSON.parse(current_players)));
-socket.on("update current player", (current_player) => update_current_player(JSON.parse(current_player)));
+//socket.on("update current player", (current_player) => update_current_player(JSON.parse(current_player)));
 socket.on("update hand", (cards_on_hand) => update_hand(JSON.parse(cards_on_hand)));
-socket.on("update game phase", (game_phase) => update_game_phase(JSON.parse(game_phase)));
+socket.on("update game phase", (game_phase_dict) => update_game_phase(JSON.parse(game_phase_dict).game_phase, JSON.parse(game_phase_dict).is_current_player));
 socket.on("update cards left", (cards_left) => update_cards_left(JSON.parse(cards_left)));
 
 
 /* Planning
 
 // Display hands
-Loop through the player ID and send each players and to their respective SIDs (no broadcast)
+Loop through the player ID and send each player their respective SIDs (no broadcast)
 
 // Display play/discard buttons
 1. Emit the current player SID
-2. In front-end, check if the SID is the same as in "let session = {{ session | json }}
+2. In front-end, check if the SID is the same as in "let session = {{ session | json }}"
 3. If it is, check what button to display (discard, draw)
 4. If it's not, remove those buttons to make sure they're not displayed
 
@@ -162,7 +225,7 @@ Loop through the player ID and send each players and to their respective SIDs (n
 // Play a card
 1. From front-end emit play card event including the SID of the player + the card to play
 2. Backend listens, changes the game state to choose cord etc.
-x. Very similar with discard. Essentially replace the existing decorators with with the socketio.on decorators
+x. Very similar with discard. Essentially replace the existing decorators with the socketio.on decorators
 
 */
 
@@ -192,3 +255,12 @@ x. Very similar with discard. Essentially replace the existing decorators with w
         //             "</form>"
         //     )
         //}
+
+        // if(current_player === true && game_phase == "Choose Discard"){
+        //     console.log("Time to discard")
+        //     $(".button_placeholder").append(""+
+        //             "<form action='/discard_card' method='post'>" +
+        //             "<input name='card_name' type='hidden' value='" + card + "'>" +
+        //             "<input type='submit' class='btn btn-dark' value='Discard card'>" +
+        //             "</form>")
+        // }

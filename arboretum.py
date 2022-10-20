@@ -20,19 +20,21 @@ socketio = SocketIO(app, logger=True, manage_session=False)
 
 uid_to_player_map = {}
 
-# @socketio.on("connect")
-# def emit_players():
-#     socketio.emit("player change", json.dumps(uid_to_player_map), broadcast=True)
-#
-# @app.before_request
-# def validate_cookie():
-#     if "uids" not in session:
-#         return redirect(url_for("lobby"))
-#     return
-
 def flash_io(text: str, category: str = "dark") -> None:
     """Send "message" to the client with the given error category"""
     emit('message', json.dumps({"text": text, "category": category}))
+
+
+def is_current_player(uid: str) -> bool:
+    global uid_to_player_map
+    print(f"I am finding out if player {uid} is the current player")
+    print(uid_to_player_map)
+    current_player_name = game_manager.current_player.name
+    if uid_to_player_map[uid]["player_id"] == current_player_name:
+        is_current_player = True
+    else:
+        is_current_player = False
+    return is_current_player
 
 
 @app.route("/lobby", methods=["GET"])
@@ -53,10 +55,7 @@ def get_player_list():
 @socketio.on('sit_down')
 def on_sit_down(data):
     global uid_to_player_map
-    #uid_to_player_map = session.get("uids")
-    print("\nPlayer UID below\n")
     player_uid = request.cookies.get("player_uid")
-    print(player_uid)
     player_name = data["player_name"]
 
     # Get the player ID
@@ -87,7 +86,7 @@ def on_stand_up():
 
 
 @socketio.on("get hand")
-def draw_card():
+def get_hand():
     global uid_to_player_map
 
     player_hands = {}
@@ -99,27 +98,61 @@ def draw_card():
     player_name = uid_to_player_map[player_uid]["player_id"]
     socketio.emit("update hand", json.dumps(player_hands[player_name]), to=request.sid)
 
-    num_cards_in_deck = game_manager.scorer.players[0].deck.get_amt_of_cards_left()
-    socketio.emit("update cards left", json.dumps(num_cards_in_deck), broadcast=True)
 
-
-@socketio.on("get current player")
-def get_current_player():
-    player_uid = request.cookies.get("player_uid")
-    current_player_name = game_manager.current_player.name
-    if uid_to_player_map[player_uid]["player_id"] == current_player_name:
-        is_current_player = True
-    else:
-        is_current_player = False
-
-    print("Current player name below\n")
-    print(current_player_name)
-    socketio.emit("update current player", json.dumps(is_current_player), to=request.sid)
-
+# @socketio.on("get current player")
+# def get_current_player():
+#     print("\nResponding to get player request")
+#     player_uid = request.cookies.get("player_uid")
+#     is_cur_player = is_current_player(player_uid)
+#     game_status = {"game_phase": game_manager.game_phase.value, "is_current_player": is_cur_player}
+#     print(f"\nGame status {game_status}")
+#     emit("update game phase", json.dumps(game_status), broadcast=True)
 
 @socketio.on("get game phase")
 def get_game_phase():
+    print("\nResponding to get phase request")
+    player_uid = request.cookies.get("player_uid")
+    is_cur_player = is_current_player(player_uid)
+    game_status = {"game_phase": game_manager.game_phase.value, "is_current_player": is_cur_player}
+    print(f"\nGame status {game_status}")
+    emit("update game phase", json.dumps(game_status), broadcast=True)
+
+
+@socketio.on("choose card to play")
+def choose_card_to_play(card_to_play):
+    game_manager.selected_card_to_play = card_to_play
+    game_manager.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
     emit("update game phase", json.dumps(game_manager.game_phase.value))
+
+
+@socketio.on("draw card")
+def draw_card():
+    # if game_manager.current_player.deck.get_amt_of_cards_left() <= 0:
+    #     flash_io("The deck is empty. Scoring will start after the current turn is complete.", "error")
+    #     return
+
+    print("\n\n\n\n\n###Starting to draw card###")
+
+    player_uid = request.cookies.get("player_uid")
+    player_name = uid_to_player_map[player_uid]["player_id"]
+    player_to_draw = game_manager.scorer.get_player_instance(player_name)
+    print(f"The player to draw is {player_to_draw.name}")
+    player_to_draw.draw_card_from_deck() # TODO - assume that the current player is drawing
+
+    cards_on_hand = player_to_draw.get_player_card_names()
+    print(cards_on_hand)
+    socketio.emit("update hand", json.dumps(cards_on_hand), to=request.sid)
+
+    num_cards_in_deck = game_manager.scorer.players[0].deck.get_amt_of_cards_left()
+    socketio.emit("update cards left", json.dumps(num_cards_in_deck), broadcast=True)
+
+    game_manager.num_cards_drawn_current_turn += 1
+    print(f"Amount of cards drawn this turn {game_manager.num_cards_drawn_current_turn}")
+
+    if game_manager.num_cards_drawn_current_turn >= 2:
+        game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
+        emit("update game phase", json.dumps(game_manager.game_phase.value), broadcast=True)
+    print("\n\n\n\n\n\n")
 
 @app.route("/game", methods=["GET"])
 def main():
@@ -142,9 +175,10 @@ def main():
 
     flash(player_game_state_messages[game_manager.game_phase])
 
+    #player_hands = player_hands,
+
     return render_template(
         'game.html',
-        player_hands=player_hands,
         player_boards=player_boards,
         game_phase=game_phase,
         top_discard_cards=top_discard_cards,
@@ -192,23 +226,23 @@ def game_over():
                            )
 
 
-@app.route("/draw_card_from_deck", methods=["POST"])
-def draw_card_from_deck():
-    """
-    Draws a card from the deck and adds it to the players hand. Progresses to the next phase (i.e. play card)
-    when two cards have been drawn
-    # TODO - if multiplayer is implemented, check will be needed that correct player tries to perform an action
-    """
-    if game_manager.current_player.deck.get_amt_of_cards_left() <= 0:
-        flash("The deck is empty. Scoring will start after the current turn is complete.", "error")
-        return redirect(url_for("main"))
-
-    game_manager.current_player.draw_card_from_deck()
-    game_manager.num_cards_drawn_current_turn += 1
-    if game_manager.num_cards_drawn_current_turn >= 2:
-        game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
-
-    return redirect(url_for("main"))
+# @app.route("/draw_card_from_deck_old", methods=["POST"])
+# def draw_card_from_deck_old():
+#     """
+#     Draws a card from the deck and adds it to the players hand. Progresses to the next phase (i.e. play card)
+#     when two cards have been drawn
+#     # TODO - if multiplayer is implemented, check will be needed that correct player tries to perform an action
+#     """
+#     if game_manager.current_player.deck.get_amt_of_cards_left() <= 0:
+#         flash("The deck is empty. Scoring will start after the current turn is complete.", "error")
+#         return redirect(url_for("main"))
+#
+#     game_manager.current_player.draw_card_from_deck()
+#     game_manager.num_cards_drawn_current_turn += 1
+#     if game_manager.num_cards_drawn_current_turn >= 2:
+#         game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
+#
+#     return redirect(url_for("main"))
 
 
 @app.route("/draw_from_discard", methods=["POST"])
@@ -228,16 +262,6 @@ def draw_card_from_discard():
     return redirect(url_for("main"))
 
 
-@app.route("/choose_card_to_play", methods=["POST"])
-def choose_card_to_play():
-    """
-    Identifies the card the player has chosen to play and sets the game manager to remember the card. Then progresses
-    the game state so the player can choose where to place the selected card
-    """
-    selected_card_to_play = request.form['card_name']
-    game_manager.selected_card_to_play = selected_card_to_play
-    game_manager.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
-    return redirect(url_for("main"))
 
 
 @app.route("/choose_coordinates", methods=["POST"])
@@ -292,7 +316,23 @@ def discard_card():
         return redirect(url_for("game_over"))
 
     game_manager.start_next_round()
+
+    socketio.emit("update game phase", json.dumps(game_manager.game_phase.value), broadcast=True)
+
     return redirect(url_for("main"))
+
+
+# @app.route("/choose_card_to_play_old", methods=["POST"])
+# def choose_card_to_play_old():
+#     """
+#     Identifies the card the player has chosen to play and sets the game manager to remember the card. Then progresses
+#     the game state so the player can choose where to place the selected card
+#     """
+#     selected_card_to_play = request.form['card_name']
+#     game_manager.selected_card_to_play = selected_card_to_play
+#     game_manager.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
+#     return redirect(url_for("main"))
+
 
 
 if __name__ == "__main__":
