@@ -63,24 +63,6 @@ function update_game_phase(g_phase, is_cur_player){
     console.log(typeof(is_cur_player))
 
 
-    console.log("Evaluating what buttons to show")
-    // Draw button!
-    if (is_current_player == true && game_phase === "Choose Card"){
-        console.log("Showing play button")
-        $(".card_to_play").removeClass("hide_button");
-    }
-    else{
-        $(".card_to_play").addClass("hide_button");
-    }
-
-    // Discard button
-    if(is_current_player === true && game_phase === "Choose Discard"){
-        console.log("Showing discard button")
-        $(".discard_btn").removeClass("hide_button");
-    }
-    else{
-        $(".discard_btn").addClass("hide_button");
-    }
 
     // Draw button
     if(is_current_player === true && game_phase === "Draw"){
@@ -101,8 +83,6 @@ function update_game_phase(g_phase, is_cur_player){
 
 function update_hand(cards_on_hand) {
     console.log(cards_on_hand)
-    console.log("The current player value is " + is_current_player);
-    console.log("The current game phase is " + game_phase);
 
     $("#player_hand_div").empty();
 
@@ -115,7 +95,7 @@ function update_hand(cards_on_hand) {
             "<input name='card_name' type='hidden' value='" + card + "'>" +
             "<input type='submit' class='btn btn-dark' value='Play card'>" +
             "</form>" +
-            "<form class='discard_btn hide_button' action='/discard_card' method='post'>" +
+            "<form class='discard_btn hide_button' method='post' action='/discard_card'>" +
             "<input name='card_name' type='hidden' value='" + card + "'>" +
             "<input type='submit' class='btn btn-dark' value='Discard card'>" +
             "</form>" +
@@ -152,6 +132,31 @@ function update_hand(cards_on_hand) {
     //     $("#draw_button_container").addClass("hide_button");
     // }
     //
+    console.log("Evaluating what buttons to show with input as below")
+    console.log("The current player value is " + is_current_player);
+    console.log("The current game phase is " + game_phase);
+
+    // Draw button!
+    // TODO - not sure why these have to be in here, doesn't make sense to me - but they are most stable here
+    if (is_current_player == true && game_phase === "Choose Card"){
+        console.log("Showing play button")
+        $(".card_to_play").removeClass("hide_button");
+    }
+    else{
+        $(".card_to_play").addClass("hide_button");
+    }
+
+    // Discard button
+    if(is_current_player === true && game_phase === "Choose Discard"){
+        console.log("Showing discard button")
+        $(".discard_btn").removeClass("hide_button");
+    }
+    else{
+        $(".discard_btn").addClass("hide_button");
+    }
+
+
+
     $(".card_to_play").submit(function (event){
         console.log("Playing card" + event.currentTarget[0].value)
         let card_to_play = event.currentTarget[0].value

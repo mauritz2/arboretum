@@ -25,6 +25,16 @@ def flash_io(text: str, category: str = "dark") -> None:
     emit('message', json.dumps({"text": text, "category": category}))
 
 
+def emit_game_phase(r):
+    print("\nResponding to get phase request")
+    player_uid = r.cookies.get("player_uid")
+    print(f"\nUID: {player_uid}")
+    is_cur_player = is_current_player(player_uid)
+    game_status = {"game_phase": game_manager.game_phase.value, "is_current_player": is_cur_player}
+    print(f"\nGame status {game_status}")
+    socketio.emit("update game phase", json.dumps(game_status), broadcast=True)
+
+
 def is_current_player(uid: str) -> bool:
     global uid_to_player_map
     print(f"I am finding out if player {uid} is the current player")
@@ -109,20 +119,18 @@ def get_hand():
 #     emit("update game phase", json.dumps(game_status), broadcast=True)
 
 @socketio.on("get game phase")
-def get_game_phase():
-    print("\nResponding to get phase request")
-    player_uid = request.cookies.get("player_uid")
-    is_cur_player = is_current_player(player_uid)
-    game_status = {"game_phase": game_manager.game_phase.value, "is_current_player": is_cur_player}
-    print(f"\nGame status {game_status}")
-    emit("update game phase", json.dumps(game_status), broadcast=True)
+def call_get_game_phase():
+    emit_game_phase(request)
+
+
 
 
 @socketio.on("choose card to play")
 def choose_card_to_play(card_to_play):
     game_manager.selected_card_to_play = card_to_play
     game_manager.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
-    emit("update game phase", json.dumps(game_manager.game_phase.value))
+    emit_game_phase(request)
+    #emit("update game phase", json.dumps(game_manager.game_phase.value))
 
 
 @socketio.on("draw card")
@@ -151,7 +159,8 @@ def draw_card():
 
     if game_manager.num_cards_drawn_current_turn >= 2:
         game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
-        emit("update game phase", json.dumps(game_manager.game_phase.value), broadcast=True)
+        emit_game_phase(request)
+        #emit("update game phase", json.dumps(game_manager.game_phase.value), broadcast=True)
     print("\n\n\n\n\n\n")
 
 @app.route("/game", methods=["GET"])
@@ -317,7 +326,9 @@ def discard_card():
 
     game_manager.start_next_round()
 
-    socketio.emit("update game phase", json.dumps(game_manager.game_phase.value), broadcast=True)
+    emit_game_phase(request)
+
+    #socketio.emit("update game phase", json.dumps(game_manager.game_phase.value), broadcast=True)
 
     return redirect(url_for("main"))
 
