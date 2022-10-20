@@ -99,6 +99,9 @@ def draw_card():
     player_name = uid_to_player_map[player_uid]["player_id"]
     socketio.emit("update hand", json.dumps(player_hands[player_name]), to=request.sid)
 
+    num_cards_in_deck = game_manager.scorer.players[0].deck.get_amt_of_cards_left()
+    socketio.emit("update cards left", json.dumps(num_cards_in_deck), broadcast=True)
+
 
 @socketio.on("get current player")
 def get_current_player():
@@ -116,7 +119,6 @@ def get_current_player():
 
 @socketio.on("get game phase")
 def get_game_phase():
-    game_manager.game_phase = GameState.CHOOSE_DISCARD
     emit("update game phase", json.dumps(game_manager.game_phase.value))
 
 @app.route("/game", methods=["GET"])
@@ -235,7 +237,6 @@ def choose_card_to_play():
     selected_card_to_play = request.form['card_name']
     game_manager.selected_card_to_play = selected_card_to_play
     game_manager.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
-
     return redirect(url_for("main"))
 
 

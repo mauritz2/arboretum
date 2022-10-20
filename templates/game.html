@@ -4,14 +4,14 @@
 <div class="row align-items-end">
         <div class="col-1 offset-1">
             <p class="mb-0"><strong>Deck</strong></p>
-            <p><small>{{num_cards_in_deck}} cards remain</small></p>
+            <p id="cards_left"></p>
             <!--Deck-->
             <form action="/draw_card_from_deck" method="post">
                 <div class="overlay-button-container">
                     <img class="card_on_hand" src="../static/css/other/deck-full.png">
-                    {% if game_phase == "Draw" %}
-                    <input class="btn btn-dark" type="submit" value="Draw card">
-                    {% endif %}
+                    <div id="draw_button_placeholder">
+                        <!-- Placeholder for the draw card button-->
+                    </div>
                 </div>
             </form>
         </div>
@@ -93,6 +93,7 @@
     </div>
 </div>
 
+<!--Player hand-->
 <div class="row justify-content-center" id="player_hand_div">
 </div>
 
@@ -105,32 +106,14 @@
 
 </script>
 
-<!--                <div class="overlay-button-container">-->
-<!--                    <form>-->
-<!--                        <input name="card_name" type="hidden" value="{{card}}">-->
-<!--                        <input type="submit" class="btn btn-dark" value="Play card">-->
-<!--                    </form>-->
-<!--                </div> -->
 
-<!--<div class="row justify-content-center">-->
-<!--        {% for card in player_hands[current_player_name] %}-->
-<!--        <div class="col-1">-->
+<!--            <form action="/draw_card_from_deck" method="post">-->
 <!--                <div class="overlay-button-container">-->
-<!--                <img class="card_on_hand" src="../static/css/playing_cards/{{card}}.png">-->
-<!--                {% if game_phase == "Choose Card" %}-->
-<!--                    <form>-->
-<!--                        <input name="card_name" type="hidden" value="{{card}}">-->
-<!--                        <input type="submit" class="btn btn-dark" value="Play card">-->
-<!--                    </form>-->
-<!--                {% elif game_phase == "Choose Discard" %}-->
-<!--                    <form action="/discard_card" method="post">-->
-<!--                        <input name="card_name" type="hidden" value="{{card}}">-->
-<!--                        <input type="submit" class="btn btn-dark" value="Discard card">-->
-<!--                    </form>-->
-<!--                {% endif %}-->
+<!--                    <img class="card_on_hand" src="../static/css/other/deck-full.png">-->
+<!--                    {% if game_phase == "Draw" %}-->
+<!--                    <input class="btn btn-dark" type="submit" value="Draw card">-->
+<!--                    {% endif %}-->
 <!--                </div>-->
-<!--        </div>-->
-<!--    {% endfor %}-->
-<!--</div>-->
+<!--            </form>-->
 
 {% endblock %}

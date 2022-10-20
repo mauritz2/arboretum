@@ -57,6 +57,9 @@ function update_game_phase(g_phase){
 }
 
 function update_hand(cards_on_hand) {
+    console.log("The current player value is " + current_player);
+    console.log("The current game phase is " + game_phase);
+
     cards_on_hand.forEach(function (card) {
         $("#player_hand_div").append("" +
             "<div class='col-1'>" +
@@ -66,28 +69,34 @@ function update_hand(cards_on_hand) {
             "</div>" +
             "</div>" +
             "</div>")
-    });
-    console.log("The current player value is " + current_player);
-    console.log("The current game phase is " + game_phase);
 
-    console.log(current_player == true);
-    if(current_player === true && game_phase == "Choose Card"){
-        $(".button_placeholder").append(""+
-                "<form>" +
-                "<input name='card_name' type='hidden' value='my_card'>" +
-                "<input type='submit' class='btn btn-dark' value='Play card'>" +
-                "</form>"
-        )
-    }
-    else if(current_player === true && game_phase == "Choose Discard"){
-        console.log("Time ti discard")
-        $(".button_placeholder").append(""+
-                "<form action='/discard_card' method='post'>" +
-                "<input name='card_name' type='hidden' value='card_name_TBD'>" +
-                "<input type='submit' class='btn btn-dark' value='Discard card'>" +
-                "</form>"
-        )
-    }
+
+        if(current_player === true && game_phase == "Choose Card"){
+            $(".button_placeholder").append(""+
+                    "<form action='/choose_card_to_play' method='post'>" +
+                    "<input name='card_name' type='hidden' value='" + card + "'>" +
+                    "<input type='submit' class='btn btn-dark' value='Play card'>" +
+                    "</form>"
+            )
+        }
+        else if(current_player === true && game_phase == "Choose Discard"){
+            console.log("Time to discard")
+            $(".button_placeholder").append(""+
+                    "<form action='/discard_card' method='post'>" +
+                    "<input name='card_name' type='hidden' value='" + card + "'>" +
+                    "<input type='submit' class='btn btn-dark' value='Discard card'>" +
+                    "</form>")
+        }
+
+        else if(current_player === true && game_phase == "Draw"){
+            console.log("Time to draw")
+            $("#draw_button_placeholder").append("<input class='btn btn-dark' type='submit' value='Draw card'>")
+        }
+    })
+}
+
+function update_cards_left(cards_left){
+    $("#cards_left").text(cards_left + " cards remain");
 }
 
 
@@ -123,6 +132,7 @@ socket.on("update player list", (current_players) => update_players(JSON.parse(c
 socket.on("update current player", (current_player) => update_current_player(JSON.parse(current_player)));
 socket.on("update hand", (cards_on_hand) => update_hand(JSON.parse(cards_on_hand)));
 socket.on("update game phase", (game_phase) => update_game_phase(JSON.parse(game_phase)));
+socket.on("update cards left", (cards_left) => update_cards_left(JSON.parse(cards_left)));
 
 
 /* Planning
