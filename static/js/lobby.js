@@ -1,5 +1,6 @@
 let socket = io();
 let current_player = null;
+let game_phase = null;
 
 function join_game(player_name){
         socket.emit('sit_down', {player_name: player_name});
@@ -46,18 +47,48 @@ function show_message(text, category) {
 }
 
 function update_current_player(player_name){
-    console.log("Stuff")
     current_player = player_name;
     console.log("Within update_cur-player" + current_player)
 }
 
-function update_hand(cards_on_hand){
-    cards_on_hand.forEach(function(card){
-        $("#player_hand_div").append("<div class='col-1'> <img class='card_on_hand' src='../static/css/playing_cards/" + card + ".png'></div>")
-    });
-    console.log("It's the turn of " + current_player)
+function update_game_phase(g_phase){
+    console.log("Updating game phase!")
+    game_phase = g_phase
 }
 
+function update_hand(cards_on_hand) {
+    cards_on_hand.forEach(function (card) {
+        $("#player_hand_div").append("" +
+            "<div class='col-1'>" +
+            "<div class='overlay-button-container'>" +
+            "<img class='card_on_hand' src='../static/css/playing_cards/" + card + ".png'>" +
+            "<div class='button_placeholder'>" +
+            "</div>" +
+            "</div>" +
+            "</div>")
+    });
+    console.log("The current player value is " + current_player);
+    console.log("The current game phase is " + game_phase);
+
+    console.log(current_player == true);
+    if(current_player === true && game_phase == "Choose Card"){
+        $(".button_placeholder").append(""+
+                "<form>" +
+                "<input name='card_name' type='hidden' value='my_card'>" +
+                "<input type='submit' class='btn btn-dark' value='Play card'>" +
+                "</form>"
+        )
+    }
+    else if(current_player === true && game_phase == "Choose Discard"){
+        console.log("Time ti discard")
+        $(".button_placeholder").append(""+
+                "<form action='/discard_card' method='post'>" +
+                "<input name='card_name' type='hidden' value='card_name_TBD'>" +
+                "<input type='submit' class='btn btn-dark' value='Discard card'>" +
+                "</form>"
+        )
+    }
+}
 
 
 // Used only for generating test data
@@ -88,9 +119,10 @@ function update_hand(cards_on_hand){
 
 // Message listeners
 socket.on("message", (message) => show_message(JSON.parse(message).text, JSON.parse(message).category));
-socket.on("player change", (current_players) => update_players(JSON.parse(current_players)));
-socket.on("current player", (current_player) => update_current_player(current_player));
-socket.on("hand update", (cards_on_hand) => update_hand(JSON.parse(cards_on_hand)));
+socket.on("update player list", (current_players) => update_players(JSON.parse(current_players)));
+socket.on("update current player", (current_player) => update_current_player(JSON.parse(current_player)));
+socket.on("update hand", (cards_on_hand) => update_hand(JSON.parse(cards_on_hand)));
+socket.on("update game phase", (game_phase) => update_game_phase(JSON.parse(game_phase)));
 
 
 /* Planning

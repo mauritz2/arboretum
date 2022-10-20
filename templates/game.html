@@ -99,8 +99,18 @@
 <script>
     // This runs everytime on submit, which is why drawing cards is currently working
     // Drawing a card should emit an event - not post something
-    socket.emit("hand change")
+    socket.emit("get current player")
+    socket.emit("get game phase")
+    socket.emit("get hand")
+
 </script>
+
+<!--                <div class="overlay-button-container">-->
+<!--                    <form>-->
+<!--                        <input name="card_name" type="hidden" value="{{card}}">-->
+<!--                        <input type="submit" class="btn btn-dark" value="Play card">-->
+<!--                    </form>-->
+<!--                </div> -->
 
 <!--<div class="row justify-content-center">-->
 <!--        {% for card in player_hands[current_player_name] %}-->

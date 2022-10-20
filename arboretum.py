@@ -2,25 +2,33 @@ import json
 
 import flask
 import random
+import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from logic import game_manager, GameState, player_game_state_messages
+from flask_session import Session
 from flask_socketio import SocketIO, emit
+from logic import game_manager, GameState, player_game_state_messages
 
 
 # Flask config
 app = Flask(__name__)
 app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
-socketio = SocketIO(app, logger=True)
 app.debug = True
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
+socketio = SocketIO(app, logger=True, manage_session=False)
 #app.host="0.0.0.0"
 
 uid_to_player_map = {}
 
-
 # @socketio.on("connect")
 # def emit_players():
 #     socketio.emit("player change", json.dumps(uid_to_player_map), broadcast=True)
-
+#
+# @app.before_request
+# def validate_cookie():
+#     if "uids" not in session:
+#         return redirect(url_for("lobby"))
+#     return
 
 def flash_io(text: str, category: str = "dark") -> None:
     """Send "message" to the client with the given error category"""
@@ -29,6 +37,7 @@ def flash_io(text: str, category: str = "dark") -> None:
 
 @app.route("/lobby", methods=["GET"])
 def lobby():
+    # Set the player UID cookie
     response = flask.make_response(render_template("lobby.html"))
     player_uid = request.cookies.get("player_uid")
     if player_uid:
@@ -37,27 +46,30 @@ def lobby():
     response.set_cookie("player_uid", value=str(random.randrange(100, 999)))
     return response
 
+@socketio.on("get player list")
+def get_player_list():
+    emit("update player list", json.dumps(session.get("uids")), broadcast=True)
 
 @socketio.on('sit_down')
 def on_sit_down(data):
     global uid_to_player_map
+    #uid_to_player_map = session.get("uids")
     print("\nPlayer UID below\n")
     player_uid = request.cookies.get("player_uid")
     print(player_uid)
-    if player_uid in uid_to_player_map.keys():
-        flash_io(f"Can't join. You've already joined.", "warning")
-    else:
-        player_name = data["player_name"]
-        if len(player_name) == 0:
-            flash_io(f"Please enter a name before joining", "warning")
-        else:
-            existing_player_ids = [value["player_id"] for value in uid_to_player_map.values()]
-            # TODO - next ID can return a ValueError --> should it return None instead? Add msg if game is full
-            next_id = game_manager.get_next_player_id(existing_player_ids)
-            uid_to_player_map[player_uid] = {"player_name": player_name, "player_id": next_id}
-            emit("player change", json.dumps(uid_to_player_map), broadcast=True)
-            flash_io(f"You've joined the game with name {player_name} and player ID {next_id}")
+    player_name = data["player_name"]
 
+    # Get the player ID
+    existing_player_ids = [value["player_id"] for value in uid_to_player_map.values()]
+    next_id = game_manager.get_next_player_id(existing_player_ids)
+
+    uid_to_player_map[player_uid] = {"player_name": player_name, "player_id": next_id}
+
+    session["uids"] = uid_to_player_map
+
+    # TODO - this is repetition with get_player_list but can't seem to call that func
+    emit("update player list", json.dumps(session.get("uids")), broadcast=True)
+    flash_io(f"You've joined the game with name {player_name} and player ID {next_id}")
 
 @socketio.on('stand_up')
 def on_stand_up():
@@ -65,19 +77,19 @@ def on_stand_up():
     # TODO - add in cookie to track users. Currently refreshing page results in a new SID/users
     player_uid = request.cookies.get("player_uid")
 
-    if player_uid not in uid_to_player_map:
-        flash_io(f"Can't leave. You haven't joined.")
-    else:
-        flash_io(f'Player id {uid_to_player_map[player_uid]["player_id"]} with {uid_to_player_map[player_uid]["player_name"]} has left the game.')
-        del uid_to_player_map[player_uid]
-        # TODO - don't broadcast the SIDs to everyone - will be fixed by using cookies
-        emit("player change", json.dumps(uid_to_player_map), broadcast=True)
+    #uid_to_player_map = session.get("uids")
+
+    flash_io(f'Player id {uid_to_player_map[player_uid]["player_id"]} with {uid_to_player_map[player_uid]["player_name"]} has left the game.')
+    del uid_to_player_map[player_uid]
+    session["uids"] = uid_to_player_map
+
+    emit("update player list", json.dumps(session.get("uids")), broadcast=True)
 
 
-@socketio.on("hand change")
+@socketio.on("get hand")
 def draw_card():
     global uid_to_player_map
-    print("Card change initiated")
+
     player_hands = {}
     for p in game_manager.scorer.players:
         player_name = p.name
@@ -85,8 +97,27 @@ def draw_card():
 
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]["player_id"]
-    socketio.emit("hand update", json.dumps(player_hands[player_name]), to=request.sid)
+    socketio.emit("update hand", json.dumps(player_hands[player_name]), to=request.sid)
 
+
+@socketio.on("get current player")
+def get_current_player():
+    player_uid = request.cookies.get("player_uid")
+    current_player_name = game_manager.current_player.name
+    if uid_to_player_map[player_uid]["player_id"] == current_player_name:
+        is_current_player = True
+    else:
+        is_current_player = False
+
+    print("Current player name below\n")
+    print(current_player_name)
+    socketio.emit("update current player", json.dumps(is_current_player), to=request.sid)
+
+
+@socketio.on("get game phase")
+def get_game_phase():
+    game_manager.game_phase = GameState.CHOOSE_DISCARD
+    emit("update game phase", json.dumps(game_manager.game_phase.value))
 
 @app.route("/game", methods=["GET"])
 def main():
@@ -108,10 +139,6 @@ def main():
     num_cards_in_deck = game_manager.scorer.players[0].deck.get_amt_of_cards_left()
 
     flash(player_game_state_messages[game_manager.game_phase])
-
-    print("Current player name below\n")
-    print(current_player_name)
-    socketio.emit("current player", json.dumps(current_player_name), broadcast=True)
 
     return render_template(
         'game.html',
