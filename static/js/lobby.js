@@ -6,6 +6,7 @@ function join_game(player_name){
         socket.emit('sit_down', {player_name: player_name});
 }
 
+
 $(function()  {
     $('#join_game').click(function call_join_game () {
         let player_name = $("#player_name_input").val();
@@ -61,25 +62,21 @@ function update_hand(cards_on_hand) {
     console.log("The current game phase is " + game_phase);
 
     cards_on_hand.forEach(function (card) {
+
         $("#player_hand_div").append("" +
             "<div class='col-1'>" +
             "<div class='overlay-button-container'>" +
             "<img class='card_on_hand' src='../static/css/playing_cards/" + card + ".png'>" +
-            "<div class='button_placeholder'>" +
+            "<div class='button_placeholder hide_button'>" +
+            "<form class='card_to_play'>" +
+            "<input name='card_name' type='hidden' value='" + card + "'>" +
+            "<input type='submit' class='btn btn-dark' value='Play card'>" +
+            "</form>" +
             "</div>" +
             "</div>" +
             "</div>")
 
-
-        if(current_player === true && game_phase == "Choose Card"){
-            $(".button_placeholder").append(""+
-                    "<form action='/choose_card_to_play' method='post'>" +
-                    "<input name='card_name' type='hidden' value='" + card + "'>" +
-                    "<input type='submit' class='btn btn-dark' value='Play card'>" +
-                    "</form>"
-            )
-        }
-        else if(current_player === true && game_phase == "Choose Discard"){
+        if(current_player === true && game_phase == "Choose Discard"){
             console.log("Time to discard")
             $(".button_placeholder").append(""+
                     "<form action='/discard_card' method='post'>" +
@@ -93,6 +90,18 @@ function update_hand(cards_on_hand) {
             $("#draw_button_placeholder").append("<input class='btn btn-dark' type='submit' value='Draw card'>")
         }
     })
+    console.log("Evaluating if you should be shown draw")
+    if (current_player == true && game_phase == "Choose Card"){
+        $(".button_placeholder").removeClass("hide_button");
+    }
+    else{
+        $(".button_placeholder").addClass("hide_button");
+    }
+
+    $(".card_to_play").submit(function (event){
+        console.log(event.currentTarget[0].value)
+        socket.emit("play card");
+    });
 }
 
 function update_cards_left(cards_left){
@@ -156,3 +165,30 @@ Loop through the player ID and send each players and to their respective SIDs (n
 x. Very similar with discard. Essentially replace the existing decorators with with the socketio.on decorators
 
 */
+
+
+        // if(current_player === true && game_phase == "Choose Card"){
+        //     $(".button_placeholder").append(""+
+        //             "<form class='card_to_play'>" +
+        //             "<input name='card_name' type='hidden' value='" + card + "'>" +
+        //             "<input type='submit' class='btn btn-dark' value='Play card'>" +
+        //             "</form>"
+        //     )
+        //     )        $("#player_hand_div").append("" +
+        //     "<div class='col-1'>" +
+        //     "<div class='overlay-button-container'>" +
+        //     "<img class='card_on_hand' src='../static/css/playing_cards/" + card + ".png'>" +
+        //     "<div class='button_placeholder'>" +
+        //     "</div>" +
+        //     "</div>" +
+        //     "</div>")
+        //
+        //
+        // if(current_player === true && game_phase == "Choose Card"){
+        //     $(".button_placeholder").append(""+
+        //             "<form class='card_to_play'>" +
+        //             "<input name='card_name' type='hidden' value='" + card + "'>" +
+        //             "<input type='submit' class='btn btn-dark' value='Play card'>" +
+        //             "</form>"
+        //     )
+        //}

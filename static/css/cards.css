@@ -91,3 +91,8 @@ body {
     height: 180px;
     width: 120px;
 }
+
+.hide_button
+{
+    display: none;
+}
