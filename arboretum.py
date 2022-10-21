@@ -4,6 +4,8 @@ import flask
 import random
 import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, session
+
+import logic
 from flask_session import Session
 from flask_socketio import SocketIO, emit
 from logic import game_manager, GameState, player_game_state_messages
@@ -12,13 +14,13 @@ from logic import game_manager, GameState, player_game_state_messages
 app = Flask(__name__)
 app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
 app.debug = True
-app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_TYPE'] = "filesystem"
 Session(app)
 socketio = SocketIO(app, logger=True, manage_session=False)
 # app.host="0.0.0.0"
 
+## TODO - Why does everone seem to have their own copy of the uid to player map?
 uid_to_player_map = {}
-
 
 def flash_io(text: str, category: str = "dark") -> None:
     """Send "message" to the client with the given error category"""
@@ -26,13 +28,15 @@ def flash_io(text: str, category: str = "dark") -> None:
 
 
 def emit_board_state(req) -> (dict, list[str]):
-    global uid_to_player_map
+    #global uid_to_player_map
 
     from logic import card
     #game_manager.game_phase == GameState.CHOOSE_DISCARD
     #game_manager.scorer.players[0].discard.cards = [card.Card(tree_num=1, tree_type="Oak")]
     #game_manager.scorer.players[1].discard.cards = [card.Card(tree_num=1, tree_type="Cassia")]
 
+    global uid_to_player_map
+    #uid_to_player_map = session.get("uids")
     player_uid = req.cookies.get("player_uid")
     #board_state_dict, cards_on_hand = get_player_board_state(player_uid)
     #print("\nI got the board state dict and here it is: \n")
@@ -44,14 +48,23 @@ def emit_board_state(req) -> (dict, list[str]):
     player_instance = game_manager.scorer.get_player_instance(player_name)
     cards_on_hand = player_instance.get_player_card_names()
 
+
     # Check if it's the player's turn
     current_player_name = game_manager.current_player.name
-    if uid_to_player_map[player_uid]["player_id"] == current_player_name:
-        is_current_player = True
-    else:
-        is_current_player = False
+    print(f"I will try to find {current_player_name} in {uid_to_player_map}")
+    #current_player_uid = None
+    #if uid_to_player_map[player_uid]["player_id"] == current_player_name:
+    #    current_player_uid = uid_to_player_map[player_uid]["player_id"]
 
-    # Get the current game phase (e.g. draw, choose card to play)
+    for uid in uid_to_player_map:
+       if uid_to_player_map[uid]["player_id"] == current_player_name:
+           current_player_uid = uid
+    else:
+       if current_player_uid == None:
+           raise ValueError(f"Couldn't find {current_player_uid} in {uid_to_player_map}")
+    print(f"The current UID is {current_player_uid} which means {current_player_name}")
+
+    # Get the current game phase (e.g. dr\aw, choose card to play)
     game_phase = game_manager.game_phase.value
 
     # Get the remaining amount of cards in the deck
@@ -67,7 +80,7 @@ def emit_board_state(req) -> (dict, list[str]):
 
     # Construct the game state dict
     board_state_dict = {"game_phase": game_phase,
-                        "is_current_player": is_current_player,
+                        "current_player_uid": current_player_uid,
                         "num_cards_in_deck": num_cards_in_deck,
                         "top_discard_cards": top_discard_cards}
 
@@ -110,12 +123,15 @@ def lobby():
 
 @socketio.on("get player list")
 def get_player_list():
-    emit("update player list", json.dumps(session.get("uids")), broadcast=True)
+    #emit("update player list", json.dumps(session.get("uids")), broadcast=True)
+    global uid_to_player_map
+    emit("update player list", json.dumps(uid_to_player_map), broadcast=True)
 
 
 @socketio.on('sit_down')
 def on_sit_down(data):
     global uid_to_player_map
+    #uid_to_player_map = session.get("uids")
     player_uid = request.cookies.get("player_uid")
     player_name = data["player_name"]
 
@@ -125,16 +141,18 @@ def on_sit_down(data):
 
     uid_to_player_map[player_uid] = {"player_name": player_name, "player_id": next_id}
 
-    session["uids"] = uid_to_player_map
+    #session["uids"] = uid_to_player_map
 
     # TODO - this is repetition with get_player_list but can't seem to call that func
-    emit("update player list", json.dumps(session.get("uids")), broadcast=True)
+    #emit("update player list", json.dumps(session.get("uids")), broadcast=True)
+    emit("update player list", json.dumps(uid_to_player_map), broadcast=True)
     flash_io(f"You've joined the game with name {player_name} and player ID {next_id}")
 
 
 @socketio.on('stand_up')
 def on_stand_up():
     global uid_to_player_map
+    #uid_to_player_map = session.get("uids")
     # TODO - add in cookie to track users. Currently refreshing page results in a new SID/users
     player_uid = request.cookies.get("player_uid")
 
@@ -143,9 +161,10 @@ def on_stand_up():
     flash_io(
         f'Player id {uid_to_player_map[player_uid]["player_id"]} with {uid_to_player_map[player_uid]["player_name"]} has left the game.')
     del uid_to_player_map[player_uid]
-    session["uids"] = uid_to_player_map
+    #session["uids"] = uid_to_player_map
 
-    emit("update player list", json.dumps(session.get("uids")), broadcast=True)
+    #emit("update player list", json.dumps(session.get("uids")), broadcast=True)
+    emit("update player list", json.dumps(uid_to_player_map), broadcast=True)
 
 # @socketio.on("get hand")
 # def get_hand():
@@ -186,6 +205,8 @@ def choose_card_to_play(card_to_play):
 
 @socketio.on("draw card")
 def draw_card():
+    global uid_to_player_map
+    #uid_to_player_map = session.get("uids")
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]["player_id"]
     player_to_draw = game_manager.scorer.get_player_instance(player_name)
@@ -236,7 +257,12 @@ def main():
 
     flash(player_game_state_messages[game_manager.game_phase])
 
-    # player_hands = player_hands,
+    global uid_to_player_map
+    #num_players = len(session.get("uids").keys())
+    num_players = len(uid_to_player_map.keys())
+
+    game_manager.num_players = num_players
+    game_manager.setup_scorer()
 
     return render_template(
         'game.html',

@@ -75,6 +75,7 @@ class GameManager:
         self.num_cards_drawn_current_turn = 0
         self.selected_card_to_play = None
         self.current_player_index = self._get_next_player_index()
+        print(f"\nThe next player will be {self.current_player_index}\n")
         self.current_player = self.scorer.players[self.current_player_index]
 
     def check_if_game_is_over(self):
@@ -92,9 +93,12 @@ class GameManager:
         or return 0 to start over from the first player if the last player just took their turn
         """
         i = self.current_player_index
+        print(f"The current index is {i}")
+        print(f"Value to be compared against {len(self.scorer.players)}")
         i += 1
         if i >= len(self.scorer.players):
             i = 0
+        print(f"The new i is {i}")
         return i
 
     def get_winner(self):

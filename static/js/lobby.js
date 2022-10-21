@@ -1,6 +1,8 @@
 let socket = io();
 // let is_current_player = null;
 // let game_phase = null;
+let my_uid = getCookie("player_uid")
+
 
 function join_game(player_name){
         socket.emit('sit_down', {player_name: player_name});
@@ -49,23 +51,23 @@ function show_message(text, category) {
 //     console.log("Within update_cur-player" + current_player)
 // }
 
-function update_game_phase(g_phase, is_cur_player){
+function update_game_phase(g_phase, cur_player_uid){
     //console.log(game_phase_dict)
     console.log("Updating game phase to " + g_phase)
-    console.log("Updating is current player to " + is_cur_player)
+    console.log("Updating is current player to " + cur_player_uid)
     
     game_phase = g_phase
-    is_current_player = is_cur_player
+    //current_player_uid = cur_player_uid
     
     //socket.emit("get current player")
 
-    console.log(is_cur_player)
-    console.log(typeof(is_cur_player))
+    console.log(cur_player_uid)
+    console.log(typeof(cur_player_uid))
 
 
 
     // Draw button
-    if(is_current_player === true && game_phase === "Draw"){
+    if(cur_player_uid === my_uid && game_phase === "Draw"){
         console.log("Showing draw button")
         $("#draw_button_container").removeClass("hide_button");
     }
@@ -152,15 +154,28 @@ function update_discard(top_discard_cards) {
     });
 }
 
+function getCookie(cname) {
+  let cookies = ` ${document.cookie}`.split(";");
+  let val = "";
+  for (let i = 0; i < cookies.length; i++) {
+    let cookie = cookies[i].split("=");
+    if (cookie[0] == ` ${cname}`) {
+      return cookie[1];
+    }
+  }
+  return "";
+}
+
+
 function update_board_state(game_state){
     console.log(game_state);
     console.log(game_state["game_phase"]);
-    console.log(game_state["is_current_player"]);
+    console.log(game_state["current_player_uid"]);
     console.log(game_state["num_cards_in_deck"]);
 
     // Update the global state variables
     game_phase = game_state["game_phase"];
-    is_current_player = game_state["is_current_player"];
+    cur_player_uid = game_state["current_player_uid"];
 
     // Update amount of cards remaining
     update_cards_left(game_state["num_cards_in_deck"]);
@@ -168,33 +183,17 @@ function update_board_state(game_state){
     // Update discard piles
     update_discard(game_state["top_discard_cards"]);
 
-
     // Show/hide buttons based on game state - this has to happen last - otherwise not all elements will exist yet
-    toggle_buttons(game_phase, is_current_player);
+    toggle_buttons(game_phase, cur_player_uid);
 
-
-
-    // Show/hide buttons
-
-    // Helper function to call all funcs to update the game state
-    // A large helper func is used as opposed to one emit per board item to make the code simpler to troubleshoot
-
-    // Update the game phase
-    // Update the current player
-
-    // Update player hands
-    // Update remaining cards in hand
-    // Update top discard decks
-
-
-    // Assign bindings to elements that didn't exist before (?)
 }
 
-function toggle_buttons(game_phase, is_current_player){
-    console.log("Evaluating what buttons to show")
+function toggle_buttons(game_phase, cur_player_uid){
+    console.log("Evaluating what buttons to show");
+    console.log("The cur UID is " + cur_player_uid);
 
     // Draw button!
-    if (is_current_player === true && game_phase === "Choose Card"){
+    if (cur_player_uid === my_uid && game_phase === "Choose Card"){
         console.log("Showing play button")
         $(".card_to_play").removeClass("hide_button");
     }
@@ -203,7 +202,7 @@ function toggle_buttons(game_phase, is_current_player){
     }
 
     // Discard button
-    if(is_current_player === true && game_phase === "Choose Discard"){
+    if(cur_player_uid === my_uid && game_phase === "Choose Discard"){
         console.log("Showing discard button")
         $(".discard_btn").removeClass("hide_button");
     }
@@ -212,7 +211,7 @@ function toggle_buttons(game_phase, is_current_player){
     }
 
     // Draw button
-    if(is_current_player === true && game_phase === "Draw"){
+    if(cur_player_uid === my_uid && game_phase === "Draw"){
         console.log("Showing draw button")
         $("#draw_button_container").removeClass("hide_button");
         $(".draw_discard_btn").removeClass("hide_button");
