@@ -15,7 +15,7 @@ app = Flask(__name__)
 app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
 app.debug = True
 app.config['SESSION_TYPE'] = "filesystem"
-Session(app)
+#Session(app)
 socketio = SocketIO(app, logger=True, manage_session=False)
 # app.host="0.0.0.0"
 
@@ -28,13 +28,6 @@ def flash_io(text: str, category: str = "dark") -> None:
 
 
 def emit_board_state(req) -> (dict, list[str]):
-    #global uid_to_player_map
-
-    from logic import card
-    #game_manager.game_phase == GameState.CHOOSE_DISCARD
-    #game_manager.scorer.players[0].discard.cards = [card.Card(tree_num=1, tree_type="Oak")]
-    #game_manager.scorer.players[1].discard.cards = [card.Card(tree_num=1, tree_type="Cassia")]
-
     global uid_to_player_map
     #uid_to_player_map = session.get("uids")
     player_uid = req.cookies.get("player_uid")
@@ -137,10 +130,11 @@ def on_sit_down(data):
 
     # Get the player ID
     existing_player_ids = [value["player_id"] for value in uid_to_player_map.values()]
+    print(f"\n\nThe existing player IDs are {existing_player_ids}\n\n")
     next_id = game_manager.get_next_player_id(existing_player_ids)
 
     uid_to_player_map[player_uid] = {"player_name": player_name, "player_id": next_id}
-
+    print(f"\n\nUID to player map created {uid_to_player_map}\n\n")
     #session["uids"] = uid_to_player_map
 
     # TODO - this is repetition with get_player_list but can't seem to call that func

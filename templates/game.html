@@ -86,6 +86,7 @@
 <script>
     // This runs everytime on submit, which is why drawing cards is currently working
     // Drawing a card should emit an event - not post something
+    socket.emit("sit_down", {"player_name": "TestPlayer"})
     socket.emit("get board state");
     //socket.emit("get game phase");
     //socket.emit("get hand");

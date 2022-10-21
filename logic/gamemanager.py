@@ -59,6 +59,7 @@ class GameManager:
         nums_in_use = set([int(player_name[-1]) for player_name in player_names])
         possible_nums = set([i + 1 for i in range(self.num_players)])
         available_nums = possible_nums - nums_in_use
+        # TODO - recommence here: why can't this func deal with an empty input list?
         if len(available_nums) == 0:
             raise ValueError("Can't find next player name. Game is already full")
         lowest_available_num = min(available_nums)
