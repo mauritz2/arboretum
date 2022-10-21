@@ -8,7 +8,6 @@ from flask_session import Session
 from flask_socketio import SocketIO, emit
 from logic import game_manager, GameState, player_game_state_messages
 
-
 # Flask config
 app = Flask(__name__)
 app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
@@ -16,35 +15,85 @@ app.debug = True
 app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
 socketio = SocketIO(app, logger=True, manage_session=False)
-#app.host="0.0.0.0"
+# app.host="0.0.0.0"
 
 uid_to_player_map = {}
+
 
 def flash_io(text: str, category: str = "dark") -> None:
     """Send "message" to the client with the given error category"""
     emit('message', json.dumps({"text": text, "category": category}))
 
 
-def emit_game_phase(r):
-    print("\nResponding to get phase request")
-    player_uid = r.cookies.get("player_uid")
-    print(f"\nUID: {player_uid}")
-    is_cur_player = is_current_player(player_uid)
-    game_status = {"game_phase": game_manager.game_phase.value, "is_current_player": is_cur_player}
-    print(f"\nGame status {game_status}")
-    socketio.emit("update game phase", json.dumps(game_status), broadcast=True)
-
-
-def is_current_player(uid: str) -> bool:
+def emit_board_state(req) -> (dict, list[str]):
     global uid_to_player_map
-    print(f"I am finding out if player {uid} is the current player")
-    print(uid_to_player_map)
+
+    from logic import card
+    #game_manager.game_phase == GameState.CHOOSE_DISCARD
+    #game_manager.scorer.players[0].discard.cards = [card.Card(tree_num=1, tree_type="Oak")]
+    #game_manager.scorer.players[1].discard.cards = [card.Card(tree_num=1, tree_type="Cassia")]
+
+    player_uid = req.cookies.get("player_uid")
+    #board_state_dict, cards_on_hand = get_player_board_state(player_uid)
+    #print("\nI got the board state dict and here it is: \n")
+    #print(board_state_dict)
+    #print("\n\n")
+
+    # Get the player's hand
+    player_name = uid_to_player_map[player_uid]["player_id"]
+    player_instance = game_manager.scorer.get_player_instance(player_name)
+    cards_on_hand = player_instance.get_player_card_names()
+
+    # Check if it's the player's turn
     current_player_name = game_manager.current_player.name
-    if uid_to_player_map[uid]["player_id"] == current_player_name:
+    if uid_to_player_map[player_uid]["player_id"] == current_player_name:
         is_current_player = True
     else:
         is_current_player = False
-    return is_current_player
+
+    # Get the current game phase (e.g. draw, choose card to play)
+    game_phase = game_manager.game_phase.value
+
+    # Get the remaining amount of cards in the deck
+    num_cards_in_deck = game_manager.scorer.players[0].deck.get_amt_of_cards_left()
+
+    # Get top discard cards
+    top_discard_cards = {}
+    for p in game_manager.scorer.players:
+        top_discard_cards[p.name] = p.discard.get_top_card(only_str=True)
+
+
+    print(f"The top discard cards are {top_discard_cards}")
+
+    # Construct the game state dict
+    board_state_dict = {"game_phase": game_phase,
+                        "is_current_player": is_current_player,
+                        "num_cards_in_deck": num_cards_in_deck,
+                        "top_discard_cards": top_discard_cards}
+
+    # Cards on hand are emitted separately since they're player-specific. The rest is public data.
+    emit("update hand", json.dumps(cards_on_hand), to=request.sid)
+    emit("update board state", json.dumps(board_state_dict), broadcast=True)
+
+
+@socketio.on("get board state")
+def get_board_state(req=None):
+    if req:
+        emit_board_state(req)
+    else:
+        emit_board_state(request)
+
+
+# def is_current_player(uid: str) -> bool:
+#     global uid_to_player_map
+#     print(f"I am finding out if player {uid} is the current player")
+#     print(uid_to_player_map)
+#     current_player_name = game_manager.current_player.name
+#     if uid_to_player_map[uid]["player_id"] == current_player_name:
+#         is_current_player = True
+#     else:
+#         is_current_player = False
+#     return is_current_player
 
 
 @app.route("/lobby", methods=["GET"])
@@ -58,9 +107,11 @@ def lobby():
     response.set_cookie("player_uid", value=str(random.randrange(100, 999)))
     return response
 
+
 @socketio.on("get player list")
 def get_player_list():
     emit("update player list", json.dumps(session.get("uids")), broadcast=True)
+
 
 @socketio.on('sit_down')
 def on_sit_down(data):
@@ -80,33 +131,34 @@ def on_sit_down(data):
     emit("update player list", json.dumps(session.get("uids")), broadcast=True)
     flash_io(f"You've joined the game with name {player_name} and player ID {next_id}")
 
+
 @socketio.on('stand_up')
 def on_stand_up():
     global uid_to_player_map
     # TODO - add in cookie to track users. Currently refreshing page results in a new SID/users
     player_uid = request.cookies.get("player_uid")
 
-    #uid_to_player_map = session.get("uids")
+    # uid_to_player_map = session.get("uids")
 
-    flash_io(f'Player id {uid_to_player_map[player_uid]["player_id"]} with {uid_to_player_map[player_uid]["player_name"]} has left the game.')
+    flash_io(
+        f'Player id {uid_to_player_map[player_uid]["player_id"]} with {uid_to_player_map[player_uid]["player_name"]} has left the game.')
     del uid_to_player_map[player_uid]
     session["uids"] = uid_to_player_map
 
     emit("update player list", json.dumps(session.get("uids")), broadcast=True)
 
-
-@socketio.on("get hand")
-def get_hand():
-    global uid_to_player_map
-
-    player_hands = {}
-    for p in game_manager.scorer.players:
-        player_name = p.name
-        player_hands[player_name] = p.get_player_card_names()
-
-    player_uid = request.cookies.get("player_uid")
-    player_name = uid_to_player_map[player_uid]["player_id"]
-    socketio.emit("update hand", json.dumps(player_hands[player_name]), to=request.sid)
+# @socketio.on("get hand")
+# def get_hand():
+#     global uid_to_player_map
+#
+#     player_hands = {}
+#     for p in game_manager.scorer.players:
+#         player_name = p.name
+#         player_hands[player_name] = p.get_player_card_names()
+#
+#     player_uid = request.cookies.get("player_uid")
+#     player_name = uid_to_player_map[player_uid]["player_id"]
+#     socketio.emit("update hand", json.dumps(player_hands[player_name]), to=request.sid)
 
 
 # @socketio.on("get current player")
@@ -118,50 +170,50 @@ def get_hand():
 #     print(f"\nGame status {game_status}")
 #     emit("update game phase", json.dumps(game_status), broadcast=True)
 
-@socketio.on("get game phase")
-def call_get_game_phase():
-    emit_game_phase(request)
-
-
+# @socketio.on("get game phase")
+# def call_get_game_phase():
+#     emit_game_phase(request)
 
 
 @socketio.on("choose card to play")
 def choose_card_to_play(card_to_play):
     game_manager.selected_card_to_play = card_to_play
     game_manager.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
-    emit_game_phase(request)
-    #emit("update game phase", json.dumps(game_manager.game_phase.value))
+    emit_board_state(request)
+    # emit_game_phase(request)
+    # emit("update game phase", json.dumps(game_manager.game_phase.value))
 
 
 @socketio.on("draw card")
 def draw_card():
-    # if game_manager.current_player.deck.get_amt_of_cards_left() <= 0:
-    #     flash_io("The deck is empty. Scoring will start after the current turn is complete.", "error")
-    #     return
-
-    print("\n\n\n\n\n###Starting to draw card###")
-
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]["player_id"]
     player_to_draw = game_manager.scorer.get_player_instance(player_name)
-    print(f"The player to draw is {player_to_draw.name}")
-    player_to_draw.draw_card_from_deck() # TODO - assume that the current player is drawing
-
-    cards_on_hand = player_to_draw.get_player_card_names()
-    print(cards_on_hand)
-    socketio.emit("update hand", json.dumps(cards_on_hand), to=request.sid)
-
-    num_cards_in_deck = game_manager.scorer.players[0].deck.get_amt_of_cards_left()
-    socketio.emit("update cards left", json.dumps(num_cards_in_deck), broadcast=True)
+    player_to_draw.draw_card_from_deck()
 
     game_manager.num_cards_drawn_current_turn += 1
-    print(f"Amount of cards drawn this turn {game_manager.num_cards_drawn_current_turn}")
-
     if game_manager.num_cards_drawn_current_turn >= 2:
         game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
-        emit_game_phase(request)
-        #emit("update game phase", json.dumps(game_manager.game_phase.value), broadcast=True)
-    print("\n\n\n\n\n\n")
+
+    # Sends the updated player hand and board state to all players
+    get_board_state(request)
+
+
+@socketio.on("discard card")
+def discard_card(card_to_discard):
+    print(f"\n\nDiscarding a card: {card_to_discard}")
+    game_manager.current_player.discard_card(card_to_discard, to_discard=True)
+
+    is_game_over = game_manager.check_if_game_is_over()
+
+    if is_game_over:
+        game_manager.game_phase = GameState.SCORING
+        return redirect(url_for("game_over"))
+
+    game_manager.start_next_round()
+
+    emit_board_state(request)
+
 
 @app.route("/game", methods=["GET"])
 def main():
@@ -184,7 +236,7 @@ def main():
 
     flash(player_game_state_messages[game_manager.game_phase])
 
-    #player_hands = player_hands,
+    # player_hands = player_hands,
 
     return render_template(
         'game.html',
@@ -271,8 +323,6 @@ def draw_card_from_discard():
     return redirect(url_for("main"))
 
 
-
-
 @app.route("/choose_coordinates", methods=["POST"])
 def choose_coordinates():
     """
@@ -309,28 +359,31 @@ def choose_coordinates():
     return redirect(url_for("main"))
 
 
-@app.route("/discard_card", methods=["POST"])
-def discard_card():
-    """
-    Discards a chosen card from the player's hand. Then checks if the game is over (i.e. deck is empty).
-    If it is, navigate to the scoring screen. If it's not, start the next player's turn.
-    """
-    card_to_discard = request.form["card_name"]
-    game_manager.current_player.discard_card(card_to_discard, to_discard=True)
 
-    game_over_bool = game_manager.check_if_game_is_over()
 
-    if game_over_bool:
-        game_manager.game_phase = GameState.SCORING
-        return redirect(url_for("game_over"))
 
-    game_manager.start_next_round()
-
-    emit_game_phase(request)
-
-    #socketio.emit("update game phase", json.dumps(game_manager.game_phase.value), broadcast=True)
-
-    return redirect(url_for("main"))
+# @app.route("/discard_card_old", methods=["POST"])
+# def discard_card_old():
+#     """
+#     Discards a chosen card from the player's hand. Then checks if the game is over (i.e. deck is empty).
+#     If it is, navigate to the scoring screen. If it's not, start the next player's turn.
+#     """
+#     card_to_discard = request.form["card_name"]
+#     game_manager.current_player.discard_card(card_to_discard, to_discard=True)
+#
+#     game_over_bool = game_manager.check_if_game_is_over()
+#
+#     if game_over_bool:
+#         game_manager.game_phase = GameState.SCORING
+#         return redirect(url_for("game_over"))
+#
+#     game_manager.start_next_round()
+#
+#     emit_board_state(request)
+#
+#     # socketio.emit("update game phase", json.dumps(game_manager.game_phase.value), broadcast=True)
+#
+#     return redirect(url_for("main"))
 
 
 # @app.route("/choose_card_to_play_old", methods=["POST"])
@@ -345,7 +398,15 @@ def discard_card():
 #     return redirect(url_for("main"))
 
 
-
 if __name__ == "__main__":
     socketio.run(app)
-    #app.run(host="0.0.0.0")
+    # app.run(host="0.0.0.0")
+
+# def emit_game_phase(r):
+#     print("\nResponding to get phase request")
+#     player_uid = r.cookies.get("player_uid")
+#     print(f"\nUID: {player_uid}")
+#     is_cur_player = is_current_player(player_uid)
+#     game_status = {"game_phase": game_manager.game_phase.value, "is_current_player": is_cur_player}
+#     print(f"\nGame status {game_status}")
+#     socketio.emit("update game phase", json.dumps(game_status), broadcast=True)

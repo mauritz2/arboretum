@@ -2,40 +2,26 @@
 {% block game %}
 
 <div class="row align-items-end">
-        <div class="col-1 offset-1">
-            <p class="mb-0"><strong>Deck</strong></p>
-            <p id="cards_left"></p>
-            <!--Deck-->
-            <form>
-                <div class="overlay-button-container">
-                    <img class="card_on_hand" src="../static/css/other/deck-full.png">
-                    <div class="hide_button" id="draw_button_container">
-                        <input class="btn btn-dark" id="draw_button" type="button" value='Draw card'>"
-                    </div>
+    <!-- Start of deck -->
+    <div class="col-1 offset-1">
+        <p class="mb-0"><strong>Deck</strong></p>
+        <p id="cards_left"></p>
+        <form>
+            <div class="overlay-button-container">
+                <img class="card_on_hand" src="../static/css/other/deck-full.png">
+                <div class="hide_button" id="draw_button_container">
+                    <input class="btn btn-dark" id="draw_button" type="button" value='Draw card'>"
                 </div>
-            </form>
-        </div>
-        <!--Discard pile-->
-            {% for player_name in top_discard_cards %}
-                <div class="col-1">
-                    <p class="mb-0 mt-3"><strong>Discard pile</strong></p>
-                <p><small>{{player_name}}</small></p>
-                {% set top_discard_card = top_discard_cards[player_name] %}
-                {% if top_discard_card != None %}
-                    <div class="overlay-button-container">
-                    <img class="card_on_hand" src="../static/css/playing_cards/{{top_discard_card}}.png">
-                    {% if game_phase == "Draw" %}
-                        <form action="/draw_from_discard" method="post">
-                            <input name="discard_owner" type="hidden" value="{{player_name}}">
-                            <input class="btn btn-dark" type="submit" value="Draw card">
-                        </form>
-                    {% endif %}
-                    </div>
-                {% else %}
-                    <img class="card_on_hand blank" src="../static/css/other/blank-w-border.png">
-                {% endif %}
-                    </div>
-            {% endfor %}
+            </div>
+        </form>
+    </div>
+    <!-- End of deck-->
+
+    <!--Discard pile-->
+    <div class="col-1" id="discard_div">
+        <!-- Discard piles placeholder-->
+    </div>
+
 
     <div class="col-5">
         <!--Board-->
@@ -100,8 +86,9 @@
 <script>
     // This runs everytime on submit, which is why drawing cards is currently working
     // Drawing a card should emit an event - not post something
-    socket.emit("get game phase");
-    socket.emit("get hand");
+    socket.emit("get board state");
+    //socket.emit("get game phase");
+    //socket.emit("get hand");
     //socket.emit("get current player");
 
 </script>
@@ -125,5 +112,26 @@
 <!--                    </div>-->
 <!--                </div>-->
 <!--            </form>-->
+
+<!--            {% for player_name in top_discard_cards %}-->
+<!--                <div class="col-1">-->
+<!--                    <p class="mb-0 mt-3"><strong>Discard pile</strong></p>-->
+<!--                <p><small>{{player_name}}</small></p>-->
+<!--                {% set top_discard_card = top_discard_cards[player_name] %}-->
+<!--                {% if top_discard_card != None %}-->
+<!--                    <div class="overlay-button-container">-->
+<!--                    <img id="discard_img_player_1" class="card_on_hand" src="../static/css/playing_cards/{{top_discard_card}}.png">-->
+<!--                    {% if game_phase == "Draw" %}-->
+<!--                        <form action="/draw_from_discard" method="post">-->
+<!--                            <input name="discard_owner" type="hidden" value="{{player_name}}">-->
+<!--                            <input class="btn btn-dark" type="submit" value="Draw card">-->
+<!--                        </form>-->
+<!--                    {% endif %}-->
+<!--                    </div>-->
+<!--                {% else %}-->
+<!--                    <img class="card_on_hand blank" src="../static/css/other/blank-w-border.png">-->
+<!--                {% endif %}-->
+<!--                    </div>-->
+<!--            {% endfor %}-->
 
 {% endblock %}
