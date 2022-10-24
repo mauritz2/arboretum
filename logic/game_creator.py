@@ -24,12 +24,16 @@ class GameCreator:
         deck = Deck()
 
         for player_name in player_names:
+            print(f"Creating player {player_name}\n")
             discard = Discard(cards=[])
             board = Board(num_rows=config.BOARD_ROWS, num_columns=config.BOARD_COLUMNS)
             player = Player(name=player_name, deck=deck, discard=discard, board=board)
             players.append(player)
 
+        print(f"Creating scorers with {players}")
         scorer = Scorer(players=players)
+        print(f"Scorer created with players: {scorer.players}\n")
         game_manager = GameManager(scorer=scorer)
+        print(f"GM created with players: {game_manager.scorer.players}\n")
         return game_manager
 

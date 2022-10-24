@@ -22,16 +22,16 @@ $(function(){
 
 // FUNCTIONS
 function update_board_state(game_state){
-    console.log(game_state);
-    console.log(game_state["game_phase"]);
-    console.log(game_state["uid_name_mapping"]);
-    console.log(game_state["num_cards_in_deck"]);
-    console.log(game_state["player_boards"])
+    console.log(game_state)
+    console.log("Game phase " + game_state["game_phase"]);
+    console.log("Current player ID " + game_state["current_player_id"]["uid"]);
+    console.log("Num cards in deck " + game_state["num_cards_in_deck"]["player_name"]);
+    console.log("Player boards " + game_state["player_boards"])
 
     // Update the global state variables
     game_phase = game_state["game_phase"];
-    let cur_player_uid = game_state["uid_name_mapping"]["uid"];
-    let cur_player_name = game_state["uid_name_mapping"]["player_name"]
+    let cur_player_uid = game_state["current_player_id"]["uid"];
+    let cur_player_name = game_state["current_player_id"]["player_name"]
 
     // Update boards
     let player_boards = game_state["player_boards"]
@@ -251,26 +251,24 @@ function update_discard(top_discard_cards, cur_player_uid) {
     $("#discard_div").empty();
 
     Object.entries(top_discard_cards).forEach(([player, card]) => {
-        // TODO - refactor this logic with the card name - looks weird. Introduce a JS config file also?
-        let card_name = card
-        if(card_name == null){
-            // TODO - blank-w border currently exists in two folders- refactor into tiles and cards
-            card_name = blank_card_name
-        }
 
         let content = ""
         content += '<p class="mb-0 mt-3"><strong>Discard pile</strong></p>'
         // Replace here with the actual player's name
         content += '<p><small>' + player + '</small></p>'
         content += '<div class="overlay-button-container">'
-        content += '<img class="card_on_hand" src="../static/css/playing_cards/' + card_name + '.png">'
+
+        if(card === null)
+        {
+            content += '<img class="card_on_hand blank" src="../static/css/playing_cards/' + blank_card_name + '.png">'
+        }
+        else
+        {
+            content += '<img class="card_on_hand" src="../static/css/playing_cards/' + card + '.png">'
+        }
         content += '<form class="draw_discard_btn '
 
         // # TODO - update this and all element creations
-        console.log("Card is " + card);
-        console.log(card == null);
-        console.log(cur_player_uid != my_uid);
-        console.log(game_phase != "Draw");
         if (cur_player_uid !== my_uid || game_phase !== "Draw" || card === null) {
             // Unless the current player UID === my_uid
             // TODO - refactor!

@@ -231,4 +231,4 @@ class Scorer:
             if name == p.name:
                 return p
         else:
-            raise ValueError("Tried finding a player instance for a player name that doesn't exist")
+            raise ValueError(f"Tried finding instance of {name}, but it didn't exist in {self.players}")

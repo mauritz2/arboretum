@@ -14,6 +14,7 @@ function highlight_path(player, tree_type)
 
 function dim_all_cards()
 {
+    // TODO -re-write now that we can't rely on Player 1 and Player 2 names anymore
     // :-) :-) :-)
     // TODO - this is a very silly loop to dim all coords - refactor
     // To fix this JS needs to know what IDs exist - so we don't have to generate them through hard coding here

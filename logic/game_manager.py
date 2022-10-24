@@ -15,12 +15,13 @@ class GameManager:
     def __init__(self, scorer: Scorer) -> None:
         self.scorer = scorer
         #self.current_player_index = 0
-        self.has_not_taken_turn = self.scorer.players
+        self.has_not_taken_turn = self.scorer.players.copy()
         #self.current_player = self.scorer.players[self.current_player_index]
         self.current_player = self._get_next_player()
         self.game_phase = GameState.CHOOSE_WHAT_TO_DRAW
         self.num_cards_drawn_current_turn = 0
         self.selected_card_to_play = None
+        print(f"I have been created with players {self.scorer.players}")
 
     def start_next_round(self):
         """
@@ -30,9 +31,9 @@ class GameManager:
         self.game_phase = GameState.CHOOSE_WHAT_TO_DRAW
         self.num_cards_drawn_current_turn = 0
         self.selected_card_to_play = None
-        self.current_player_index = self._get_next_player_index()
-        print(f"\nThe next player will be {self.current_player_index}\n")
-        self.current_player = self.scorer.players[self.current_player_index]
+        #self.current_player_index = self._get_next_player_index()
+        #print(f"\nThe next player will be {self.current_player_index}\n")
+        self.current_player = self._get_next_player() # self.scorer.players[self.current_player_index]
 
     def check_if_game_is_over(self):
         """
@@ -50,7 +51,7 @@ class GameManager:
         """
         if len(self.has_not_taken_turn) == 0:
             # Everybody has taken their turn - resetting to new round
-            self.has_not_taken_turn = self.scorer.players
+            self.has_not_taken_turn = self.scorer.players.copy()
         return self.has_not_taken_turn.pop()
 
 

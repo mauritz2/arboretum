@@ -105,16 +105,23 @@ def emit_game_state(req) -> (dict, list[str]):
 
     # Get the player's hand
     player_name = uid_to_player_map[player_uid]
+    print(f"I will try to find the instance of {player_name}")
     player_instance = game_manager.scorer.get_player_instance(player_name)
     cards_on_hand = player_instance.get_player_card_names()
 
-    # Find the current player's UID
-    current_player_name = game_manager.current_player.name
+    # Does a reverse loopup to find the uid (key) based on the current player's player name (value)
+    # current_player_uid = list(uid_to_player_map.keys())[list(uid_to_player_map.values()).index(current_player_name)]
+    # print([item for item in uid_to_player_map.items() if item[0] == "Apple"])
 
-    for uid in uid_to_player_map:
-        if uid_to_player_map[uid] == current_player_name:
-            uid_name_mapping = {"uid": uid, "player_name": uid_to_player_map[uid]["player_name"]}
-            print(f"The current name is {uid_to_player_map[uid]} which means UID {uid}")
+    # Get the UID and player name for the current player
+    current_player_name = game_manager.current_player.name
+    # TODO - refactor list comprehension here is odd
+    current_player_id = [{"uid": item[0], "player_name": item[1]} for item in uid_to_player_map.items() if item[1] == current_player_name][0]
+
+    # for uid in uid_to_player_map:
+    #     if uid_to_player_map[uid] == current_player_name:
+    #         uid_name_mapping = {"uid": uid, "player_name": uid_to_player_map[uid]["player_name"]}
+    #         print(f"The current name is {uid_to_player_map[uid]} which means UID {uid}")
 
     # Get the current game phase (e.g. draw, choose card to play)
     game_phase = game_manager.game_phase.value
@@ -131,12 +138,12 @@ def emit_game_state(req) -> (dict, list[str]):
     player_boards = {}
     # TODO - to think about: where is the source of truth of what players exist? GameManager?
     for uid in uid_to_player_map:
-        p_instance = game_manager.scorer.get_player_instance(uid_to_player_map[uid]["player_id"])
+        p_instance = game_manager.scorer.get_player_instance(uid_to_player_map[uid])
         player_boards[uid] = p_instance.board.get_board_state()
 
     # Construct the game state dict
     board_state_dict = {"game_phase": game_phase,
-                        "uid_name_mapping": uid_name_mapping,
+                        "current_player_id": current_player_id,
                         "player_boards": player_boards,
                         "num_cards_in_deck": num_cards_in_deck,
                         "top_discard_cards": top_discard_cards}
@@ -169,7 +176,7 @@ def draw_card_from_deck():
     global game_manager
     
     player_uid = request.cookies.get("player_uid")
-    player_name = uid_to_player_map[player_uid]["player_id"]
+    player_name = uid_to_player_map[player_uid]
     player_to_draw = game_manager.scorer.get_player_instance(player_name)
     player_to_draw.draw_card_from_deck()
 
