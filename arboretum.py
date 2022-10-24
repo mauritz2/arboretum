@@ -1,10 +1,8 @@
 import json
-
-import flask
+from logic import game_creator, GameState
 import random
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 from flask_socketio import SocketIO, emit
-from logic import game_manager, GameState, player_game_state_messages
 
 # Flask config
 app = Flask(__name__)
@@ -14,7 +12,85 @@ app.config['SESSION_TYPE'] = "filesystem"
 socketio = SocketIO(app, logger=True, manage_session=False)
 # app.host="0.0.0.0"
 
+# Global variables
 uid_to_player_map = {}
+game_manager = None
+
+
+### LOBBY VIEWS ###
+
+
+@app.route("/lobby", methods=["GET"])
+def lobby():
+    response = make_response(render_template("lobby.html"))
+    player_uid = request.cookies.get("player_uid")
+
+    if player_uid:
+        # Don't set a new cookie if a uid cookie exists
+        return response
+
+    # Otherwise, create a new user ID (uid) and set it in a cookie
+    # TODO - create a MD5 hash or something instead to remove risk of collision
+    response.set_cookie("player_uid", value=str(random.randrange(1, 999)))
+    return response
+
+
+@socketio.on('sit down')
+def on_sit_down(player_name):
+    global uid_to_player_map
+    global game_manager
+
+    # TODO - check if cookie exists - otherwuse redirect to lobby?
+    player_uid = request.cookies.get("player_uid")
+
+    # existing_player_ids = [value["player_id"] for value in uid_to_player_map.values()]
+    # print(f"\n\nThe existing player IDs are {existing_player_ids}\n\n")
+    # next_id = game_manager.get_next_player_id(existing_player_ids)
+
+    # TODO - does it make sense to add each player in two places? Or should
+    # the player be added to the UID mapping and then created later?
+    #game_creator.add_player(player_name)
+    # uid_to_player_map[player_uid] = {"player_name": player_name, "player_id": next_id}
+    uid_to_player_map[player_uid] = player_name
+    # print(f"\n\nUID to player map created {uid_to_player_map}\n\n")
+
+    emit("update player list", json.dumps(list(uid_to_player_map.values())), broadcast=True)
+    flash_io(f"You've joined the game as {player_name}")
+
+
+@socketio.on('stand up')
+def on_stand_up():
+    global uid_to_player_map
+    player_uid = request.cookies.get("player_uid")
+
+    flash_io(f"Player {uid_to_player_map[player_uid]} has left the game.")
+    # game_creator.remove_player(uid_to_player_map[player_uid])
+    del uid_to_player_map[player_uid]
+
+    emit("update player list", json.dumps(list(uid_to_player_map.values())), broadcast=True)
+
+
+@socketio.on("start game")
+def get_board_state():
+    global uid_to_player_map
+    global game_manager
+
+    player_names = list(uid_to_player_map.values())
+
+    if len(player_names) < 1:
+        flash_io("Not enough players connected. Add more players.", "warning")
+    else:
+        game_manager = game_creator.create_game(player_names)
+        emit('redirect', json.dumps(url_for('main')), broadcast=True)
+
+
+@socketio.on("get player list")
+def get_player_list():
+    global uid_to_player_map
+    emit("update player list", json.dumps(uid_to_player_map), broadcast=True)
+
+
+#### MAIN LOGIC ###
 
 def flash_io(text: str, category: str = "dark") -> None:
     """Send "message" to the client with the given error category"""
@@ -23,19 +99,20 @@ def flash_io(text: str, category: str = "dark") -> None:
 
 def emit_game_state(req) -> (dict, list[str]):
     global uid_to_player_map
+    global game_manager
 
     player_uid = req.cookies.get("player_uid")
 
     # Get the player's hand
-    player_name = uid_to_player_map[player_uid]["player_id"]
+    player_name = uid_to_player_map[player_uid]
     player_instance = game_manager.scorer.get_player_instance(player_name)
     cards_on_hand = player_instance.get_player_card_names()
 
-    # Check if it's the player's turn
+    # Find the current player's UID
     current_player_name = game_manager.current_player.name
 
     for uid in uid_to_player_map:
-        if uid_to_player_map[uid]["player_id"] == current_player_name:
+        if uid_to_player_map[uid] == current_player_name:
             uid_name_mapping = {"uid": uid, "player_name": uid_to_player_map[uid]["player_name"]}
             print(f"The current name is {uid_to_player_map[uid]} which means UID {uid}")
 
@@ -77,55 +154,9 @@ def get_board_state(req=None):
         emit_game_state(request)
 
 
-@app.route("/lobby", methods=["GET"])
-def lobby():
-    # Set the player UID cookie
-    response = flask.make_response(render_template("lobby.html"))
-    player_uid = request.cookies.get("player_uid")
-    if player_uid:
-        return response
-
-    response.set_cookie("player_uid", value=str(random.randrange(100, 999)))
-    return response
-
-
-@socketio.on("get player list")
-def get_player_list():
-    global uid_to_player_map
-    emit("update player list", json.dumps(uid_to_player_map), broadcast=True)
-
-
-@socketio.on('sit_down')
-def on_sit_down(data):
-    global uid_to_player_map
-    player_uid = request.cookies.get("player_uid")
-    player_name = data["player_name"]
-
-    existing_player_ids = [value["player_id"] for value in uid_to_player_map.values()]
-    print(f"\n\nThe existing player IDs are {existing_player_ids}\n\n")
-    next_id = game_manager.get_next_player_id(existing_player_ids)
-
-    uid_to_player_map[player_uid] = {"player_name": player_name, "player_id": next_id}
-    print(f"\n\nUID to player map created {uid_to_player_map}\n\n")
-
-    emit("update player list", json.dumps(uid_to_player_map), broadcast=True)
-    flash_io(f"You've joined the game with name {player_name} and player ID {next_id}")
-
-
-@socketio.on('stand_up')
-def on_stand_up():
-    global uid_to_player_map
-    player_uid = request.cookies.get("player_uid")
-
-    flash_io(
-        f'Player id {uid_to_player_map[player_uid]["player_id"]} with {uid_to_player_map[player_uid]["player_name"]} has left the game.')
-    del uid_to_player_map[player_uid]
-
-    emit("update player list", json.dumps(uid_to_player_map), broadcast=True)
-
-
 @socketio.on("choose card to play")
 def choose_card_to_play(card_to_play):
+    global game_manager
     print(f"\n\nI am setting the card to play to {card_to_play}\n\n")
     game_manager.selected_card_to_play = card_to_play
     game_manager.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
@@ -135,6 +166,8 @@ def choose_card_to_play(card_to_play):
 @socketio.on("draw card")
 def draw_card_from_deck():
     global uid_to_player_map
+    global game_manager
+    
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]["player_id"]
     player_to_draw = game_manager.scorer.get_player_instance(player_name)
@@ -149,6 +182,7 @@ def draw_card_from_deck():
 
 @socketio.on("discard card")
 def discard_card(card_to_discard):
+    global game_manager
     print(f"\n\nDiscarding a card: {card_to_discard}")
     game_manager.current_player.discard_card(card_to_discard, to_discard=True)
 
@@ -159,6 +193,53 @@ def discard_card(card_to_discard):
 
     game_manager.start_next_round()
     emit_game_state(request)
+
+
+@socketio.on("draw from discard")
+def draw_from_discard(player_to_draw_from):
+    global game_manager
+    print(f"I am drawing from discard from {player_to_draw_from}")
+    player_instance = game_manager.scorer.get_player_instance(player_to_draw_from)
+
+    try:
+        game_manager.current_player.draw_card_from_discard(player_to_draw_from=player_instance)
+    except ValueError as e:
+        # User drew from empty discard
+        flash_io(str(e), "warning")
+        emit_game_state(request)
+
+    game_manager.num_cards_drawn_current_turn += 1
+    if game_manager.num_cards_drawn_current_turn >= 2:
+        game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
+
+    emit_game_state(request)
+
+
+@socketio.on("choose coords")
+def choose_coords(chosen_coords):
+    global game_manager
+    print(f"\n\nCommencing choose coords with {chosen_coords}\n\n")
+
+    card_to_play = game_manager.selected_card_to_play
+    row = int(chosen_coords[0])
+    column = int(chosen_coords[1])
+    print(f"\nYou are trying to play {card_to_play} at ({row},{column})")
+
+    # TODO - fix bug this currently allows for non-adj placement of trees
+    try:
+        game_manager.current_player.play_card(card_to_play, row=row, column=column)
+        game_manager.selected_card_to_play = None
+        game_manager.game_phase = GameState.CHOOSE_DISCARD
+        emit_game_state(request)
+
+    except ValueError as e:
+        # User chose an invalid location for a card (e.g. not adjacent to an existing card)
+        # - notifying user and resetting to start of play phase
+        game_manager.selected_card_to_play = None
+        game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
+        flash_io(str(e) + " Please select what card to play", "warning")
+        emit_game_state(request)
+
 
 
 @app.route("/game", methods=["GET"])
@@ -172,6 +253,7 @@ def game_over():
     Gets the data to display in the UI on the game over screen and then renders the page
     """
     # TODO - this is repetition with main() - break out into function?
+    global game_manager
     player_boards = {}
     player_hands = {}
     for p in game_manager.scorer.players:
@@ -194,8 +276,6 @@ def game_over():
                 list_of_coords.append(coords_id)
             top_paths[player][tree_dict]["Path"] = list_of_coords
 
-    print(top_paths)
-    print(winners)
 
     return render_template("game_over.html",
                            player_hands=player_hands,
@@ -205,59 +285,6 @@ def game_over():
                            )
 
 
-@socketio.on("draw from discard")
-def draw_from_discard(player_to_draw_from):
-    print(f"I am drawing from discard from {player_to_draw_from}")
-    player_instance = game_manager.scorer.get_player_instance(player_to_draw_from)
-
-    try:
-        game_manager.current_player.draw_card_from_discard(player_to_draw_from=player_instance)
-    except ValueError as e:
-        # User drew from empty discard
-        flash_io(str(e), "error")
-        emit_game_state(request)
-
-    game_manager.num_cards_drawn_current_turn += 1
-    if game_manager.num_cards_drawn_current_turn >= 2:
-        game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
-
-    emit_game_state(request)
-
-
-@socketio.on("choose coords")
-def choose_coords(chosen_coords):
-    print(f"\n\nCommencing choose coords with {chosen_coords}\n\n")
-
-    if game_manager.game_phase != GameState.CHOOSE_WHERE_TO_PLAY:
-        flash(f"You can't place a card now. The current game phase is {game_manager.game_phase}.", "error")
-        return redirect(url_for("main"))
-
-    if game_manager.selected_card_to_play is None:
-        flash(f"No card has been selected to be played. Select a card to play.", "error")
-        return redirect(url_for("main"))
-
-    card_to_play = game_manager.selected_card_to_play
-    row = int(chosen_coords[0])
-    column = int(chosen_coords[1])
-    print(f"\nYou are trying to play {card_to_play} at ({row},{column})")
-
-    # TODO - fix bug this currently allows for non-adj placement of trees
-    try:
-        game_manager.current_player.play_card(card_to_play, row=row, column=column)
-        game_manager.selected_card_to_play = None
-        game_manager.game_phase = GameState.CHOOSE_DISCARD
-        emit_game_state(request)
-
-    except ValueError as e:
-        # User chose an invalid location for a card (e.g. not adjacent to an existing card)
-        # - notifying user and resetting to start of play phase
-        game_manager.selected_card_to_play = None
-        game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
-        flash_io(str(e) + " Please select what card to play", "error")
-        emit_game_state(request)
-
-
 if __name__ == "__main__":
     socketio.run(app)
-    # app.run(host="0.0.0.0")
 

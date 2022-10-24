@@ -9,9 +9,8 @@ function highlight_path(player, tree_type)
         for (const [tree, coord] of Object.entries(top_paths[player][tree_type].Path)){
               var card = document.getElementById(coord);
               card.classList.remove("dimmed");
-		}
-    };
-//};
+        }
+}
 
 function dim_all_cards()
 {
@@ -36,7 +35,7 @@ function dim_all_cards()
             all_coords.push(coord_id);
           }
         }
-     };
+     }
 
     console.log(all_coords)
 
@@ -44,13 +43,4 @@ function dim_all_cards()
         card = document.getElementById(coord);
         card.classList.add("dimmed");
     });
- };
-
-// Lights up empty tiles when player is choosing where to place a card
-function hover(element) {
-element.setAttribute('src', '../static/css/other/blank-selected.png');
-}
-
-function unhover(element) {
-  element.setAttribute('src', '../static/css/other/blank-w-border.png');
-}
+ }

@@ -1,14 +1,17 @@
-from logic.player import Player
-from logic.board import Board
-from logic.deck import Deck
-from logic.scorer import Scorer
-from logic.card import Card
-from logic.discard import Discard
-from logic.gamemanager import GameManager
-from logic.gamemanager import GameState, player_game_state_messages
-import logic.config as config
+# from logic.player import Player
+# from logic.board import Board
+# from logic.deck import Deck
+# from logic.scorer import Scorer
+# from logic.card import Card
+# from logic.discard import Discard
+# from logic.gamemanager import GameManager
+from logic.game_manager import GameState, player_game_state_messages
+from logic.game_creator import GameCreator
+#import logic.config as config
 
-game_manager = GameManager(config.NUM_PLAYERS)
+game_creator = GameCreator()
+
+#game_manager = GameManager(config.NUM_PLAYERS)
 
 # # TODO - removing data below used in troubleshooting
 # # # Player 1 paths
@@ -52,28 +55,28 @@ game_manager = GameManager(config.NUM_PLAYERS)
 # game_manager.scorer.players[1].board.board_grid[5][4] = blue3
 # game_manager.scorer.players[1].board.board_grid[5][5] = blue4
 
-oak2 = Card(tree_type="Oak", tree_num=2)
-cas4 = Card(tree_type="Cassia", tree_num=4)
-blue3 = Card(tree_type="Blue Spruce", tree_num=3)
-blue4 = Card(tree_type="Blue Spruce", tree_num=4)
-blue6 = Card(tree_type="Blue Spruce", tree_num=6)
-jac6 = Card(tree_type="Jacaranda", tree_num=6)
-blue7 = Card(tree_type="Blue Spruce", tree_num=7)
-oak8 = Card(tree_type="Oak", tree_num=8)
-
-# Path start
-game_manager.scorer.players[0].board.board_grid[2][2] = oak2
-
-# Path #1
-game_manager.scorer.players[0].board.board_grid[2][3] = cas4
-game_manager.scorer.players[0].board.board_grid[2][4] = jac6
-
-# Path #2
-game_manager.scorer.players[0].board.board_grid[3][2] = blue3
-game_manager.scorer.players[0].board.board_grid[3][3] = blue4
-game_manager.scorer.players[0].board.board_grid[3][4] = blue6
-game_manager.scorer.players[0].board.board_grid[3][5] = blue7
-
-# Path end
-game_manager.scorer.players[0].board.board_grid[2][5] = oak8
+# oak2 = Card(tree_type="Oak", tree_num=2)
+# cas4 = Card(tree_type="Cassia", tree_num=4)
+# blue3 = Card(tree_type="Blue Spruce", tree_num=3)
+# blue4 = Card(tree_type="Blue Spruce", tree_num=4)
+# blue6 = Card(tree_type="Blue Spruce", tree_num=6)
+# jac6 = Card(tree_type="Jacaranda", tree_num=6)
+# blue7 = Card(tree_type="Blue Spruce", tree_num=7)
+# oak8 = Card(tree_type="Oak", tree_num=8)
+#
+# # Path start
+# game_manager.scorer.players[0].board.board_grid[2][2] = oak2
+#
+# # Path #1
+# game_manager.scorer.players[0].board.board_grid[2][3] = cas4
+# game_manager.scorer.players[0].board.board_grid[2][4] = jac6
+#
+# # Path #2
+# game_manager.scorer.players[0].board.board_grid[3][2] = blue3
+# game_manager.scorer.players[0].board.board_grid[3][3] = blue4
+# game_manager.scorer.players[0].board.board_grid[3][4] = blue6
+# game_manager.scorer.players[0].board.board_grid[3][5] = blue7
+#
+# # Path end
+# game_manager.scorer.players[0].board.board_grid[2][5] = oak8
 
