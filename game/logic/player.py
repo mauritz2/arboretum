@@ -1,7 +1,7 @@
-import logic.config as config
-from logic.deck import Deck
-from logic.board import Board
-from logic.discard import Discard
+import game.config as config
+from game.logic.deck import Deck
+from game.logic.board import Board
+from game.logic.discard import Discard
 
 
 class Player:

@@ -1,5 +1,5 @@
 import json
-from logic import game_creator, GameState, GameManager
+from game import game_creator, GameState, GameManager
 import random
 from flask import Flask, render_template, request, url_for, make_response
 from flask_socketio import SocketIO, emit

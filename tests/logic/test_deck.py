@@ -1,5 +1,5 @@
 import pickle
-from logic import Card
+from game import Card
 
 
 def test_shuffle_deck(deck):

@@ -1,5 +1,5 @@
-from logic.player import Player
-from logic.scorer import Scorer
+from game.logic.player import Player
+from game.logic.scorer import Scorer
 from enum import Enum
 
 
@@ -9,7 +9,7 @@ class GameManager:
     what phase in the current turn it is, when the game is over. The Game Manager also sets up the game,
     e.g. creating the scorer with the right amount of players.
     # TODO - rename to game_manager.py and Game_Manager class?
-    # TODO - add the GameState manipulations into this class, as opposed to having the web app do we logic
+    # TODO - add the GameState manipulations into this class, as opposed to having the web app do we game
     # TODO - create dummy funcs for the things arboretum.py reference the game_manager for. Make everything else _
     # TODO - set up some cool enum structure that defines the round? E.g. draw, discard etc. with conditions on when to progress?
     This is the only class that arboretum.py should reference. It hides all the other functions and properties of

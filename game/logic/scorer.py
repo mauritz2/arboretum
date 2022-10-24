@@ -1,8 +1,8 @@
 import random
 
-import logic.config as config
-from logic.card import Card
-from logic.player import Player
+import game.config as config
+from game.logic.card import Card
+from game.logic.player import Player
 
 
 class Scorer:

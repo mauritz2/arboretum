@@ -1,5 +1,5 @@
 from typing import Literal
-import logic.config as config
+import game.config as config
 from dataclasses import dataclass, asdict
 from json import dumps
 

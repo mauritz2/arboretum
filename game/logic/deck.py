@@ -1,7 +1,7 @@
-import logic.config as config
+import game.config as config
 import random
 import itertools
-from logic.card import Card
+from game.logic.card import Card
 
 
 class Deck:

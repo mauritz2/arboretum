@@ -1,5 +1,5 @@
 import pytest
-from logic import Board, Deck, Scorer, Player, Card, Discard, GameManager
+from game import Board, Deck, Scorer, Player, Card, Discard, GameManager
 
 
 @pytest.fixture

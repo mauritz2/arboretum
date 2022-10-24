@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from logic.card import Card
+from game.logic.card import Card
 
 
 @dataclass()

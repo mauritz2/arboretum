@@ -1,5 +1,5 @@
 import pytest
-from logic import Card
+from game import Card
 from conftest import cards as c
 
 
