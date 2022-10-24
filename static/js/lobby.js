@@ -50,38 +50,39 @@ function show_message(text, category) {
 //     current_player = player_name;
 //     console.log("Within update_cur-player" + current_player)
 // }
+//
+// function update_game_phase(g_phase, cur_player_uid){
+//     //console.log(game_phase_dict)
+//     console.log("Updating game phase to " + g_phase)
+//     console.log("Updating is current player to " + cur_player_uid)
+//
+//     game_phase = g_phase
+//     //current_player_uid = cur_player_uid
+//
+//     //socket.emit("get current player")
+//
+//     console.log(cur_player_uid)
+//     console.log(typeof(cur_player_uid))
+//
+//
+//
+//     // Draw button
+//     if(cur_player_uid === my_uid && game_phase === "Draw"){
+//         console.log("Showing draw button")
+//         $("#draw_button_container").removeClass("hide_button");
+//     }
+//     else{
+//         console.log("Hiding draw button")
+//         $("#draw_button_container").addClass("hide_button");
+//     }
+//
+//     $(".card_to_play").submit(function (event){
+//         console.log("Playing card" + event.currentTarget[0].value)
+//         let card_to_play = event.currentTarget[0].value
+//         socket.emit("choose card to play", card_to_play);
+//     });
+// }
 
-function update_game_phase(g_phase, cur_player_uid){
-    //console.log(game_phase_dict)
-    console.log("Updating game phase to " + g_phase)
-    console.log("Updating is current player to " + cur_player_uid)
-    
-    game_phase = g_phase
-    //current_player_uid = cur_player_uid
-    
-    //socket.emit("get current player")
-
-    console.log(cur_player_uid)
-    console.log(typeof(cur_player_uid))
-
-
-
-    // Draw button
-    if(cur_player_uid === my_uid && game_phase === "Draw"){
-        console.log("Showing draw button")
-        $("#draw_button_container").removeClass("hide_button");
-    }
-    else{
-        console.log("Hiding draw button")
-        $("#draw_button_container").addClass("hide_button");
-    }
-
-    $(".card_to_play").submit(function (event){
-        console.log("Playing card" + event.currentTarget[0].value)
-        let card_to_play = event.currentTarget[0].value
-        socket.emit("choose card to play", card_to_play);
-    });
-}
 
 function update_hand(cards_on_hand) {
     console.log(cards_on_hand)
@@ -90,28 +91,26 @@ function update_hand(cards_on_hand) {
 
     cards_on_hand.forEach(function (card) {
 
-        $("#player_hand_div").append("" +
-            "<div class='col-1'>" +
-            "<div class='overlay-button-container'>" +
-            "<img class='card_on_hand' src='../static/css/playing_cards/" + card + ".png'>" +
-            "<form class='card_to_play hide_button'>" +
-            "<input name='card_name' type='hidden' value='" + card + "'>" +
-            "<input type='submit' class='btn btn-dark' value='Play card'>" +
-            "</form>" +
-            "<form class='discard_btn hide_button'>" +
-            "<input name='card_name' type='hidden' value='" + card + "'>" +
-            "<input type='submit' class='btn btn-dark' value='Discard card'>" +
-            "</form>" +
-            "</div>" +
-            "</div>")
+    // TODO - verify again if these truly have to be nested in this func. Can't they be outside?
 
-
+    $("#player_hand_div").append("" +
+        "<div class='col-1'>" +
+        "<div class='overlay-button-container'>" +
+        "<img class='card_on_hand' src='../static/css/playing_cards/" + card + ".png'>" +
+        "<form class='card_to_play hide_button'>" +
+        "<input name='card_name' type='hidden' value='" + card + "'>" +
+        "<input type='submit' class='btn btn-dark' value='Play card'>" +
+        "</form>" +
+        "<form class='discard_btn hide_button'>" +
+        "<input name='card_name' type='hidden' value='" + card + "'>" +
+        "<input type='submit' class='btn btn-dark' value='Discard card'>" +
+        "</form>" +
+        "</div>" +
+        "</div>")
     });
 
-    // TODO - verify again if these truly have to be nested in this func. Can't they be outside?
-    $(".card_to_play").submit(function (event){
-        // Add prevent default back once board is generated through sockerio
-        //event.preventDefault();
+    $(".card_to_play").on("submit", function (event){
+        event.preventDefault();
         console.log("Playing card" + event.currentTarget[0].value)
         let card_to_play = event.currentTarget[0].value
         socket.emit("choose card to play", card_to_play);
@@ -139,7 +138,7 @@ function update_discard(top_discard_cards) {
         if(card == null){
             // TODO - blank-w border currently exists in two folders- refactor into tiles and cards
             card = "blank-w-border"
-        };
+        }
 
         $("#discard_div").append("" +
             '<p class="mb-0 mt-3"><strong>Discard pile</strong></p>' +
@@ -166,16 +165,86 @@ function getCookie(cname) {
   return "";
 }
 
+function update_main_board(main_board) {
+    let board = $("#main-board")
+    board.empty();
+
+    for (const [row_index, row] of main_board.entries()) {
+        let content = '<tr>'
+        for (const [col_index, card] of row.entries()) {
+            content += "";
+            content += '<td>'
+
+            let card_name = card
+
+            if (card_name != null) {
+                content += '<img class="card_on_board blank" id="' + row_index + col_index + '" src="../static/css/playing_cards/' + card_name + '.png">'
+            } else {
+
+                blank_card_name = "blank-w-border"
+
+
+                if (game_phase === "Choose Coords") {
+                    content += '<form action="/choose_coordinates" method="post">'
+                    content += '<input name="coords" type="hidden" value="' + row_index + col_index + '">'
+                    content += '<input class="card_on_board blank_choose_coord" src="../static/css/playing_cards/' + blank_card_name + '.png" type="image">'
+                    content += '</form>'
+                } else {
+                    content += '<img class="card_on_board zoom" id="' + row_index + col_index + '" src="../static/css/playing_cards/' + blank_card_name + '.png">'
+                }
+            }
+            content += '</td>'
+        }
+        content += '</tr>'
+        board.append(content)
+    }
+}
+
+//     console.log(main_board);
+//     {% for row in player_boards[current_player_name] %}
+//     {% set outer_loop = loop.index - 1 %}
+//     <tr>
+//         {% for card in row %}
+//             {% set inner_loop = loop.index - 1 %}
+//             <td>
+//                 {% if card.name != None %}
+//                 <!-- TODO - address that IDs are 11, but values are (1,2). Make consistently 11?-->
+//                 <img class="card_on_board zoom" id="{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.name}}.png">
+//                 {% else %}
+//                 {% if game_phase == "Choose Coords" %}
+//                 <form action="/choose_coordinates" method="post">
+//                     <input name="coords" type="hidden" value="{{outer_loop, inner_loop}}">
+//                     <input class="card_on_board blank blank_choose_coord" src="../static/css/other/blank-w-border.png"
+//                            type="image">
+//                 </form>
+//                 {% else %}
+//                 <!-- Form tag is here to ensure formatting is the same as during coord selection -->
+//                 <form>
+//                 <!-- Not used - putting here to mirror padding when coords are being selected-->
+//                     <input disabled class="card_on_board blank" id="{{outer_loop}}{{inner_loop}}" src="../static/css/other/blank-w-border.png" type="image">
+//                 </form>
+//                 {% endif %}
+//                 {% endif %}
+//             </td>
+//         {% endfor %}
+//     </tr>
+// {% endfor %}
+
 
 function update_board_state(game_state){
     console.log(game_state);
     console.log(game_state["game_phase"]);
     console.log(game_state["current_player_uid"]);
     console.log(game_state["num_cards_in_deck"]);
+    console.log(game_state["player_boards"])
 
     // Update the global state variables
     game_phase = game_state["game_phase"];
     cur_player_uid = game_state["current_player_uid"];
+
+    // Update boards
+    current_player_board = game_state["player_boards"][cur_player_uid]
+    update_main_board(current_player_board)
 
     // Update amount of cards remaining
     update_cards_left(game_state["num_cards_in_deck"]);
@@ -183,7 +252,7 @@ function update_board_state(game_state){
     // Update discard piles
     update_discard(game_state["top_discard_cards"]);
 
-    // Show/hide buttons based on game state - this has to happen last - otherwise not all elements will exist yet
+    // Show/hide buttons based on game state - this has to happen after hand and discard pile updates - otherwise not all elements will exist yet
     toggle_buttons(game_phase, cur_player_uid);
 
 }
@@ -229,11 +298,10 @@ function toggle_buttons(game_phase, cur_player_uid){
 $(function(){
     $("#draw_button").on("click",function ()
     {
-        console.log("Drawing button was clicked!")
-        socket.emit("draw card")
+        console.log("Drawing button was clicked!");
+        socket.emit("draw card");
     });
 });
-
 
 
 // SOCKET LISTENERS

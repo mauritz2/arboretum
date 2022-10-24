@@ -113,3 +113,19 @@ class Board:
                     return row_coord, col_coord
         else:
             return None
+
+    def get_board_state(self):
+        """
+        Returns nested lists representing the board - with only the card names. I.e. no Card instances are returned.
+        This is useful because the Card instance isn't serializable meaning it can't be sent to the front-end. The front-end
+        also only needs the names so good for information hiding.
+        """
+
+        card_names_board = []
+        for row in self.board_grid:
+            card_names_row = []
+            for card in row:
+                card_names_row.append(card.name)
+            card_names_board.append(card_names_row)
+
+        return card_names_board

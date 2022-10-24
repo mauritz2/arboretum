@@ -1,6 +1,7 @@
-from dataclasses import dataclass
 from typing import Literal
 import logic.config as config
+from dataclasses import dataclass, asdict
+from json import dumps
 
 
 @dataclass(order=True)
@@ -16,3 +17,19 @@ class Card:
 
     def __post_init__(self):
         self.name = None if (self.tree_type is None or self.tree_num is None) else f"{self.tree_type} {self.tree_num}"
+
+    @property
+    def __dict__(self):
+        """
+        get a python dictionary
+        """
+        return asdict(self)
+
+    @property
+    def json(self):
+        """
+        get the json formated string
+        """
+        return dumps(self.__dict__)
+
+

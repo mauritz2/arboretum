@@ -2,11 +2,7 @@ import json
 
 import flask
 import random
-import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-
-import logic
-from flask_session import Session
 from flask_socketio import SocketIO, emit
 from logic import game_manager, GameState, player_game_state_messages
 
@@ -19,7 +15,6 @@ app.config['SESSION_TYPE'] = "filesystem"
 socketio = SocketIO(app, logger=True, manage_session=False)
 # app.host="0.0.0.0"
 
-## TODO - Why does everone seem to have their own copy of the uid to player map?
 uid_to_player_map = {}
 
 def flash_io(text: str, category: str = "dark") -> None:
@@ -51,13 +46,14 @@ def emit_board_state(req) -> (dict, list[str]):
 
     for uid in uid_to_player_map:
        if uid_to_player_map[uid]["player_id"] == current_player_name:
+           # TODO - Add the chosen player name here as well, otherwise the board can't display the real player name
            current_player_uid = uid
     else:
        if current_player_uid == None:
            raise ValueError(f"Couldn't find {current_player_uid} in {uid_to_player_map}")
     print(f"The current UID is {current_player_uid} which means {current_player_name}")
 
-    # Get the current game phase (e.g. dr\aw, choose card to play)
+    # Get the current game phase (e.g. draw, choose card to play)
     game_phase = game_manager.game_phase.value
 
     # Get the remaining amount of cards in the deck
@@ -68,12 +64,17 @@ def emit_board_state(req) -> (dict, list[str]):
     for p in game_manager.scorer.players:
         top_discard_cards[p.name] = p.discard.get_top_card(only_str=True)
 
-
-    print(f"The top discard cards are {top_discard_cards}")
+    # Get the board for all players
+    player_boards = {}
+    # TODO - to think about: where is the source of truth of what players exist? GameManager?
+    for uid in uid_to_player_map:
+        p_instance = game_manager.scorer.get_player_instance(uid_to_player_map[uid]["player_id"])
+        player_boards[uid] = p_instance.board.get_board_state()
 
     # Construct the game state dict
     board_state_dict = {"game_phase": game_phase,
                         "current_player_uid": current_player_uid,
+                        "player_boards": player_boards,
                         "num_cards_in_deck": num_cards_in_deck,
                         "top_discard_cards": top_discard_cards}
 
@@ -190,6 +191,7 @@ def on_stand_up():
 
 @socketio.on("choose card to play")
 def choose_card_to_play(card_to_play):
+    print(f"\n\nI am setting the card to play to {card_to_play}\n\n")
     game_manager.selected_card_to_play = card_to_play
     game_manager.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
     emit_board_state(request)
@@ -251,12 +253,12 @@ def main():
 
     flash(player_game_state_messages[game_manager.game_phase])
 
-    global uid_to_player_map
+    #global uid_to_player_map
     #num_players = len(session.get("uids").keys())
-    num_players = len(uid_to_player_map.keys())
-
-    game_manager.num_players = num_players
-    game_manager.setup_scorer()
+    #num_players = len(uid_to_player_map.keys())
+    #game_manager.num_players = num_players
+    #game_manager.setup_scorer()
+    #print(f"\n\nThe amount of players in the game is {len(game_manager.scorer.players)}!\n\n")
 
     return render_template(
         'game.html',
@@ -360,8 +362,11 @@ def choose_coordinates():
         return redirect(url_for("main"))
 
     card_to_play = game_manager.selected_card_to_play
-    row, column = eval(request.form["coords"])
-    row, column = int(row), int(column)
+    print(f"\nYou are trying to play {card_to_play}\n\n")
+    row = int(request.form["coords"][0])
+    column = int(request.form["coords"][1])
+    # row, column = eval(request.form["coords"])
+    # row, column = int(row), int(column)
 
     try:
         game_manager.current_player.play_card(card_to_play, row=row, column=column)

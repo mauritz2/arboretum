@@ -124,3 +124,14 @@ def test_find_coords_of_card_not_played(board):
     """
     coords = board.find_coords_of_card(c["Jacaranda 5"])
     assert coords is None
+
+
+def test_get_board_state(board):
+    """
+    Verify we get None if the card we asked for doesn't exist on the board
+    """
+    board.board_grid[0][0] = Card(tree_type="Oak", tree_num=5)
+    board.board_grid[9][9] = Card(tree_type="Cassia", tree_num=8)
+    board_state = board.get_board_state()
+    expected_board_state = [["Oak 5", None, None, None, None, None, None, None, None, None]] + [[None, None, None, None, None, None, None, None, None, None]] * 8 + [[None, None, None, None, None, None, None, None, None, "Cassia 8"]]
+    assert board_state == expected_board_state

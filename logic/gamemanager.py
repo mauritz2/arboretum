@@ -108,6 +108,7 @@ class GameManager:
 
 
 class GameState(Enum):
+    # TODO - turn into str enum - easier to work with (have to upgrade Python to latest version)
     CHOOSE_WHAT_TO_DRAW = "Draw"
     CHOOSE_CARD_TO_PLAY = "Choose Card"
     CHOOSE_WHERE_TO_PLAY = "Choose Coords"
