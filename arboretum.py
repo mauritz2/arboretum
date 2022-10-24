@@ -8,8 +8,7 @@ from flask_socketio import SocketIO, emit
 app = Flask(__name__)
 app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
 app.debug = True
-#app.config['SESSION_TYPE'] = "filesystem"
-socketio = SocketIO(app) # logger=True, manage_session=False
+socketio = SocketIO(app)
 # app.host="0.0.0.0"
 
 # Global variables
@@ -43,20 +42,8 @@ def on_sit_down(player_name):
     if player_name in uid_to_player_map.values():
         raise ValueError(f"{player_name} already exists. Please choose another name")
 
-    # TODO - check if cookie exists - otherwuse redirect to lobby?
     player_uid = request.cookies.get("player_uid")
-
-    # existing_player_ids = [value["player_id"] for value in uid_to_player_map.values()]
-    # print(f"\n\nThe existing player IDs are {existing_player_ids}\n\n")
-    # next_id = game_manager.get_next_player_id(existing_player_ids)
-
-    # TODO - does it make sense to add each player in two places? Or should
-    # the player be added to the UID mapping and then created later?
-    #game_creator.add_player(player_name)
-    # uid_to_player_map[player_uid] = {"player_name": player_name, "player_id": next_id}
     uid_to_player_map[player_uid] = player_name
-    # print(f"\n\nUID to player map created {uid_to_player_map}\n\n")
-
     emit("update player list", json.dumps(list(uid_to_player_map.values())), broadcast=True)
     flash_io(f"You've joined the game as {player_name}")
 
@@ -112,19 +99,12 @@ def emit_game_state(req) -> (dict, list[str]):
     player_instance = game_manager.get_player_instance(player_name)
     cards_on_hand = player_instance.get_player_card_names()
 
-    # Does a reverse loopup to find the uid (key) based on the current player's player name (value)
-    # current_player_uid = list(uid_to_player_map.keys())[list(uid_to_player_map.values()).index(current_player_name)]
-    # print([item for item in uid_to_player_map.items() if item[0] == "Apple"])
-
     # Get the UID and player name for the current player
     current_player_name = game_manager.current_player.name
     # TODO - refactor list comprehension here is odd
+    # current_player_uid = list(uid_to_player_map.keys())[list(uid_to_player_map.values()).index(current_player_name)]
     current_player_id = [{"uid": item[0], "player_name": item[1]} for item in uid_to_player_map.items() if item[1] == current_player_name][0]
 
-    # for uid in uid_to_player_map:
-    #     if uid_to_player_map[uid] == current_player_name:
-    #         uid_name_mapping = {"uid": uid, "player_name": uid_to_player_map[uid]["player_name"]}
-    #         print(f"The current name is {uid_to_player_map[uid]} which means UID {uid}")
 
     # Get the current game phase (e.g. draw, choose card to play)
     game_phase = game_manager.game_phase.value
@@ -170,8 +150,6 @@ def choose_card_to_play(card_to_play):
     global game_manager
     print(f"\n\nI am setting the card to play to {card_to_play}\n\n")
     game_manager.select_card_to_play(card_to_play)
-    #selected_card_to_play = card_to_play
-    #game_manager.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
     emit_game_state(request)
 
 
@@ -183,12 +161,6 @@ def draw_card_from_deck():
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]
     game_manager.draw_card(player_name)
-
-    # player_to_draw = game_manager.get_player_instance(player_name)
-    # player_to_draw.draw_card_from_deck()
-    # game_manager.num_cards_drawn_current_turn += 1
-    # if game_manager.num_cards_drawn_current_turn >= 2:
-    #     game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
 
     # TODO - Can emit state be set to run after each request, or at least for some?
     # Maybe we can have a custom decorator for that that calls emit_game_state at the end
@@ -205,19 +177,10 @@ def discard_card(card_to_discard):
 
     game_manager.discard_card(player_name=player_name, card_to_discard=card_to_discard)
 
-    # print(f"\n\nDiscarding a card: {card_to_discard}")
-    # game_manager.current_player.discard_card(card_to_discard, to_discard=True)
-
-    #is_game_over = game_manager.is_game_over()
-    # if is_game_over:
-    #     game_manager.game_phase = GameState.SCORING
-    #     emit('end game', json.dumps(url_for('game_over')), broadcast=True)
-
     if game_manager.game_phase == GameState.SCORING:
         # The deck is empty, meaning that the game is over - redirecting to game over/scoring screen
         emit('end game', json.dumps(url_for('game_over')), broadcast=True)
 
-    #game_manager.start_next_round()
     emit_game_state(request)
 
 
@@ -227,18 +190,12 @@ def draw_from_discard(player_to_draw_from):
     print(f"I am drawing from discard from {player_to_draw_from}")
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]
-    #player_instance = game_manager.get_player_instance(player_to_draw_from)
 
     try:
-        #game_manager.current_player.draw_card_from_discard(player_to_draw_from=player_instance)
         game_manager.draw_card(player_name=player_name, to_draw_from=player_to_draw_from)
     except ValueError as e:
         # User drew from empty discard or some other error occurred
         flash_io(str(e), "warning")
-
-    # game_manager.num_cards_drawn_current_turn += 1
-    # if game_manager.num_cards_drawn_current_turn >= 2:
-    #     game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
 
     emit_game_state(request)
 
@@ -260,10 +217,6 @@ def choose_coords(chosen_coords):
     try:
         game_manager.play_card_at_chosen_coords(player_name=player_name, row=row, column=column)
     except ValueError as e:
-        # User chose an invalid location for a card (e.g. not adjacent to an existing card)
-        # - notifying user and resetting to start of play phase
-        # game_manager.selected_card_to_play = None
-        # game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
         flash_io(str(e) + " Please re-select what card to play", "warning")
     emit_game_state(request)
 

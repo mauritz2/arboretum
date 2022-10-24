@@ -1,13 +1,6 @@
-# from logic.player import Player
-# from logic.board import Board
-# from logic.deck import Deck
-# from logic.scorer import Scorer
-# from logic.card import Card
-# from logic.discard import Discard
 from logic.game_manager import GameManager
-from logic.game_manager import GameState, player_game_state_messages
+from logic.game_manager import GameState
 from logic.game_creator import GameCreator
-#import logic.config as config
 
 game_creator = GameCreator()
 

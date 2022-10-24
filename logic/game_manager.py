@@ -18,9 +18,7 @@ class GameManager:
 
     def __init__(self, scorer: Scorer = None) -> None:
         self.scorer = scorer
-        #self.current_player_index = 0
         self.has_not_taken_turn = self.scorer.players.copy()
-        #self.current_player = self.scorer.players[self.current_player_index]
         # TODO - Remove current player? Orr use it more? Maybe easier than having to check the UID all the time
         self.current_player = self._get_next_player()
         self.game_phase = GameState.CHOOSE_WHAT_TO_DRAW
@@ -33,22 +31,16 @@ class GameManager:
         """
         Checks if the game is over - if not switch to the next player so they can take their turn
         """
-
         self.game_phase = GameState.CHOOSE_WHAT_TO_DRAW
         self.num_cards_drawn_current_turn = 0
         self.selected_card_to_play = None
-        #self.current_player_index = self._get_next_player_index()
-        #print(f"\nThe next player will be {self.current_player_index}\n")
-        self.current_player = self._get_next_player() # self.scorer.players[self.current_player_index]
+        self.current_player = self._get_next_player()
 
     def is_game_over(self):
         """
         Returns true if the game is over (i.e. deck is empty). Otherwise returns false.
         """
-        if self.get_amt_of_cards_left() <= 0:
-            return True
-        else:
-            return False
+        return True if self.get_amt_of_cards_left() <= 0 else False
 
     def _get_next_player(self):
         """
@@ -59,21 +51,6 @@ class GameManager:
             # Everybody has taken their turn - resetting to new round
             self.has_not_taken_turn = self.scorer.players.copy()
         return self.has_not_taken_turn.pop()
-
-
-    # def _get_next_player_index(self):
-    #     """
-    #     Gets the next index for the next player
-    #     or return 0 to start over from the first player if the last player just took their turn
-    #     """
-    #     i = self.current_player_index
-    #     print(f"The current index is {i}")
-    #     print(f"Value to be compared against {len(self.scorer.players)}")
-    #     i += 1
-    #     if i >= len(self.scorer.players):
-    #         i = 0
-    #     print(f"The new i is {i}")
-    #     return i
 
     def get_winner(self):
         winners, top_paths = self.scorer.determine_winner()
@@ -139,8 +116,6 @@ class GameManager:
             raise e
 
 
-
-
 class GameState(Enum):
     # TODO - turn into str enum - easier to work with (have to upgrade Python to the latest version)
     CHOOSE_WHAT_TO_DRAW = "Draw"
@@ -150,6 +125,7 @@ class GameState(Enum):
     SCORING = "Scoring"
 
 
+# TODO - add messages back in using flash_io
 player_game_state_messages = {
     GameState.CHOOSE_WHAT_TO_DRAW: "Draw two cards from either the deck or one of the discard piles",
     GameState.CHOOSE_CARD_TO_PLAY: "Select a card to play",
