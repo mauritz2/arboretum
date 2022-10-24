@@ -23,6 +23,7 @@ def flash_io(text: str, category: str = "dark") -> None:
 
 def emit_game_state(req) -> (dict, list[str]):
     global uid_to_player_map
+
     player_uid = req.cookies.get("player_uid")
 
     # Get the player's hand
@@ -152,11 +153,9 @@ def discard_card(card_to_discard):
     game_manager.current_player.discard_card(card_to_discard, to_discard=True)
 
     is_game_over = game_manager.check_if_game_is_over()
-
     if is_game_over:
         game_manager.game_phase = GameState.SCORING
-        #return redirect(url_for("game_over"))
-        emit('end game', json.dumps(url_for('game_over')))
+        emit('end game', json.dumps(url_for('game_over')), broadcast=True)
 
     game_manager.start_next_round()
     emit_game_state(request)
@@ -164,34 +163,6 @@ def discard_card(card_to_discard):
 
 @app.route("/game", methods=["GET"])
 def main():
-    """
-    Gets the data to display in the UI and renders the main game screen
-    """
-    # player_boards = {}
-    # player_hands = {}
-    # top_discard_cards = {}
-    # for p in game_manager.scorer.players:
-    #     player_name = p.name
-    #     # TODO This sends a nested list with Cards() - send just the card name instead?
-    #     player_boards[player_name] = p.board.board_grid
-    #     player_hands[player_name] = p.get_player_card_names()
-    #     top_discard_cards[player_name] = p.discard.get_top_card(only_str=True)
-    #
-    # current_player_name = game_manager.current_player.name
-    # game_phase = game_manager.game_phase.value
-    # num_cards_in_deck = game_manager.scorer.players[0].deck.get_amt_of_cards_left()
-    #
-    # flash(player_game_state_messages[game_manager.game_phase])
-    # return render_template(
-    #     'game.html',
-    #     player_boards=player_boards,
-    #     game_phase=game_phase,
-    #     top_discard_cards=top_discard_cards,
-    #     current_player_name=current_player_name,
-    #     num_cards_in_deck=num_cards_in_deck,
-    # )
-
-
     return render_template("game.html")
 
 
@@ -270,6 +241,7 @@ def choose_coords(chosen_coords):
     column = int(chosen_coords[1])
     print(f"\nYou are trying to play {card_to_play} at ({row},{column})")
 
+    # TODO - fix bug this currently allows for non-adj placement of trees
     try:
         game_manager.current_player.play_card(card_to_play, row=row, column=column)
         game_manager.selected_card_to_play = None

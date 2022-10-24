@@ -17,6 +17,11 @@ function dim_all_cards()
 {
     // :-) :-) :-)
     // TODO - this is a very silly loop to dim all coords - refactor
+    // To fix this JS needs to know what IDs exist - so we don't have to generate them through hard coding here
+    // Either we could pass a list of coords, or the configs to the game. This might be useful anyways if the UI knows the num of players
+    // that could support multiple UIs depending on game size. But would be work to set that up.
+    // A better approach would be to be able to access the children of the board parent div and apply the class
+    // That seems like the best approach
     all_coords = []
     num_players = 2
     rows = 6
