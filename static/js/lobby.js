@@ -135,23 +135,34 @@ function update_discard(top_discard_cards, cur_player_uid) {
     $("#discard_div").empty();
 
     Object.entries(top_discard_cards).forEach(([player, card]) => {
-
-        if(card == null){
+        // TODO - refactor this logic with the card name - looks weird. Introduce a JS config file also?
+        let card_name = card
+        if(card_name == null){
             // TODO - blank-w border currently exists in two folders- refactor into tiles and cards
-            card = "blank-w-border"
+            card_name = blank_card_name
         }
 
         let content = ""
         content += '<p class="mb-0 mt-3"><strong>Discard pile</strong></p>'
+        // Replace here with the actual player's name
         content += '<p><small>' + player + '</small></p>'
         content += '<div class="overlay-button-container">'
-        content += '<img class="card_on_hand" src="../static/css/playing_cards/' + card + '.png">'
+        content += '<img class="card_on_hand" src="../static/css/playing_cards/' + card_name + '.png">'
         content += '<form class="draw_discard_btn '
 
         // # TODO - update this and all element creations
-        if (cur_player_uid === my_uid && game_phase === "Draw" && card != null)
-        {
-             content += 'hide_button'
+        console.log("Card is " + card);
+        console.log(card == null);
+        console.log(cur_player_uid != my_uid);
+        console.log(game_phase != "Draw");
+        if (cur_player_uid !== my_uid || game_phase !== "Draw" || card === null) {
+            // Unless the current player UID === my_uid
+            // TODO - refactor!
+            // Adding hide_buttons hides the button
+            // There are three scenarios where we want to add this call (i.e. hide it)
+            // When it's not your turn we want it to be true: !(cur_player_uid !== my_uid)
+            // When it's not the draw phase we want it to be true (ie. !(game_phase !== "Draw")
+            content += 'hide_button'
         }
         content += '">'
         content += '<input name="discard_owner" type="hidden" value="'+ player +'">'
@@ -311,7 +322,7 @@ function update_board_state(game_state){
     update_discard(top_discard_cards, cur_player_uid);
 
     // Show/hide buttons based on game state - this has to happen after hand and discard pile updates - otherwise not all elements will exist yet
-    toggle_buttons(game_phase, cur_player_uid);
+    toggle_buttons(game_phase, cur_player_uid, num_cards_in_deck);
 
 }
 
@@ -319,8 +330,8 @@ function toggle_buttons(game_phase, cur_player_uid, num_cards_in_deck){
     console.log("Evaluating what buttons to show");
     console.log("The cur UID is " + cur_player_uid);
 
-    // Draw button!
-    if (cur_player_uid === my_uid && game_phase === "Choose Card" && num_cards_in_deck > 0){
+    // Play button
+    if (cur_player_uid === my_uid && game_phase === "Choose Card"){
         console.log("Showing play button")
         $(".card_to_play").removeClass("hide_button");
     }
@@ -337,8 +348,10 @@ function toggle_buttons(game_phase, cur_player_uid, num_cards_in_deck){
         $(".discard_btn").addClass("hide_button");
     }
 
+    console.log("The amount of cards in the deck is " + num_cards_in_deck)
+    console.log((cur_player_uid === my_uid && game_phase === "Draw") && num_cards_in_deck > 0)
     // Draw button
-    if(cur_player_uid === my_uid && game_phase === "Draw"){
+    if((cur_player_uid === my_uid && game_phase === "Draw") && num_cards_in_deck > 0){
         // TODO - only show this if there's more than 0 card sin the discard piles and draw deck!
         // Reduce the height of the discard piles so they don't push down the cards too much
         // Replace the cards on hand and cards on board with em things?
@@ -353,16 +366,11 @@ function toggle_buttons(game_phase, cur_player_uid, num_cards_in_deck){
     }
 }
 
-
-// JQUERY HTML BINDINGS
-
-$(function(){
-    $("#draw_button").on("click",function ()
-    {
-        console.log("Drawing button was clicked!");
-        socket.emit("draw card");
-    });
-});
+function end_game(url){
+    // Ends the game
+    console.log(url)
+    window.location = url
+}
 
 
 // SOCKET LISTENERS
@@ -373,6 +381,18 @@ socket.on("update hand", (cards_on_hand) => update_hand(JSON.parse(cards_on_hand
 // socket.on("update game phase", (game_phase_dict) => update_game_phase(JSON.parse(game_phase_dict).game_phase, JSON.parse(game_phase_dict).is_current_player));
 // socket.on("update cards left", (cards_left) => update_cards_left(JSON.parse(cards_left)));
 socket.on("update board state", (board_state) => update_board_state(JSON.parse(board_state)));
+socket.on("end game", (url) => end_game(JSON.parse(url)));
+
+
+// JQUERY HTML BINDINGS
+
+$(function(){
+    $("#draw_button").on("click",function ()
+    {
+        console.log("Drawing button was clicked!");
+        socket.emit("draw card");
+    });
+});
 
 
 

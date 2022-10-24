@@ -155,7 +155,8 @@ def discard_card(card_to_discard):
 
     if is_game_over:
         game_manager.game_phase = GameState.SCORING
-        return redirect(url_for("game_over"))
+        #return redirect(url_for("game_over"))
+        emit('end game', json.dumps(url_for('game_over')))
 
     game_manager.start_next_round()
     emit_game_state(request)
@@ -166,30 +167,32 @@ def main():
     """
     Gets the data to display in the UI and renders the main game screen
     """
-    player_boards = {}
-    player_hands = {}
-    top_discard_cards = {}
-    for p in game_manager.scorer.players:
-        player_name = p.name
-        # TODO This sends a nested list with Cards() - send just the card name instead?
-        player_boards[player_name] = p.board.board_grid
-        player_hands[player_name] = p.get_player_card_names()
-        top_discard_cards[player_name] = p.discard.get_top_card(only_str=True)
+    # player_boards = {}
+    # player_hands = {}
+    # top_discard_cards = {}
+    # for p in game_manager.scorer.players:
+    #     player_name = p.name
+    #     # TODO This sends a nested list with Cards() - send just the card name instead?
+    #     player_boards[player_name] = p.board.board_grid
+    #     player_hands[player_name] = p.get_player_card_names()
+    #     top_discard_cards[player_name] = p.discard.get_top_card(only_str=True)
+    #
+    # current_player_name = game_manager.current_player.name
+    # game_phase = game_manager.game_phase.value
+    # num_cards_in_deck = game_manager.scorer.players[0].deck.get_amt_of_cards_left()
+    #
+    # flash(player_game_state_messages[game_manager.game_phase])
+    # return render_template(
+    #     'game.html',
+    #     player_boards=player_boards,
+    #     game_phase=game_phase,
+    #     top_discard_cards=top_discard_cards,
+    #     current_player_name=current_player_name,
+    #     num_cards_in_deck=num_cards_in_deck,
+    # )
 
-    current_player_name = game_manager.current_player.name
-    game_phase = game_manager.game_phase.value
-    num_cards_in_deck = game_manager.scorer.players[0].deck.get_amt_of_cards_left()
 
-    flash(player_game_state_messages[game_manager.game_phase])
-
-    return render_template(
-        'game.html',
-        player_boards=player_boards,
-        game_phase=game_phase,
-        top_discard_cards=top_discard_cards,
-        current_player_name=current_player_name,
-        num_cards_in_deck=num_cards_in_deck,
-    )
+    return render_template("game.html")
 
 
 @app.route("/game_over", methods=["GET"])
@@ -235,7 +238,13 @@ def game_over():
 def draw_from_discard(player_to_draw_from):
     print(f"I am drawing from discard from {player_to_draw_from}")
     player_instance = game_manager.scorer.get_player_instance(player_to_draw_from)
-    game_manager.current_player.draw_card_from_discard(player_to_draw_from=player_instance)
+
+    try:
+        game_manager.current_player.draw_card_from_discard(player_to_draw_from=player_instance)
+    except ValueError as e:
+        # User drew from empty discard
+        flash_io(str(e), "error")
+        emit_game_state(request)
 
     game_manager.num_cards_drawn_current_turn += 1
     if game_manager.num_cards_drawn_current_turn >= 2:
@@ -243,22 +252,6 @@ def draw_from_discard(player_to_draw_from):
 
     emit_game_state(request)
 
-# @app.route("/draw_from_discard_old", methods=["POST"])
-# def draw_card_from_discard_old():
-#     """
-#     Draws a card from a selected discard pile and adds it to the players hand. Progresses to the next phase
-#     (i.e. play card) when two cards have been drawn
-#     """
-#     player_to_draw_from = request.form["discard_owner"]
-#     player_instance = game_manager.scorer.get_player_instance(player_to_draw_from)
-#     game_manager.current_player.draw_card_from_discard(player_to_draw_from=player_instance)
-#
-#     game_manager.num_cards_drawn_current_turn += 1
-#     if game_manager.num_cards_drawn_current_turn >= 2:
-#         game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
-#
-#     return redirect(url_for("main"))
-#
 
 @socketio.on("choose coords")
 def choose_coords(chosen_coords):

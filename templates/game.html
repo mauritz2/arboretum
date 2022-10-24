@@ -2,7 +2,7 @@
 {% block game %}
 
 <div class="row align-items-end">
-    <!-- Start of deck -->
+    <!-- Deck -->
     <div class="col-1 offset-1">
         <p class="mb-0"><strong>Deck</strong></p>
         <p id="cards_left"></p>
@@ -15,39 +15,17 @@
             </div>
         </form>
     </div>
-    <!-- End of deck-->
-
-    <!--Discard pile-->
     <div class="col-1" id="discard_div">
-        <!-- Discard piles placeholder-->
+        <!-- Discard pile(s)-->
     </div>
-
     <div class="col-5">
-        <!-- Main Board-->
         <h4 class="mb-1" id="main_board_title"></h4>
         <table class="table-sm" id="main_board">
+            <!-- Main Board-->
         </table>
     </div>
     <div class="col-3" id="side_board_container">
-        <!--Side boards-->
-<!--        {% for player_name in player_boards %}-->
-<!--            {% if player_name != current_player_name %}-->
-<!--                <p><strong>{{ player_name }}'s board</strong></p>-->
-<!--                <table class="table-sm">-->
-<!--                {% for row in player_boards[player_name] %}-->
-<!--                    <tr>-->
-<!--                    {% for card in row %}-->
-<!--                        <td>-->
-<!--                        {% if card.name != None %}-->
-<!--                            <img class="card_on_mini_board zoom-larger" src="../static/css/playing_cards/{{card.name}}.png">-->
-<!--                        {% else %}-->
-<!--                            <img class="card_on_mini_board blank" src="../static/css/other/blank-w-border.png">-->
-<!--                        {% endif %}-->
-<!--                    {% endfor %}-->
-<!--                {% endfor %}-->
-<!--                </table>-->
-<!--            {% endif %}-->
-<!--        {% endfor %}-->
+        <!--Side board(s)-->
     </div>
 </div>
 
@@ -56,94 +34,11 @@
 </div>
 
 <script>
-    // This runs everytime on submit, which is why drawing cards is currently working
-    // Drawing a card should emit an event - not post something
-    //socket.emit("sit_down", {"player_name": "TestPlayer"})
     socket.emit("get board state");
-    //socket.emit("get game phase");
-    //socket.emit("get hand");
-    //socket.emit("get current player");
-
 </script>
 
 
-<!--            <form action="/draw_card_from_deck" method="post">-->
-<!--                <div class="overlay-button-container">-->
-<!--                    <img class="card_on_hand" src="../static/css/other/deck-full.png">-->
-<!--                    {% if game_phase == "Draw" %}-->
-<!--                    <input class="btn btn-dark" type="submit" value="Draw card">-->
-<!--                    {% endif %}-->
-<!--                </div>-->
-<!--            </form>-->
-
-<!--Deck-->
-<!--            <form action="/draw_card_from_deck" method="post">-->
-<!--                <div class="overlay-button-container">-->
-<!--                    <img class="card_on_hand" src="../static/css/other/deck-full.png">-->
-<!--                    <div id="draw_button_placeholder">-->
-<!--                        &lt;!&ndash; Placeholder for the draw card button&ndash;&gt;-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </form>-->
-
-<!--            {% for player_name in top_discard_cards %}-->
-<!--                <div class="col-1">-->
-<!--                    <p class="mb-0 mt-3"><strong>Discard pile</strong></p>-->
-<!--                <p><small>{{player_name}}</small></p>-->
-<!--                {% set top_discard_card = top_discard_cards[player_name] %}-->
-<!--                {% if top_discard_card != None %}-->
-<!--                    <div class="overlay-button-container">-->
-<!--                    <img id="discard_img_player_1" class="card_on_hand" src="../static/css/playing_cards/{{top_discard_card}}.png">-->
-<!--                    {% if game_phase == "Draw" %}-->
-<!--                        <form action="/draw_from_discard" method="post">-->
-<!--                            <input name="discard_owner" type="hidden" value="{{player_name}}">-->
-<!--                            <input class="btn btn-dark" type="submit" value="Draw card">-->
-<!--                        </form>-->
-<!--                    {% endif %}-->
-<!--                    </div>-->
-<!--                {% else %}-->
-<!--                    <img class="card_on_hand blank" src="../static/css/other/blank-w-border.png">-->
-<!--                {% endif %}-->
-<!--                    </div>-->
-<!--            {% endfor %}-->
 
 
-
-
-
-<!-- <div class="col-5">-->
-<!--        &lt;!&ndash;Board&ndash;&gt;-->
-<!--        <h4 class="mb-1">Current player's board ({{ current_player_name }})</h4>-->
-<!--        <table class="table-sm">-->
-<!--            {% for row in player_boards[current_player_name] %}-->
-<!--                {% set outer_loop = loop.index - 1 %}-->
-<!--                <tr>-->
-<!--                    {% for card in row %}-->
-<!--                        {% set inner_loop = loop.index - 1 %}-->
-<!--                        <td>-->
-<!--                            {% if card.name != None %}-->
-<!--                            &lt;!&ndash; TODO - address that IDs are 11, but values are (1,2). Make consistently 11?&ndash;&gt;-->
-<!--                            <img class="card_on_board zoom" id="{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.name}}.png">-->
-<!--                            {% else %}-->
-<!--                            {% if game_phase == "Choose Coords" %}-->
-<!--                            <form action="/choose_coordinates" method="post">-->
-<!--                                <input name="coords" type="hidden" value="{{outer_loop, inner_loop}}">-->
-<!--                                <input class="card_on_board blank blank_choose_coord" src="../static/css/other/blank-w-border.png"-->
-<!--                                       type="image">-->
-<!--                            </form>-->
-<!--                            {% else %}-->
-<!--                            &lt;!&ndash; Form tag is here to ensure formatting is the same as during coord selection &ndash;&gt;-->
-<!--                            <form>-->
-<!--                            &lt;!&ndash; Not used - putting here to mirror padding when coords are being selected&ndash;&gt;-->
-<!--                                <input disabled class="card_on_board blank" id="{{outer_loop}}{{inner_loop}}" src="../static/css/other/blank-w-border.png" type="image">-->
-<!--                            </form>-->
-<!--                            {% endif %}-->
-<!--                            {% endif %}-->
-<!--                        </td>-->
-<!--                    {% endfor %}-->
-<!--                </tr>-->
-<!--            {% endfor %}-->
-<!--        </table>-->
-<!--    </div>-->
 
 {% endblock %}
