@@ -8,12 +8,15 @@ class GameManager:
     Class to manage the phases of the game, i.e. who's turn it is,
     what phase in the current turn it is, when the game is over. The Game Manager also sets up the game,
     e.g. creating the scorer with the right amount of players.
+
+    This is the only game logic class that the Flask app arboretum.py should reference. It hides the other
+    functions and properties of the other classes
+
     # TODO - rename to game_manager.py and Game_Manager class?
     # TODO - add the GameState manipulations into this class, as opposed to having the web app do we game
     # TODO - create dummy funcs for the things arboretum.py reference the game_manager for. Make everything else _
     # TODO - set up some cool enum structure that defines the round? E.g. draw, discard etc. with conditions on when to progress?
-    This is the only class that arboretum.py should reference. It hides all the other functions and properties of
-    the other classes
+
     """
 
     def __init__(self, scorer: Scorer = None) -> None:
@@ -82,9 +85,11 @@ class GameManager:
         player = self.get_player_instance(player_name)
 
         if to_draw_from:
+            # Drawing from a discard pile
             player_to_draw_from = self.get_player_instance(to_draw_from)
             player.draw_card_from_discard(player_to_draw_from=player_to_draw_from)
         else:
+            # Drawing from the deck
             player.draw_card_from_deck()
 
         self.num_cards_drawn_current_turn += 1
@@ -102,7 +107,7 @@ class GameManager:
 
         self.start_next_round()
 
-    def play_card_at_chosen_coords(self, player_name: str, row:int, column: int):
+    def play_card_at_chosen_coords(self, player_name: str, row: int, column: int):
         player = self.get_player_instance(player_name)
         try:
             player.play_card(self.selected_card_to_play, row=row, column=column)

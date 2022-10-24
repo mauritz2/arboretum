@@ -44,6 +44,7 @@ def on_sit_down(player_name):
 
     player_uid = request.cookies.get("player_uid")
     uid_to_player_map[player_uid] = player_name
+    # TODO - create special func for updating the player list
     emit("update player list", json.dumps(list(uid_to_player_map.values())), broadcast=True)
     flash_io(f"You've joined the game as {player_name}")
 
@@ -54,7 +55,6 @@ def on_stand_up():
     player_uid = request.cookies.get("player_uid")
 
     flash_io(f"Player {uid_to_player_map[player_uid]} has left the game.")
-    # game_creator.remove_player(uid_to_player_map[player_uid])
     del uid_to_player_map[player_uid]
 
     emit("update player list", json.dumps(list(uid_to_player_map.values())), broadcast=True)
@@ -77,7 +77,7 @@ def get_board_state():
 @socketio.on("get player list")
 def get_player_list():
     global uid_to_player_map
-    emit("update player list", json.dumps(uid_to_player_map), broadcast=True)
+    emit("update player list", json.dumps(list(uid_to_player_map.values())), broadcast=True)
 
 
 #### MAIN LOGIC ###
@@ -95,7 +95,6 @@ def emit_game_state(req) -> (dict, list[str]):
 
     # Get the player's hand
     player_name = uid_to_player_map[player_uid]
-    print(f"I will try to find the instance of {player_name}")
     player_instance = game_manager.get_player_instance(player_name)
     cards_on_hand = player_instance.get_player_card_names()
 
@@ -104,7 +103,6 @@ def emit_game_state(req) -> (dict, list[str]):
     # TODO - refactor list comprehension here is odd
     # current_player_uid = list(uid_to_player_map.keys())[list(uid_to_player_map.values()).index(current_player_name)]
     current_player_id = [{"uid": item[0], "player_name": item[1]} for item in uid_to_player_map.items() if item[1] == current_player_name][0]
-
 
     # Get the current game phase (e.g. draw, choose card to play)
     game_phase = game_manager.game_phase.value
@@ -139,6 +137,7 @@ def emit_game_state(req) -> (dict, list[str]):
 
 @socketio.on("get board state")
 def get_board_state(req=None):
+    # TODO - remove this? Not sure if needed, maybe emit game stat can be socketio.on()
     if req:
         emit_game_state(req)
     else:
@@ -148,7 +147,6 @@ def get_board_state(req=None):
 @socketio.on("choose card to play")
 def choose_card_to_play(card_to_play):
     global game_manager
-    print(f"\n\nI am setting the card to play to {card_to_play}\n\n")
     game_manager.select_card_to_play(card_to_play)
     emit_game_state(request)
 
@@ -187,7 +185,6 @@ def discard_card(card_to_discard):
 @socketio.on("draw from discard")
 def draw_from_discard(player_to_draw_from):
     global game_manager
-    print(f"I am drawing from discard from {player_to_draw_from}")
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]
 
@@ -208,7 +205,6 @@ def choose_coords(chosen_coords):
     card_to_play = game_manager.selected_card_to_play
     row = int(chosen_coords[0])
     column = int(chosen_coords[1])
-    print(f"\nYou are trying to play {card_to_play} at ({row},{column})")
 
     # TODO - is it better to always read the cookie value, or should we just reference current player?
     player_uid = request.cookies.get("player_uid")
