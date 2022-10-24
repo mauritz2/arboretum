@@ -24,7 +24,7 @@
 .card_on_mini_board {
     height: 30px;
     width: 20px;
-    border-radius: 2px;
+    border-radius: 3px;
 }
 
 .scoring_tree_type:hover {
@@ -43,10 +43,9 @@
 }
 
 body {
-  overflow-y:hidden;
   background-color: rgb(45,45,45) !important;
   color: white !important;
-   caret-color: transparent;
+    caret-color: transparent;
 }
 
 .overlay-button-container {

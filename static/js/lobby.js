@@ -2,6 +2,7 @@ let socket = io();
 // let is_current_player = null;
 // let game_phase = null;
 let my_uid = getCookie("player_uid")
+const blank_card_name = "blank-w-border"
 
 
 function join_game(player_name){
@@ -128,7 +129,7 @@ function update_cards_left(cards_left){
     $("#cards_left").text(cards_left + " cards remain");
 }
 
-function update_discard(top_discard_cards) {
+function update_discard(top_discard_cards, cur_player_uid) {
     console.log(top_discard_cards)
 
     $("#discard_div").empty();
@@ -140,16 +141,45 @@ function update_discard(top_discard_cards) {
             card = "blank-w-border"
         }
 
-        $("#discard_div").append("" +
-            '<p class="mb-0 mt-3"><strong>Discard pile</strong></p>' +
-            '<p><small>' + player + '</small></p>' +
-            '<div class="overlay-button-container">' +
-            '<img class="card_on_hand" src="../static/css/playing_cards/' + card + '.png">' +
-            '<form class="draw_discard_btn hide_button">' +
-            '<input name="discard_owner" type="hidden" value="'+ player +'">' +
-            '<input class="btn btn-dark" type="submit" value="Draw card">' +
-            '</form>' +
-            '</div>')
+        let content = ""
+        content += '<p class="mb-0 mt-3"><strong>Discard pile</strong></p>'
+        content += '<p><small>' + player + '</small></p>'
+        content += '<div class="overlay-button-container">'
+        content += '<img class="card_on_hand" src="../static/css/playing_cards/' + card + '.png">'
+        content += '<form class="draw_discard_btn '
+
+        // # TODO - update this and all element creations
+        if (cur_player_uid === my_uid && game_phase === "Draw" && card != null)
+        {
+             content += 'hide_button'
+        }
+        content += '">'
+        content += '<input name="discard_owner" type="hidden" value="'+ player +'">'
+        content += '<input class="btn btn-dark" type="submit" value="Draw card">'
+        content += '</form>'
+        content += '</div>'
+
+        $("#discard_div").append(content)
+
+    });
+
+    //     // Draw button
+    // if(cur_player_uid === my_uid && game_phase === "Draw" && card != null){
+    //     $(".draw_discard_btn").removeClass("hide_button");
+    // }
+    // else{
+    //     console.log("Hiding draw button")
+    //     $("#draw_button_container").addClass("hide_button");
+    //     $(".draw_discard_btn").addClass("hide_button");
+    // }
+
+    // TODO - rename to consistent naming, e.g. btn is not a btn, it's a form
+    // TODO - split js into separate files so it makes sense
+    $(".draw_discard_btn").on("submit", function(event) {
+        event.preventDefault();
+        let player_to_draw_from = event.currentTarget[0].value;
+        console.log("Drawing from discard: " + player_to_draw_from);
+        socket.emit("draw from discard", player_to_draw_from);
     });
 }
 
@@ -165,8 +195,11 @@ function getCookie(cname) {
   return "";
 }
 
-function update_main_board(main_board) {
-    let board = $("#main-board")
+function update_main_board(main_board, current_player_uid, current_player_name) {
+
+    $("#main_board_title").text("Current player's board (" + current_player_name + ")")
+
+    let board = $("#main_board")
     board.empty();
 
     for (const [row_index, row] of main_board.entries()) {
@@ -178,91 +211,116 @@ function update_main_board(main_board) {
             let card_name = card
 
             if (card_name != null) {
-                content += '<img class="card_on_board blank" id="' + row_index + col_index + '" src="../static/css/playing_cards/' + card_name + '.png">'
+                content += '<img class="card_on_board zoom" id="' + row_index + col_index + '" src="../static/css/playing_cards/' + card_name + '.png">'
             } else {
 
-                blank_card_name = "blank-w-border"
-
-
-                if (game_phase === "Choose Coords") {
-                    content += '<form action="/choose_coordinates" method="post">'
+                if (game_phase === "Choose Coords" && current_player_uid === my_uid)  {
+                    content += '<form class="choose_coord_btn">'
                     content += '<input name="coords" type="hidden" value="' + row_index + col_index + '">'
                     content += '<input class="card_on_board blank_choose_coord" src="../static/css/playing_cards/' + blank_card_name + '.png" type="image">'
                     content += '</form>'
                 } else {
-                    content += '<img class="card_on_board zoom" id="' + row_index + col_index + '" src="../static/css/playing_cards/' + blank_card_name + '.png">'
+                    content += '<form>'
+                    content += '<input disabled class="card_on_board blank" id="' + row_index + col_index + '"  src="../static/css/other/' + blank_card_name + '.png" type="image">'
+                    content += '</form>'
                 }
             }
             content += '</td>'
         }
         content += '</tr>'
+        content += '</tr>'
         board.append(content)
     }
+
+    $(".choose_coord_btn").on("submit", function (event){
+    event.preventDefault();
+    console.log("Choosing coords: " + event.currentTarget[0].value)
+    let coords_to_place_card = event.currentTarget[0].value
+    socket.emit("choose coords", coords_to_place_card);
+    });
+
+
 }
 
-//     console.log(main_board);
-//     {% for row in player_boards[current_player_name] %}
-//     {% set outer_loop = loop.index - 1 %}
-//     <tr>
-//         {% for card in row %}
-//             {% set inner_loop = loop.index - 1 %}
-//             <td>
-//                 {% if card.name != None %}
-//                 <!-- TODO - address that IDs are 11, but values are (1,2). Make consistently 11?-->
-//                 <img class="card_on_board zoom" id="{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.name}}.png">
-//                 {% else %}
-//                 {% if game_phase == "Choose Coords" %}
-//                 <form action="/choose_coordinates" method="post">
-//                     <input name="coords" type="hidden" value="{{outer_loop, inner_loop}}">
-//                     <input class="card_on_board blank blank_choose_coord" src="../static/css/other/blank-w-border.png"
-//                            type="image">
-//                 </form>
-//                 {% else %}
-//                 <!-- Form tag is here to ensure formatting is the same as during coord selection -->
-//                 <form>
-//                 <!-- Not used - putting here to mirror padding when coords are being selected-->
-//                     <input disabled class="card_on_board blank" id="{{outer_loop}}{{inner_loop}}" src="../static/css/other/blank-w-border.png" type="image">
-//                 </form>
-//                 {% endif %}
-//                 {% endif %}
-//             </td>
-//         {% endfor %}
-//     </tr>
-// {% endfor %}
+function update_side_boards(side_board, current_player_uid, current_player_name) {
+    let side_board_el = $("#side_board_container");
+
+    let content = ""
+    content += "<p><strong>" + current_player_name + "'s board" + "</strong></p>"
+    content += '<table className="table-sm">'
+
+    for( const [row_index, row] of side_board.entries()){
+        content += '<tr>'
+
+        for (const [col_index, card] of row.entries(row)){
+            content += '<td>'
+
+             if (card != null) {
+                content += '<img class="card_on_mini_board zoom-larger" src="../static/css/playing_cards/' + card + '.png">'
+            } else {
+                 content += '<img class="card_on_mini_board blank" src="../static/css/playing_cards/' + blank_card_name + '.png">'
+
+             }
+            content += '</td>'
+        }
+        content += '</tr>'
+    }
+
+    content += '</table>'
+    side_board_el.append(content);
+}
 
 
 function update_board_state(game_state){
     console.log(game_state);
     console.log(game_state["game_phase"]);
-    console.log(game_state["current_player_uid"]);
+    console.log(game_state["uid_name_mapping"]);
     console.log(game_state["num_cards_in_deck"]);
     console.log(game_state["player_boards"])
 
     // Update the global state variables
     game_phase = game_state["game_phase"];
-    cur_player_uid = game_state["current_player_uid"];
+    let cur_player_uid = game_state["uid_name_mapping"]["uid"];
+    let cur_player_name = game_state["uid_name_mapping"]["player_name"]
 
     // Update boards
-    current_player_board = game_state["player_boards"][cur_player_uid]
-    update_main_board(current_player_board)
+    let player_boards = game_state["player_boards"]
+
+    $("#side_board_container").empty();
+
+    for (const board_uid of Object.keys(player_boards))
+    {
+
+        if(board_uid === cur_player_uid){
+            update_main_board(player_boards[board_uid], cur_player_uid, cur_player_name);
+        }
+        else {
+            console.log("Updating side board!")
+            update_side_boards(player_boards[board_uid], cur_player_uid, cur_player_name);
+        }
+    }
+
+    // current_player_board = game_state["player_boards"][cur_player_uid]
 
     // Update amount of cards remaining
-    update_cards_left(game_state["num_cards_in_deck"]);
+    let num_cards_in_deck = game_state["num_cards_in_deck"]
+    update_cards_left(num_cards_in_deck);
 
     // Update discard piles
-    update_discard(game_state["top_discard_cards"]);
+    let top_discard_cards = game_state["top_discard_cards"]
+    update_discard(top_discard_cards, cur_player_uid);
 
     // Show/hide buttons based on game state - this has to happen after hand and discard pile updates - otherwise not all elements will exist yet
     toggle_buttons(game_phase, cur_player_uid);
 
 }
 
-function toggle_buttons(game_phase, cur_player_uid){
+function toggle_buttons(game_phase, cur_player_uid, num_cards_in_deck){
     console.log("Evaluating what buttons to show");
     console.log("The cur UID is " + cur_player_uid);
 
     // Draw button!
-    if (cur_player_uid === my_uid && game_phase === "Choose Card"){
+    if (cur_player_uid === my_uid && game_phase === "Choose Card" && num_cards_in_deck > 0){
         console.log("Showing play button")
         $(".card_to_play").removeClass("hide_button");
     }
@@ -281,14 +339,17 @@ function toggle_buttons(game_phase, cur_player_uid){
 
     // Draw button
     if(cur_player_uid === my_uid && game_phase === "Draw"){
+        // TODO - only show this if there's more than 0 card sin the discard piles and draw deck!
+        // Reduce the height of the discard piles so they don't push down the cards too much
+        // Replace the cards on hand and cards on board with em things?
         console.log("Showing draw button")
         $("#draw_button_container").removeClass("hide_button");
-        $(".draw_discard_btn").removeClass("hide_button");
+        //$(".draw_discard_btn").removeClass("hide_button");
     }
     else{
         console.log("Hiding draw button")
         $("#draw_button_container").addClass("hide_button");
-        $(".draw_discard_btn").addClass("hide_button");
+        //$(".draw_discard_btn").addClass("hide_button");
     }
 }
 

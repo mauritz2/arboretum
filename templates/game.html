@@ -10,7 +10,7 @@
             <div class="overlay-button-container">
                 <img class="card_on_hand" src="../static/css/other/deck-full.png">
                 <div class="hide_button" id="draw_button_container">
-                    <input class="btn btn-dark" id="draw_button" type="button" value='Draw card'>"
+                    <input class="btn btn-dark" id="draw_button" type="button" value='Draw card'>
                 </div>
             </div>
         </form>
@@ -22,32 +22,32 @@
         <!-- Discard piles placeholder-->
     </div>
 
-
     <div class="col-5">
         <!-- Main Board-->
-        <h4 class="mb-1">Current player's board ({{ current_player_name }})</h4>
-        <table class="table-sm" id="main-board">
+        <h4 class="mb-1" id="main_board_title"></h4>
+        <table class="table-sm" id="main_board">
         </table>
     </div>
-    <div class="col-3" id="parent">
-        {% for player_name in player_boards %}
-            {% if player_name != current_player_name %}
-                <p><strong>{{ player_name }}'s board</strong></p>
-                <table class="table-sm">
-                {% for row in player_boards[player_name] %}
-                    <tr>
-                    {% for card in row %}
-                        <td>
-                        {% if card.name != None %}
-                            <img class="card_on_mini_board zoom-larger" src="../static/css/playing_cards/{{card.name}}.png">
-                        {% else %}
-                            <img class="card_on_mini_board blank" src="../static/css/other/blank-w-border.png">
-                        {% endif %}
-                    {% endfor %}
-                {% endfor %}
-                </table>
-            {% endif %}
-        {% endfor %}
+    <div class="col-3" id="side_board_container">
+        <!--Side boards-->
+<!--        {% for player_name in player_boards %}-->
+<!--            {% if player_name != current_player_name %}-->
+<!--                <p><strong>{{ player_name }}'s board</strong></p>-->
+<!--                <table class="table-sm">-->
+<!--                {% for row in player_boards[player_name] %}-->
+<!--                    <tr>-->
+<!--                    {% for card in row %}-->
+<!--                        <td>-->
+<!--                        {% if card.name != None %}-->
+<!--                            <img class="card_on_mini_board zoom-larger" src="../static/css/playing_cards/{{card.name}}.png">-->
+<!--                        {% else %}-->
+<!--                            <img class="card_on_mini_board blank" src="../static/css/other/blank-w-border.png">-->
+<!--                        {% endif %}-->
+<!--                    {% endfor %}-->
+<!--                {% endfor %}-->
+<!--                </table>-->
+<!--            {% endif %}-->
+<!--        {% endfor %}-->
     </div>
 </div>
 

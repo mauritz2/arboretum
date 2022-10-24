@@ -11,7 +11,6 @@ app = Flask(__name__)
 app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
 app.debug = True
 app.config['SESSION_TYPE'] = "filesystem"
-#Session(app)
 socketio = SocketIO(app, logger=True, manage_session=False)
 # app.host="0.0.0.0"
 
@@ -22,36 +21,22 @@ def flash_io(text: str, category: str = "dark") -> None:
     emit('message', json.dumps({"text": text, "category": category}))
 
 
-def emit_board_state(req) -> (dict, list[str]):
+def emit_game_state(req) -> (dict, list[str]):
     global uid_to_player_map
-    #uid_to_player_map = session.get("uids")
     player_uid = req.cookies.get("player_uid")
-    #board_state_dict, cards_on_hand = get_player_board_state(player_uid)
-    #print("\nI got the board state dict and here it is: \n")
-    #print(board_state_dict)
-    #print("\n\n")
 
     # Get the player's hand
     player_name = uid_to_player_map[player_uid]["player_id"]
     player_instance = game_manager.scorer.get_player_instance(player_name)
     cards_on_hand = player_instance.get_player_card_names()
 
-
     # Check if it's the player's turn
     current_player_name = game_manager.current_player.name
-    print(f"I will try to find {current_player_name} in {uid_to_player_map}")
-    #current_player_uid = None
-    #if uid_to_player_map[player_uid]["player_id"] == current_player_name:
-    #    current_player_uid = uid_to_player_map[player_uid]["player_id"]
 
     for uid in uid_to_player_map:
-       if uid_to_player_map[uid]["player_id"] == current_player_name:
-           # TODO - Add the chosen player name here as well, otherwise the board can't display the real player name
-           current_player_uid = uid
-    else:
-       if current_player_uid == None:
-           raise ValueError(f"Couldn't find {current_player_uid} in {uid_to_player_map}")
-    print(f"The current UID is {current_player_uid} which means {current_player_name}")
+        if uid_to_player_map[uid]["player_id"] == current_player_name:
+            uid_name_mapping = {"uid": uid, "player_name": uid_to_player_map[uid]["player_name"]}
+            print(f"The current name is {uid_to_player_map[uid]} which means UID {uid}")
 
     # Get the current game phase (e.g. draw, choose card to play)
     game_phase = game_manager.game_phase.value
@@ -73,7 +58,7 @@ def emit_board_state(req) -> (dict, list[str]):
 
     # Construct the game state dict
     board_state_dict = {"game_phase": game_phase,
-                        "current_player_uid": current_player_uid,
+                        "uid_name_mapping": uid_name_mapping,
                         "player_boards": player_boards,
                         "num_cards_in_deck": num_cards_in_deck,
                         "top_discard_cards": top_discard_cards}
@@ -86,21 +71,9 @@ def emit_board_state(req) -> (dict, list[str]):
 @socketio.on("get board state")
 def get_board_state(req=None):
     if req:
-        emit_board_state(req)
+        emit_game_state(req)
     else:
-        emit_board_state(request)
-
-
-# def is_current_player(uid: str) -> bool:
-#     global uid_to_player_map
-#     print(f"I am finding out if player {uid} is the current player")
-#     print(uid_to_player_map)
-#     current_player_name = game_manager.current_player.name
-#     if uid_to_player_map[uid]["player_id"] == current_player_name:
-#         is_current_player = True
-#     else:
-#         is_current_player = False
-#     return is_current_player
+        emit_game_state(request)
 
 
 @app.route("/lobby", methods=["GET"])
@@ -117,7 +90,6 @@ def lobby():
 
 @socketio.on("get player list")
 def get_player_list():
-    #emit("update player list", json.dumps(session.get("uids")), broadcast=True)
     global uid_to_player_map
     emit("update player list", json.dumps(uid_to_player_map), broadcast=True)
 
@@ -125,21 +97,16 @@ def get_player_list():
 @socketio.on('sit_down')
 def on_sit_down(data):
     global uid_to_player_map
-    #uid_to_player_map = session.get("uids")
     player_uid = request.cookies.get("player_uid")
     player_name = data["player_name"]
 
-    # Get the player ID
     existing_player_ids = [value["player_id"] for value in uid_to_player_map.values()]
     print(f"\n\nThe existing player IDs are {existing_player_ids}\n\n")
     next_id = game_manager.get_next_player_id(existing_player_ids)
 
     uid_to_player_map[player_uid] = {"player_name": player_name, "player_id": next_id}
     print(f"\n\nUID to player map created {uid_to_player_map}\n\n")
-    #session["uids"] = uid_to_player_map
 
-    # TODO - this is repetition with get_player_list but can't seem to call that func
-    #emit("update player list", json.dumps(session.get("uids")), broadcast=True)
     emit("update player list", json.dumps(uid_to_player_map), broadcast=True)
     flash_io(f"You've joined the game with name {player_name} and player ID {next_id}")
 
@@ -147,46 +114,13 @@ def on_sit_down(data):
 @socketio.on('stand_up')
 def on_stand_up():
     global uid_to_player_map
-    #uid_to_player_map = session.get("uids")
-    # TODO - add in cookie to track users. Currently refreshing page results in a new SID/users
     player_uid = request.cookies.get("player_uid")
-
-    # uid_to_player_map = session.get("uids")
 
     flash_io(
         f'Player id {uid_to_player_map[player_uid]["player_id"]} with {uid_to_player_map[player_uid]["player_name"]} has left the game.')
     del uid_to_player_map[player_uid]
-    #session["uids"] = uid_to_player_map
 
-    #emit("update player list", json.dumps(session.get("uids")), broadcast=True)
     emit("update player list", json.dumps(uid_to_player_map), broadcast=True)
-
-# @socketio.on("get hand")
-# def get_hand():
-#     global uid_to_player_map
-#
-#     player_hands = {}
-#     for p in game_manager.scorer.players:
-#         player_name = p.name
-#         player_hands[player_name] = p.get_player_card_names()
-#
-#     player_uid = request.cookies.get("player_uid")
-#     player_name = uid_to_player_map[player_uid]["player_id"]
-#     socketio.emit("update hand", json.dumps(player_hands[player_name]), to=request.sid)
-
-
-# @socketio.on("get current player")
-# def get_current_player():
-#     print("\nResponding to get player request")
-#     player_uid = request.cookies.get("player_uid")
-#     is_cur_player = is_current_player(player_uid)
-#     game_status = {"game_phase": game_manager.game_phase.value, "is_current_player": is_cur_player}
-#     print(f"\nGame status {game_status}")
-#     emit("update game phase", json.dumps(game_status), broadcast=True)
-
-# @socketio.on("get game phase")
-# def call_get_game_phase():
-#     emit_game_phase(request)
 
 
 @socketio.on("choose card to play")
@@ -194,15 +128,12 @@ def choose_card_to_play(card_to_play):
     print(f"\n\nI am setting the card to play to {card_to_play}\n\n")
     game_manager.selected_card_to_play = card_to_play
     game_manager.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
-    emit_board_state(request)
-    # emit_game_phase(request)
-    # emit("update game phase", json.dumps(game_manager.game_phase.value))
+    emit_game_state(request)
 
 
 @socketio.on("draw card")
-def draw_card():
+def draw_card_from_deck():
     global uid_to_player_map
-    #uid_to_player_map = session.get("uids")
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]["player_id"]
     player_to_draw = game_manager.scorer.get_player_instance(player_name)
@@ -212,8 +143,7 @@ def draw_card():
     if game_manager.num_cards_drawn_current_turn >= 2:
         game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
 
-    # Sends the updated player hand and board state to all players
-    get_board_state(request)
+    emit_game_state(request)
 
 
 @socketio.on("discard card")
@@ -228,8 +158,7 @@ def discard_card(card_to_discard):
         return redirect(url_for("game_over"))
 
     game_manager.start_next_round()
-
-    emit_board_state(request)
+    emit_game_state(request)
 
 
 @app.route("/game", methods=["GET"])
@@ -252,13 +181,6 @@ def main():
     num_cards_in_deck = game_manager.scorer.players[0].deck.get_amt_of_cards_left()
 
     flash(player_game_state_messages[game_manager.game_phase])
-
-    #global uid_to_player_map
-    #num_players = len(session.get("uids").keys())
-    #num_players = len(uid_to_player_map.keys())
-    #game_manager.num_players = num_players
-    #game_manager.setup_scorer()
-    #print(f"\n\nThe amount of players in the game is {len(game_manager.scorer.players)}!\n\n")
 
     return render_template(
         'game.html',
@@ -309,32 +231,9 @@ def game_over():
                            )
 
 
-# @app.route("/draw_card_from_deck_old", methods=["POST"])
-# def draw_card_from_deck_old():
-#     """
-#     Draws a card from the deck and adds it to the players hand. Progresses to the next phase (i.e. play card)
-#     when two cards have been drawn
-#     # TODO - if multiplayer is implemented, check will be needed that correct player tries to perform an action
-#     """
-#     if game_manager.current_player.deck.get_amt_of_cards_left() <= 0:
-#         flash("The deck is empty. Scoring will start after the current turn is complete.", "error")
-#         return redirect(url_for("main"))
-#
-#     game_manager.current_player.draw_card_from_deck()
-#     game_manager.num_cards_drawn_current_turn += 1
-#     if game_manager.num_cards_drawn_current_turn >= 2:
-#         game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
-#
-#     return redirect(url_for("main"))
-
-
-@app.route("/draw_from_discard", methods=["POST"])
-def draw_card_from_discard():
-    """
-    Draws a card from a selected discard pile and adds it to the players hand. Progresses to the next phase
-    (i.e. play card) when two cards have been drawn
-    """
-    player_to_draw_from = request.form["discard_owner"]
+@socketio.on("draw from discard")
+def draw_from_discard(player_to_draw_from):
+    print(f"I am drawing from discard from {player_to_draw_from}")
     player_instance = game_manager.scorer.get_player_instance(player_to_draw_from)
     game_manager.current_player.draw_card_from_discard(player_to_draw_from=player_instance)
 
@@ -342,16 +241,28 @@ def draw_card_from_discard():
     if game_manager.num_cards_drawn_current_turn >= 2:
         game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
 
-    return redirect(url_for("main"))
+    emit_game_state(request)
 
+# @app.route("/draw_from_discard_old", methods=["POST"])
+# def draw_card_from_discard_old():
+#     """
+#     Draws a card from a selected discard pile and adds it to the players hand. Progresses to the next phase
+#     (i.e. play card) when two cards have been drawn
+#     """
+#     player_to_draw_from = request.form["discard_owner"]
+#     player_instance = game_manager.scorer.get_player_instance(player_to_draw_from)
+#     game_manager.current_player.draw_card_from_discard(player_to_draw_from=player_instance)
+#
+#     game_manager.num_cards_drawn_current_turn += 1
+#     if game_manager.num_cards_drawn_current_turn >= 2:
+#         game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
+#
+#     return redirect(url_for("main"))
+#
 
-@app.route("/choose_coordinates", methods=["POST"])
-def choose_coordinates():
-    """
-    Gets input indicating the coordinates where the player wants to play the selected card.
-    Form input format: str(row, column). Example: (1,1). Then plays the card to that location.
-    Progresses to the discard phase after playing the card.
-    """
+@socketio.on("choose coords")
+def choose_coords(chosen_coords):
+    print(f"\n\nCommencing choose coords with {chosen_coords}\n\n")
 
     if game_manager.game_phase != GameState.CHOOSE_WHERE_TO_PLAY:
         flash(f"You can't place a card now. The current game phase is {game_manager.game_phase}.", "error")
@@ -362,76 +273,26 @@ def choose_coordinates():
         return redirect(url_for("main"))
 
     card_to_play = game_manager.selected_card_to_play
-    print(f"\nYou are trying to play {card_to_play}\n\n")
-    row = int(request.form["coords"][0])
-    column = int(request.form["coords"][1])
-    # row, column = eval(request.form["coords"])
-    # row, column = int(row), int(column)
+    row = int(chosen_coords[0])
+    column = int(chosen_coords[1])
+    print(f"\nYou are trying to play {card_to_play} at ({row},{column})")
 
     try:
         game_manager.current_player.play_card(card_to_play, row=row, column=column)
+        game_manager.selected_card_to_play = None
+        game_manager.game_phase = GameState.CHOOSE_DISCARD
+        emit_game_state(request)
+
     except ValueError as e:
         # User chose an invalid location for a card (e.g. not adjacent to an existing card)
         # - notifying user and resetting to start of play phase
         game_manager.selected_card_to_play = None
         game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
-        flash(str(e) + " Please select what card to play", "error")
-        return redirect(url_for("main"))
-
-    game_manager.selected_card_to_play = None
-    game_manager.game_phase = GameState.CHOOSE_DISCARD
-
-    return redirect(url_for("main"))
-
-
-
-
-
-# @app.route("/discard_card_old", methods=["POST"])
-# def discard_card_old():
-#     """
-#     Discards a chosen card from the player's hand. Then checks if the game is over (i.e. deck is empty).
-#     If it is, navigate to the scoring screen. If it's not, start the next player's turn.
-#     """
-#     card_to_discard = request.form["card_name"]
-#     game_manager.current_player.discard_card(card_to_discard, to_discard=True)
-#
-#     game_over_bool = game_manager.check_if_game_is_over()
-#
-#     if game_over_bool:
-#         game_manager.game_phase = GameState.SCORING
-#         return redirect(url_for("game_over"))
-#
-#     game_manager.start_next_round()
-#
-#     emit_board_state(request)
-#
-#     # socketio.emit("update game phase", json.dumps(game_manager.game_phase.value), broadcast=True)
-#
-#     return redirect(url_for("main"))
-
-
-# @app.route("/choose_card_to_play_old", methods=["POST"])
-# def choose_card_to_play_old():
-#     """
-#     Identifies the card the player has chosen to play and sets the game manager to remember the card. Then progresses
-#     the game state so the player can choose where to place the selected card
-#     """
-#     selected_card_to_play = request.form['card_name']
-#     game_manager.selected_card_to_play = selected_card_to_play
-#     game_manager.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
-#     return redirect(url_for("main"))
+        flash_io(str(e) + " Please select what card to play", "error")
+        emit_game_state(request)
 
 
 if __name__ == "__main__":
     socketio.run(app)
     # app.run(host="0.0.0.0")
 
-# def emit_game_phase(r):
-#     print("\nResponding to get phase request")
-#     player_uid = r.cookies.get("player_uid")
-#     print(f"\nUID: {player_uid}")
-#     is_cur_player = is_current_player(player_uid)
-#     game_status = {"game_phase": game_manager.game_phase.value, "is_current_player": is_cur_player}
-#     print(f"\nGame status {game_status}")
-#     socketio.emit("update game phase", json.dumps(game_status), broadcast=True)

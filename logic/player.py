@@ -58,6 +58,9 @@ class Player:
 
         # TODO - refactor so it takes a PLayer name as input as opposed to passing an entire Player instance
         """
+        # TODO - would this make more sense if this took a player name as input vs. a player instance?
+        # Downside is that it would have to call get_player_instance on the scorer class, which would be odd
+        # keeping like this for now
         if len(player_to_draw_from.discard.cards) <= 0:
             raise ValueError(f"The targeted discard pile of {player_to_draw_from.name} is empty. Try drawing from another discard pile or the deck.")
         card = player_to_draw_from.discard.get_top_card(only_str=False)
