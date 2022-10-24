@@ -198,15 +198,26 @@ def draw_card_from_deck():
 @socketio.on("discard card")
 def discard_card(card_to_discard):
     global game_manager
-    print(f"\n\nDiscarding a card: {card_to_discard}")
-    game_manager.current_player.discard_card(card_to_discard, to_discard=True)
 
-    is_game_over = game_manager.check_if_game_is_over()
-    if is_game_over:
-        game_manager.game_phase = GameState.SCORING
+    # TODO - the lines to get the player name are a bit repetitive - break out into func=
+    player_uid = request.cookies.get("player_uid")
+    player_name = uid_to_player_map[player_uid]
+
+    game_manager.discard_card(player_name=player_name, card_to_discard=card_to_discard)
+
+    # print(f"\n\nDiscarding a card: {card_to_discard}")
+    # game_manager.current_player.discard_card(card_to_discard, to_discard=True)
+
+    #is_game_over = game_manager.is_game_over()
+    # if is_game_over:
+    #     game_manager.game_phase = GameState.SCORING
+    #     emit('end game', json.dumps(url_for('game_over')), broadcast=True)
+
+    if game_manager.game_phase == GameState.SCORING:
+        # The deck is empty, meaning that the game is over - redirecting to game over/scoring screen
         emit('end game', json.dumps(url_for('game_over')), broadcast=True)
 
-    game_manager.start_next_round()
+    #game_manager.start_next_round()
     emit_game_state(request)
 
 
@@ -214,18 +225,20 @@ def discard_card(card_to_discard):
 def draw_from_discard(player_to_draw_from):
     global game_manager
     print(f"I am drawing from discard from {player_to_draw_from}")
-    player_instance = game_manager.get_player_instance(player_to_draw_from)
+    player_uid = request.cookies.get("player_uid")
+    player_name = uid_to_player_map[player_uid]
+    #player_instance = game_manager.get_player_instance(player_to_draw_from)
 
     try:
-        game_manager.current_player.draw_card_from_discard(player_to_draw_from=player_instance)
+        #game_manager.current_player.draw_card_from_discard(player_to_draw_from=player_instance)
+        game_manager.draw_card(player_name=player_name, to_draw_from=player_to_draw_from)
     except ValueError as e:
-        # User drew from empty discard
+        # User drew from empty discard or some other error occurred
         flash_io(str(e), "warning")
-        emit_game_state(request)
 
-    game_manager.num_cards_drawn_current_turn += 1
-    if game_manager.num_cards_drawn_current_turn >= 2:
-        game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
+    # game_manager.num_cards_drawn_current_turn += 1
+    # if game_manager.num_cards_drawn_current_turn >= 2:
+    #     game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
 
     emit_game_state(request)
 
@@ -240,21 +253,19 @@ def choose_coords(chosen_coords):
     column = int(chosen_coords[1])
     print(f"\nYou are trying to play {card_to_play} at ({row},{column})")
 
-    # TODO - fix bug this currently allows for non-adj placement of trees
-    try:
-        game_manager.current_player.play_card(card_to_play, row=row, column=column)
-        game_manager.selected_card_to_play = None
-        game_manager.game_phase = GameState.CHOOSE_DISCARD
-        emit_game_state(request)
+    # TODO - is it better to always read the cookie value, or should we just reference current player?
+    player_uid = request.cookies.get("player_uid")
+    player_name = uid_to_player_map[player_uid]
 
+    try:
+        game_manager.play_card_at_chosen_coords(player_name=player_name, row=row, column=column)
     except ValueError as e:
         # User chose an invalid location for a card (e.g. not adjacent to an existing card)
         # - notifying user and resetting to start of play phase
-        game_manager.selected_card_to_play = None
-        game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
-        flash_io(str(e) + " Please select what card to play", "warning")
-        emit_game_state(request)
-
+        # game_manager.selected_card_to_play = None
+        # game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
+        flash_io(str(e) + " Please re-select what card to play", "warning")
+    emit_game_state(request)
 
 
 @app.route("/game", methods=["GET"])

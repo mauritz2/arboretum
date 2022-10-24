@@ -12,6 +12,8 @@ class GameManager:
     # TODO - add the GameState manipulations into this class, as opposed to having the web app do we logic
     # TODO - create dummy funcs for the things arboretum.py reference the game_manager for. Make everything else _
     # TODO - set up some cool enum structure that defines the round? E.g. draw, discard etc. with conditions on when to progress?
+    This is the only class that arboretum.py should reference. It hides all the other functions and properties of
+    the other classes
     """
 
     def __init__(self, scorer: Scorer = None) -> None:
@@ -19,6 +21,7 @@ class GameManager:
         #self.current_player_index = 0
         self.has_not_taken_turn = self.scorer.players.copy()
         #self.current_player = self.scorer.players[self.current_player_index]
+        # TODO - Remove current player? Orr use it more? Maybe easier than having to check the UID all the time
         self.current_player = self._get_next_player()
         self.game_phase = GameState.CHOOSE_WHAT_TO_DRAW
         self.num_cards_drawn_current_turn = 0
@@ -38,11 +41,11 @@ class GameManager:
         #print(f"\nThe next player will be {self.current_player_index}\n")
         self.current_player = self._get_next_player() # self.scorer.players[self.current_player_index]
 
-    def check_if_game_is_over(self):
+    def is_game_over(self):
         """
         Returns true if the game is over (i.e. deck is empty). Otherwise returns false.
         """
-        if self.scorer.players[0].deck.get_amt_of_cards_left() <= 0:
+        if self.get_amt_of_cards_left() <= 0:
             return True
         else:
             return False
@@ -98,16 +101,42 @@ class GameManager:
         self.selected_card_to_play = card_name
         self.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
 
-    def draw_card(self, player_name: str):
+    def draw_card(self, player_name: str, to_draw_from: str = None):
         player = self.get_player_instance(player_name)
-        player.draw_card_from_deck()
+
+        if to_draw_from:
+            player_to_draw_from = self.get_player_instance(to_draw_from)
+            player.draw_card_from_discard(player_to_draw_from=player_to_draw_from)
+        else:
+            player.draw_card_from_deck()
 
         self.num_cards_drawn_current_turn += 1
         if self.num_cards_drawn_current_turn >= 2:
+            # If the player has drawn two cards the game moves on to the play card phase
             self.game_phase = GameState.CHOOSE_CARD_TO_PLAY
 
-    def play_card(self, player: str):
-        raise NotImplemented
+    def discard_card(self, player_name: str, card_to_discard: str):
+        player = self.get_player_instance(player_name)
+
+        player.discard_card(card_to_discard, to_discard=True)
+
+        if self.is_game_over():
+            self.game_phase = GameState.SCORING
+
+        self.start_next_round()
+
+    def play_card_at_chosen_coords(self, player_name: str, row:int, column: int):
+        player = self.get_player_instance(player_name)
+        try:
+            player.play_card(self.selected_card_to_play, row=row, column=column)
+            self.selected_card_to_play = None
+            self.game_phase = GameState.CHOOSE_DISCARD
+        except ValueError as e:
+            # User chose an invalid location for a card (e.g. not adjacent to an existing card)
+            # - notifying user and resetting to start of play phase
+            self.selected_card_to_play = None
+            self.game_phase = GameState.CHOOSE_CARD_TO_PLAY
+            raise e
 
 
 
