@@ -1,20 +1,20 @@
 import json
-from logic import game_creator, GameState
+from logic import game_creator, GameState, GameManager
 import random
-from flask import Flask, render_template, request, redirect, url_for, flash, make_response
+from flask import Flask, render_template, request, url_for, make_response
 from flask_socketio import SocketIO, emit
 
 # Flask config
 app = Flask(__name__)
 app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
 app.debug = True
-app.config['SESSION_TYPE'] = "filesystem"
-socketio = SocketIO(app, logger=True, manage_session=False)
+#app.config['SESSION_TYPE'] = "filesystem"
+socketio = SocketIO(app) # logger=True, manage_session=False
 # app.host="0.0.0.0"
 
 # Global variables
 uid_to_player_map = {}
-game_manager = None
+game_manager = GameManager
 
 
 ### LOBBY VIEWS ###
@@ -39,6 +39,9 @@ def lobby():
 def on_sit_down(player_name):
     global uid_to_player_map
     global game_manager
+
+    if player_name in uid_to_player_map.values():
+        raise ValueError(f"{player_name} already exists. Please choose another name")
 
     # TODO - check if cookie exists - otherwuse redirect to lobby?
     player_uid = request.cookies.get("player_uid")
@@ -106,7 +109,7 @@ def emit_game_state(req) -> (dict, list[str]):
     # Get the player's hand
     player_name = uid_to_player_map[player_uid]
     print(f"I will try to find the instance of {player_name}")
-    player_instance = game_manager.scorer.get_player_instance(player_name)
+    player_instance = game_manager.get_player_instance(player_name)
     cards_on_hand = player_instance.get_player_card_names()
 
     # Does a reverse loopup to find the uid (key) based on the current player's player name (value)
@@ -127,10 +130,11 @@ def emit_game_state(req) -> (dict, list[str]):
     game_phase = game_manager.game_phase.value
 
     # Get the remaining amount of cards in the deck
-    num_cards_in_deck = game_manager.scorer.players[0].deck.get_amt_of_cards_left()
+    num_cards_in_deck = game_manager.get_amt_of_cards_left()
 
     # Get top discard cards
     top_discard_cards = {}
+    # TODO - refactor
     for p in game_manager.scorer.players:
         top_discard_cards[p.name] = p.discard.get_top_card(only_str=True)
 
@@ -138,7 +142,7 @@ def emit_game_state(req) -> (dict, list[str]):
     player_boards = {}
     # TODO - to think about: where is the source of truth of what players exist? GameManager?
     for uid in uid_to_player_map:
-        p_instance = game_manager.scorer.get_player_instance(uid_to_player_map[uid])
+        p_instance = game_manager.get_player_instance(uid_to_player_map[uid])
         player_boards[uid] = p_instance.board.get_board_state()
 
     # Construct the game state dict
@@ -165,8 +169,9 @@ def get_board_state(req=None):
 def choose_card_to_play(card_to_play):
     global game_manager
     print(f"\n\nI am setting the card to play to {card_to_play}\n\n")
-    game_manager.selected_card_to_play = card_to_play
-    game_manager.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
+    game_manager.select_card_to_play(card_to_play)
+    #selected_card_to_play = card_to_play
+    #game_manager.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
     emit_game_state(request)
 
 
@@ -177,13 +182,16 @@ def draw_card_from_deck():
     
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]
-    player_to_draw = game_manager.scorer.get_player_instance(player_name)
-    player_to_draw.draw_card_from_deck()
+    game_manager.draw_card(player_name)
 
-    game_manager.num_cards_drawn_current_turn += 1
-    if game_manager.num_cards_drawn_current_turn >= 2:
-        game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
+    # player_to_draw = game_manager.get_player_instance(player_name)
+    # player_to_draw.draw_card_from_deck()
+    # game_manager.num_cards_drawn_current_turn += 1
+    # if game_manager.num_cards_drawn_current_turn >= 2:
+    #     game_manager.game_phase = GameState.CHOOSE_CARD_TO_PLAY
 
+    # TODO - Can emit state be set to run after each request, or at least for some?
+    # Maybe we can have a custom decorator for that that calls emit_game_state at the end
     emit_game_state(request)
 
 
@@ -206,7 +214,7 @@ def discard_card(card_to_discard):
 def draw_from_discard(player_to_draw_from):
     global game_manager
     print(f"I am drawing from discard from {player_to_draw_from}")
-    player_instance = game_manager.scorer.get_player_instance(player_to_draw_from)
+    player_instance = game_manager.get_player_instance(player_to_draw_from)
 
     try:
         game_manager.current_player.draw_card_from_discard(player_to_draw_from=player_instance)
@@ -276,13 +284,12 @@ def game_over():
         for tree_dict in top_paths[player]:
             list_of_coords = []
             for card in top_paths[player][tree_dict]["Path"]:
-                player_instance = game_manager.scorer.get_player_instance(player)
+                player_instance = game_manager.get_player_instance(player)
                 (row, col) = player_instance.board.find_coords_of_card(card)
                 # If is player num, row, col (e.g. 111 is Player 1 row 1 column 1)
                 coords_id = str(player)[-1] + str(row) + str(col)
                 list_of_coords.append(coords_id)
             top_paths[player][tree_dict]["Path"] = list_of_coords
-
 
     return render_template("game_over.html",
                            player_hands=player_hands,

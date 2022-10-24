@@ -1,3 +1,4 @@
+from logic.player import Player
 from logic.scorer import Scorer
 from enum import Enum
 
@@ -10,9 +11,10 @@ class GameManager:
     # TODO - rename to game_manager.py and Game_Manager class?
     # TODO - add the GameState manipulations into this class, as opposed to having the web app do we logic
     # TODO - create dummy funcs for the things arboretum.py reference the game_manager for. Make everything else _
+    # TODO - set up some cool enum structure that defines the round? E.g. draw, discard etc. with conditions on when to progress?
     """
 
-    def __init__(self, scorer: Scorer) -> None:
+    def __init__(self, scorer: Scorer = None) -> None:
         self.scorer = scorer
         #self.current_player_index = 0
         self.has_not_taken_turn = self.scorer.players.copy()
@@ -21,6 +23,7 @@ class GameManager:
         self.game_phase = GameState.CHOOSE_WHAT_TO_DRAW
         self.num_cards_drawn_current_turn = 0
         self.selected_card_to_play = None
+        # self.players ... (one day :-))
         print(f"I have been created with players {self.scorer.players}")
 
     def start_next_round(self):
@@ -73,6 +76,41 @@ class GameManager:
         winners, top_paths = self.scorer.determine_winner()
         return winners, top_paths
 
+    def get_player_instance(self, name: str) -> Player:
+        """
+        Takes a player's name as input and returns the Player instance corresponding with that name
+        This assumes player names are unique, which they currently are since they are
+        assigned as Player 1, Player 2 etc.
+        """
+        # TODO - try to move self.scorer.players to gm
+        for p in self.scorer.players:
+            if name == p.name:
+                return p
+        else:
+            raise ValueError(f"Tried finding instance of {name}, but it didn't exist in {self.scorer.players}")
+
+    def get_amt_of_cards_left(self) -> int:
+        # TODO - refactor this? Could assign the deck as a gm class var, but would duplicate?
+        return self.scorer.players[0].deck.get_amt_of_cards_left()
+
+    def select_card_to_play(self, card_name: str) -> None:
+        # Note - selected_card_to_play is shared across users since it's reset ahead of each turn
+        self.selected_card_to_play = card_name
+        self.game_phase = GameState.CHOOSE_WHERE_TO_PLAY
+
+    def draw_card(self, player_name: str):
+        player = self.get_player_instance(player_name)
+        player.draw_card_from_deck()
+
+        self.num_cards_drawn_current_turn += 1
+        if self.num_cards_drawn_current_turn >= 2:
+            self.game_phase = GameState.CHOOSE_CARD_TO_PLAY
+
+    def play_card(self, player: str):
+        raise NotImplemented
+
+
+
 
 class GameState(Enum):
     # TODO - turn into str enum - easier to work with (have to upgrade Python to the latest version)
@@ -90,3 +128,5 @@ player_game_state_messages = {
     GameState.CHOOSE_DISCARD: "Choose a card to discard. It will appear in your discard pile.",
     GameState.SCORING: "The game is over"
 }
+
+
