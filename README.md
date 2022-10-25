@@ -24,6 +24,6 @@ since no digital version exists.
 
 Navigate to the same folder as the app.py file
 ```
-flask --app arboretum run
+flask run
 ```
 
