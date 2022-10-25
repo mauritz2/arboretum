@@ -257,8 +257,14 @@ function update_discard(top_discard_cards, cur_player_uid) {
     Object.entries(top_discard_cards).forEach(([player, card]) => {
 
         let content = ""
+        content += '<div class="row">'
+        content += '<div class="col-12 d-flex justify-content-center text-center">'
         content += '<p><small>' + player + "'s discard" + '</small></p>'
-        content += '<div class="overlay-button-container flex-d justify-content-center text-center">'
+        content+= '</div>'
+        content+= '</div>'
+        content+= '<div class ="row">'
+        content+= '<div class="col-12 d-flex justify-content-center text-center">'
+        content += '<div class="overlay-button-container">'
 
         if(card === null)
         {
@@ -284,6 +290,7 @@ function update_discard(top_discard_cards, cur_player_uid) {
         content += '<input name="discard_owner" type="hidden" value="'+ player +'">'
         content += '<input class="btn btn-dark" type="submit" value="Draw card">'
         content += '</form>'
+        content += '</div>'
         content += '</div>'
 
 
