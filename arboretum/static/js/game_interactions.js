@@ -50,8 +50,6 @@ function update_board_state(game_state){
         }
     }
 
-    // current_player_board = game_state["player_boards"][cur_player_uid]
-
     // Update amount of cards remaining
     let num_cards_in_deck = game_state["num_cards_in_deck"]
     update_cards_left(num_cards_in_deck);
@@ -127,12 +125,10 @@ function toggle_buttons(game_phase, cur_player_uid, num_cards_in_deck){
         // Replace the cards on hand and cards on board with em things?
         console.log("Showing draw button")
         $("#draw_button_container").removeClass("hide");
-        //$(".draw_discard_btn").removeClass("hide_button");
     }
     else{
         console.log("Hiding draw button")
         $("#draw_button_container").addClass("hide");
-        //$(".draw_discard_btn").addClass("hide_button");
     }
 }
 
@@ -216,7 +212,7 @@ function update_hand(cards_on_hand) {
     cards_on_hand.forEach(function (card) {
         // TODO - verify again if these truly have to be nested in this func. Can't they be outside?
         let player_hand = ""
-        player_hand += "<div class='col-1'>"
+        player_hand += "<div class='col-1 d-flex justify-content-center text-center'>"
         player_hand += "<div class='overlay-button-container'>"
         player_hand += "<img class='card_on_hand' src='../static/css/playing_cards/" + card + ".png'>"
         player_hand += "<form class='card_to_play hide'>"
@@ -269,7 +265,7 @@ function update_discard(top_discard_cards, cur_player_uid) {
         //content += '<p class="mb-0 mt-3"><strong>Discard pile</strong></p>'
         // Replace here with the actual player's name
         content += '<p class="mb-1"><small>' + player + "'s discard" + '</small></p>'
-        content += '<div class="overlay-button-container mb-2">'
+        content += '<div class="overlay-button-container mb-2 flex-d justify-content-center text-center">'
 
         if(card === null)
         {
@@ -311,47 +307,3 @@ function update_discard(top_discard_cards, cur_player_uid) {
         socket.emit("draw from discard", player_to_draw_from);
     });
 }
-
-
-// function update_discard(top_discard_cards, cur_player_uid) {
-//     console.log(top_discard_cards)
-//
-//     $("#discard_div").empty();
-//
-//     Object.entries(top_discard_cards).forEach(([player, card]) => {
-//
-//         let content = ""
-//         content += '<p class="mb-0 mt-3"><strong>Discard pile</strong></p>'
-//         // Replace here with the actual player's name
-//         content += '<p><small>' + player + '</small></p>'
-//         content += '<div class="overlay-button-container">'
-//
-//         if(card === null)
-//         {
-//             content += '<img class="card_on_hand dimmed" src="../static/css/playing_cards/' + blank_card_name + '.png">'
-//         }
-//         else
-//         {
-//             content += '<img class="card_on_hand" src="../static/css/playing_cards/' + card + '.png">'
-//         }
-//         content += '<form class="draw_discard_btn '
-//
-//         // # TODO - update this and all element creations
-//         if (cur_player_uid !== my_uid || game_phase !== "Draw" || card === null) {
-//             // Unless the current player UID === my_uid
-//             // TODO - refactor!
-//             // Adding hide_buttons hides the button
-//             // There are three scenarios where we want to add this call (i.e. hide it)
-//             // When it's not your turn we want it to be true: !(cur_player_uid !== my_uid)
-//             // When it's not the draw phase we want it to be true (ie. !(game_phase !== "Draw")
-//             content += 'hide_button'
-//         }
-//         content += '">'
-//         content += '<input name="discard_owner" type="hidden" value="'+ player +'">'
-//         content += '<input class="btn btn-dark" type="submit" value="Draw card">'
-//         content += '</form>'
-//         content += '</div>'
-//
-//         $("#discard_div").append(content)
-//
-//     });
