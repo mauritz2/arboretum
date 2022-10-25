@@ -69,8 +69,8 @@ body {
 .overlay-button-container:before {
   content:"";
   position:absolute;
-  width:100%;
-  height:100%;
+  width:90%;
+  height:80%;
   top:0;left:0;right:0;
   background-color:rgba(0,0,0,0);
 }
@@ -85,8 +85,8 @@ body {
 
 .overlay-button-container input {
   position: absolute;
-  top: 88%;
-  left: 50%;
+  top: 85%;
+  left: 45%;
   transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
   opacity:0.6;
