@@ -9,8 +9,8 @@ body {
 }
 
 .card_on_hand {
-    height: 9em;
-    width: 6em;
+    height: 8em;
+    width: 5.4em;
     border-radius: .5em;
 }
 
@@ -51,6 +51,14 @@ body {
   background-color:rgba(255,255,255, 0.5);
 }
 
+.fade-in-text {
+  animation: fadeIn 2s;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
 
 .overlay-button-container {
     position: relative;

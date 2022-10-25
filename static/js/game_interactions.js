@@ -71,7 +71,7 @@ function update_side_boards(side_board, current_player_uid, current_player_name)
     let content = ""
 
     content += '<div class="col-4">'
-    content += "<p><strong>" + current_player_name + "'s board" + "</strong></p>"
+    content += "<p><small>" + current_player_name + "'s board" + "</small></p>"
     content += '<table className="table-condensed">'
 
     for( const [row_index, row] of side_board.entries()){
@@ -152,7 +152,7 @@ function getCookie(cname) {
 
 function update_main_board(main_board, current_player_uid, current_player_name) {
 
-    $("#main_board_title").text("Current player's board (" + current_player_name + ")")
+    $("#main_board_title").text(current_player_name + " is playing")
 
     let board = $("#main_board")
     board.empty();
@@ -260,12 +260,6 @@ function update_discard(top_discard_cards, cur_player_uid) {
     let discard_div = $("#discard_div")
     discard_div.empty();
 
-
-    // Draw deck
-
-
-    discard_div.append(deck);
-
     //let heading_el = '<p class="mb-0 mt-3"><strong>Discard piles</strong></p>'
     //discard_div.append(heading_el)
 
@@ -273,11 +267,11 @@ function update_discard(top_discard_cards, cur_player_uid) {
 
         let content = ""
 
-        content += '<div class="col-2">'
+        //content += '<div class="col-2">'
         //content += '<p class="mb-0 mt-3"><strong>Discard pile</strong></p>'
         // Replace here with the actual player's name
-        content += '<p><small>' + player + '</small></p>'
-        content += '<div class="overlay-button-container">'
+        content += '<p class="mb-1"><small>' + player + "'s discard" + '</small></p>'
+        content += '<div class="overlay-button-container mb-2">'
 
         if(card === null)
         {
