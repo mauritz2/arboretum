@@ -70,8 +70,7 @@ function update_side_boards(side_board, current_player_uid, current_player_name)
 
     let content = ""
 
-    content += '<div class="col-4">'
-    content += "<p><small>" + current_player_name + "'s board" + "</small></p>"
+    content += "<p class='fade-in-text'><small>" + current_player_name + "'s board" + "</small></p>"
     content += '<table className="table-condensed">'
 
     for( const [row_index, row] of side_board.entries()){
@@ -92,7 +91,6 @@ function update_side_boards(side_board, current_player_uid, current_player_name)
     }
 
     content += '</table>'
-    content += '</div>'
 
     side_board_el.append(content);
 }
@@ -291,7 +289,7 @@ function update_discard(top_discard_cards, cur_player_uid) {
             // There are three scenarios where we want to add this call (i.e. hide it)
             // When it's not your turn we want it to be true: !(cur_player_uid !== my_uid)
             // When it's not the draw phase we want it to be true (ie. !(game_phase !== "Draw")
-            content += 'hide_button'
+            content += 'hide'
         }
         content += '">'
         content += '<input name="discard_owner" type="hidden" value="'+ player +'">'

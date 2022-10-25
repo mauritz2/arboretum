@@ -37,9 +37,9 @@
     <!-- Player boards -->
     {% for player in player_boards %}
         {% set player_index = player[-1] %}
-        <div class="col-5">
+        <div class="col-4">
         <h4 class="mb-1">{{player}}'s board</h4>
-        <table class="table-sm">
+        <table class="table-condensed">
             {% for row in player_boards[player] %}
 
             {% set outer_loop = loop.index - 1 %}

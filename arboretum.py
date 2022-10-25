@@ -17,6 +17,21 @@ It does not
 - Do game logic (e.g. keep track of who's turn it is, change game phase). That is managed by the game_manager.
 - Throw errors when players do the wrong thing, e.g. play when it's not their turn. It's trying to not crash the game.
 - Communicate with all the classes in the game module (only game creator and game manager)
+
+TODO:
+Shorter-term
+- Alignment CSS fine tuning
+- Dynamic header showing what game phase the current player is at
+- Fix CSS bug where other cards display on top of zoomed card
+- Refactor JS code
+- Update path highlighting now that coords have changed
+- Fix buttons and overlays so they match card size
+- Better game-over screen where you can click to display board-cards of that player
+
+Longer-term
+- Light only up possible card placements (i.e. adjacent to existing trees)
+- Make design more responsive so it fits on smaller screens
+
 """
 
 # Flask config
@@ -34,7 +49,7 @@ game_manager = GameManager
 ### LOBBY VIEWS ###
 
 
-@app.route("/lobby", methods=["GET"])
+@app.route("/", methods=["GET"])
 def lobby():
     response = make_response(render_template("lobby.html"))
     player_uid = request.cookies.get("player_uid")
@@ -55,7 +70,13 @@ def on_sit_down(player_name):
     global game_manager
 
     if player_name in uid_to_player_map.values():
-        raise ValueError(f"{player_name} already exists. Please choose another name")
+        flash_io(f"{player_name} already exists. Please choose another name", "warning")
+        return
+
+    if len(player_name) == 0:
+        # TODO - client-side validation would be better here
+        flash_io("Player name can't be blank. Please choose a name and join the game.", "warning")
+        return
 
     player_uid = request.cookies.get("player_uid")
     uid_to_player_map[player_uid] = player_name
@@ -69,7 +90,11 @@ def on_stand_up():
     global uid_to_player_map
     player_uid = request.cookies.get("player_uid")
 
-    flash_io(f"Player {uid_to_player_map[player_uid]} has left the game.")
+    if player_uid not in uid_to_player_map:
+        flash_io(f"Can't leave - you haven't joined the game", "warning")
+        return
+
+    flash_io(f"You have left the game")
     del uid_to_player_map[player_uid]
 
     emit("update player list", json.dumps(list(uid_to_player_map.values())), broadcast=True)
@@ -83,10 +108,11 @@ def get_board_state():
     player_names = list(uid_to_player_map.values())
 
     if len(player_names) < 1:
-        flash_io("Not enough players connected. Add more players.", "warning")
-    else:
-        game_manager = game_creator.create_game(player_names)
-        emit('redirect', json.dumps(url_for('main')), broadcast=True)
+        flash_io("At least one player needs to be connected to play. Add more players and then start the game.", "warning")
+        return
+
+    game_manager = game_creator.create_game(player_names)
+    emit('redirect', json.dumps(url_for('main')), broadcast=True)
 
 
 @socketio.on("get player list")

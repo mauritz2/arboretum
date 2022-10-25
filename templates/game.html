@@ -4,6 +4,7 @@
 <!--Main board title-->
 <div class="row">
     <div class="col offset-3">
+        <!-- TODO - add in a message on what the player is "doing" - e.g. discarding, playing etc.-->
         <h4 id="main_board_title" class="text-warning fade-in-text"></h4>
     </div>
 </div>
@@ -11,7 +12,7 @@
 <div class="row align-items-end mb-3">
     <!--Deck-->
     <div class="col-1 offset-1">
-        <p class="mb-2"><small id="cards_left"></small></p>
+        <p class="mb-2 fade-in-text"><small id="cards_left"></small></p>
         <form>
             <div class="overlay-button-container">
                 <img class="card_on_hand" src="../static/css/other/deck-full.png">
@@ -26,31 +27,20 @@
 
     </div>
 
+    <!-- Main Board-->
     <div class="col-4">
         <table class="table-condensed" id="main_board">
-            <!-- Main Board-->
         </table>
     </div>
-    <div class="col-4">
-        <div class="row" id="side_board_container">
-        </div>
-        <!--Side board(s)-->
 
+    <!--Side board(s)-->
+    <div class="col-4" id="side_board_container">
     </div>
 </div>
-<!-- Draw pile -->
 
-<div class="row" id="player_hand_div">
+<!--Player hand -->
+<div class="row" id="player_hand_div"></div>
 
-    <!--Player hand -->
-</div>
-
-<script>
-    socket.emit("get board state");
-</script>
-
-
-
-
+<script> socket.emit("get board state");</script>
 
 {% endblock %}
