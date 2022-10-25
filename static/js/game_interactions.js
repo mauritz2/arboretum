@@ -7,7 +7,7 @@ const blank_card_name = "blank-w-border"
 socket.on("message", (message) => show_message(JSON.parse(message).text, JSON.parse(message).category));
 socket.on("update hand", (cards_on_hand) => update_hand(JSON.parse(cards_on_hand)));
 socket.on("update board state", (board_state) => update_board_state(JSON.parse(board_state)));
-socket.on("end game", (url) => navigate_to_page(JSON.parse(url)));
+//socket.on("end game", (url) => navigate_to_page(JSON.parse(url)));
 
 
 // JQUERY HTML element bindings
@@ -70,7 +70,7 @@ function update_side_boards(side_board, current_player_uid, current_player_name)
 
     let content = ""
     content += "<p><strong>" + current_player_name + "'s board" + "</strong></p>"
-    content += '<table className="table-sm">'
+    content += '<table className="table-condensed">'
 
     for( const [row_index, row] of side_board.entries()){
         content += '<tr>'
@@ -81,7 +81,7 @@ function update_side_boards(side_board, current_player_uid, current_player_name)
              if (card != null) {
                 content += '<img class="card_on_mini_board zoom-larger" src="../static/css/playing_cards/' + card + '.png">'
             } else {
-                 content += '<img class="card_on_mini_board blank" src="../static/css/playing_cards/' + blank_card_name + '.png">'
+                 content += '<img class="card_on_mini_board dimmed" src="../static/css/playing_cards/' + blank_card_name + '.png">'
 
              }
             content += '</td>'
@@ -101,19 +101,19 @@ function toggle_buttons(game_phase, cur_player_uid, num_cards_in_deck){
     // Play button
     if (cur_player_uid === my_uid && game_phase === "Choose Card"){
         console.log("Showing play button")
-        $(".card_to_play").removeClass("hide_button");
+        $(".card_to_play").removeClass("hide");
     }
     else{
-        $(".card_to_play").addClass("hide_button");
+        $(".card_to_play").addClass("hide");
     }
 
     // Discard button
     if(cur_player_uid === my_uid && game_phase === "Choose Discard"){
         console.log("Showing discard button")
-        $(".discard_btn").removeClass("hide_button");
+        $(".discard_btn").removeClass("hide");
     }
     else{
-        $(".discard_btn").addClass("hide_button");
+        $(".discard_btn").addClass("hide");
     }
 
     console.log("The amount of cards in the deck is " + num_cards_in_deck)
@@ -124,12 +124,12 @@ function toggle_buttons(game_phase, cur_player_uid, num_cards_in_deck){
         // Reduce the height of the discard piles so they don't push down the cards too much
         // Replace the cards on hand and cards on board with em things?
         console.log("Showing draw button")
-        $("#draw_button_container").removeClass("hide_button");
+        $("#draw_button_container").removeClass("hide");
         //$(".draw_discard_btn").removeClass("hide_button");
     }
     else{
         console.log("Hiding draw button")
-        $("#draw_button_container").addClass("hide_button");
+        $("#draw_button_container").addClass("hide");
         //$(".draw_discard_btn").addClass("hide_button");
     }
 }
@@ -172,7 +172,7 @@ function update_main_board(main_board, current_player_uid, current_player_name) 
                     content += '</form>'
                 } else {
                     content += '<form>'
-                    content += '<input disabled class="card_on_board blank" id="' + row_index + col_index + '"  src="../static/css/other/' + blank_card_name + '.png" type="image">'
+                    content += '<input disabled class="card_on_board dimmed" id="' + row_index + col_index + '"  src="../static/css/other/' + blank_card_name + '.png" type="image">'
                     content += '</form>'
                 }
             }
@@ -194,36 +194,59 @@ function update_main_board(main_board, current_player_uid, current_player_name) 
 }
 
 function show_message(text, category) {
-  // Displays a message on top of the screen
-  let message_div = document.getElementById("messages");
-  let alert_class = "alert" + "-" + category
-  message_div.classList.add("alert", alert_class);
-  message_div.innerHTML = text;
+    // Displays a message on top of the screen
+    console.log("Displaying message " + text)
+    let message_div = document.getElementById("messages");
+    let alert_class = "alert" + "-" + category
+    message_div.classList.add("alert", alert_class);
+    message_div.innerHTML = text;
 }
 
 function update_hand(cards_on_hand) {
+    let player_hand_el = $("#player_hand_div")
+    player_hand_el.empty();
+
     console.log(cards_on_hand)
 
-    $("#player_hand_div").empty();
+    // Draw deck
+    let deck = ""
+    deck += '<div class="col-2 offset-1 mb-5">'
+    deck += '<form>'
+    deck += '<div class="overlay-button-container">'
+    deck += '<img class="card_on_hand" src="../static/css/other/deck-full.png">'
+    deck += '<div class="hide" id="draw_button_container">'
+    deck += '<input class="btn btn-dark" id="draw_button" type="button" value="Draw card">'
+    deck += '</div>'
+    deck += '</div>'
+    deck += '</form>'
+    //deck += '<p ></p>'
+    deck += '</div>'
+
+    player_hand_el.append(deck);
+
+    // Hands
 
     cards_on_hand.forEach(function (card) {
 
     // TODO - verify again if these truly have to be nested in this func. Can't they be outside?
+    let player_hand = ""
 
-    $("#player_hand_div").append("" +
-        "<div class='col-1'>" +
-        "<div class='overlay-button-container'>" +
-        "<img class='card_on_hand' src='../static/css/playing_cards/" + card + ".png'>" +
-        "<form class='card_to_play hide_button'>" +
-        "<input name='card_name' type='hidden' value='" + card + "'>" +
-        "<input type='submit' class='btn btn-dark' value='Play card'>" +
-        "</form>" +
-        "<form class='discard_btn hide_button'>" +
-        "<input name='card_name' type='hidden' value='" + card + "'>" +
-        "<input type='submit' class='btn btn-dark' value='Discard card'>" +
-        "</form>" +
-        "</div>" +
-        "</div>")
+    player_hand += "<div class='col-1'>"
+    player_hand += "<div class='overlay-button-container'>"
+    player_hand += "<img class='card_on_hand' src='../static/css/playing_cards/" + card + ".png'>"
+    player_hand += "<form class='card_to_play hide'>"
+    player_hand += "<input name='card_name' type='hidden' value='" + card + "'>"
+    player_hand += "<input type='submit' class='btn btn-dark' value='Play card'>"
+    player_hand += "</form>"
+    player_hand += "<form class='discard_btn hide'>"
+    player_hand += "<input name='card_name' type='hidden' value='" + card + "'>"
+    player_hand += "<input type='submit' class='btn btn-dark' value='Discard card'>"
+    player_hand += "</form>"
+    player_hand += "</div>"
+    player_hand += "</div>"
+
+    $("#player_hand_div").append(player_hand)
+
     });
 
     $(".card_to_play").on("submit", function (event){
@@ -242,25 +265,31 @@ function update_hand(cards_on_hand) {
 }
 
 function update_cards_left(cards_left){
-    $("#cards_left").text(cards_left + " cards remain");
+    $("#cards_left").text("Deck (" + cards_left + " cards)");
 }
 
 function update_discard(top_discard_cards, cur_player_uid) {
     console.log(top_discard_cards)
 
-    $("#discard_div").empty();
+    let discard_div = $("#discard_div")
+    discard_div.empty();
+
+    let heading_el = '<p class="mb-0 mt-3"><strong>Discard piles</strong></p>'
+    discard_div.append(heading_el)
 
     Object.entries(top_discard_cards).forEach(([player, card]) => {
 
         let content = ""
-        content += '<p class="mb-0 mt-3"><strong>Discard pile</strong></p>'
+
+        content += '<div class="col-6">'
+        //content += '<p class="mb-0 mt-3"><strong>Discard pile</strong></p>'
         // Replace here with the actual player's name
         content += '<p><small>' + player + '</small></p>'
         content += '<div class="overlay-button-container">'
 
         if(card === null)
         {
-            content += '<img class="card_on_hand blank" src="../static/css/playing_cards/' + blank_card_name + '.png">'
+            content += '<img class="card_on_hand dimmed" src="../static/css/playing_cards/' + blank_card_name + '.png">'
         }
         else
         {
@@ -284,6 +313,7 @@ function update_discard(top_discard_cards, cur_player_uid) {
         content += '</form>'
         content += '</div>'
 
+
         $("#discard_div").append(content)
 
     });
@@ -297,3 +327,47 @@ function update_discard(top_discard_cards, cur_player_uid) {
         socket.emit("draw from discard", player_to_draw_from);
     });
 }
+
+
+// function update_discard(top_discard_cards, cur_player_uid) {
+//     console.log(top_discard_cards)
+//
+//     $("#discard_div").empty();
+//
+//     Object.entries(top_discard_cards).forEach(([player, card]) => {
+//
+//         let content = ""
+//         content += '<p class="mb-0 mt-3"><strong>Discard pile</strong></p>'
+//         // Replace here with the actual player's name
+//         content += '<p><small>' + player + '</small></p>'
+//         content += '<div class="overlay-button-container">'
+//
+//         if(card === null)
+//         {
+//             content += '<img class="card_on_hand dimmed" src="../static/css/playing_cards/' + blank_card_name + '.png">'
+//         }
+//         else
+//         {
+//             content += '<img class="card_on_hand" src="../static/css/playing_cards/' + card + '.png">'
+//         }
+//         content += '<form class="draw_discard_btn '
+//
+//         // # TODO - update this and all element creations
+//         if (cur_player_uid !== my_uid || game_phase !== "Draw" || card === null) {
+//             // Unless the current player UID === my_uid
+//             // TODO - refactor!
+//             // Adding hide_buttons hides the button
+//             // There are three scenarios where we want to add this call (i.e. hide it)
+//             // When it's not your turn we want it to be true: !(cur_player_uid !== my_uid)
+//             // When it's not the draw phase we want it to be true (ie. !(game_phase !== "Draw")
+//             content += 'hide_button'
+//         }
+//         content += '">'
+//         content += '<input name="discard_owner" type="hidden" value="'+ player +'">'
+//         content += '<input class="btn btn-dark" type="submit" value="Draw card">'
+//         content += '</form>'
+//         content += '</div>'
+//
+//         $("#discard_div").append(content)
+//
+//     });

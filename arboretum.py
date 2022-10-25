@@ -4,6 +4,21 @@ import random
 from flask import Flask, render_template, request, url_for, make_response
 from flask_socketio import SocketIO, emit
 
+"""
+Purpose of arboretum.py: 
+- Lets players join the game
+- Creates the game when the players are ready
+- Get player game input from the client
+- Use the game_manager to execute player actions
+- Send updated board states to the client  
+- Handle errors from the game library to make sure game doesn't crash due to any invalid actions
+
+It does not
+- Do game logic (e.g. keep track of who's turn it is, change game phase). That is managed by the game_manager.
+- Throw errors when players do the wrong thing, e.g. play when it's not their turn. It's trying to not crash the game.
+- Communicate with all the classes in the game module (only game creator and game manager)
+"""
+
 # Flask config
 app = Flask(__name__)
 app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
@@ -119,6 +134,8 @@ def emit_game_state(req) -> (dict, list[str]):
     # Get the board for all players
     player_boards = {}
     # TODO - to think about: where is the source of truth of what players exist? GameManager?
+    # TODO - can we send the player name here as well? Or can we send a mapping between UID and player separately?
+    # Currently no way to show the names of each players side board
     for uid in uid_to_player_map:
         p_instance = game_manager.get_player_instance(uid_to_player_map[uid])
         player_boards[uid] = p_instance.board.get_board_state()
@@ -158,6 +175,11 @@ def draw_card_from_deck():
     
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]
+
+    if player_name != game_manager.current_player.name:
+        flash_io(f"It's not your turn to draw a card. Current player's turn is {game_manager.current_player.name}")
+        return
+
     game_manager.draw_card(player_name)
 
     # TODO - Can emit state be set to run after each request, or at least for some?
@@ -173,13 +195,19 @@ def discard_card(card_to_discard):
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]
 
-    game_manager.discard_card(player_name=player_name, card_to_discard=card_to_discard)
+    if player_name != game_manager.current_player.name:
+        flash_io(f"It's not your turn to discard. Current player's turn is {game_manager.current_player.name}", "warning")
+        return
+    else:
+        game_manager.discard_card(player_name=player_name, card_to_discard=card_to_discard)
 
-    if game_manager.game_phase == GameState.SCORING:
-        # The deck is empty, meaning that the game is over - redirecting to game over/scoring screen
-        emit('end game', json.dumps(url_for('game_over')), broadcast=True)
+        print(f"The current game state is {game_manager.game_phase}\n")
+        if game_manager.game_phase == GameState.SCORING:
+            print("Going to redirect\n")
+            # The deck is empty, meaning that the game is over - redirecting to game over/scoring screen
+            emit('redirect', json.dumps(url_for('game_over')), broadcast=True)
 
-    emit_game_state(request)
+        emit_game_state(request)
 
 
 @socketio.on("draw from discard")
@@ -187,6 +215,10 @@ def draw_from_discard(player_to_draw_from):
     global game_manager
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]
+
+    if player_name != game_manager.current_player.name:
+        flash_io(f"It's not your turn to discard. Current player's turn is {game_manager.current_player.name}", "warning")
+        return
 
     try:
         game_manager.draw_card(player_name=player_name, to_draw_from=player_to_draw_from)
@@ -202,18 +234,21 @@ def choose_coords(chosen_coords):
     global game_manager
     print(f"\n\nCommencing choose coords with {chosen_coords}\n\n")
 
-    card_to_play = game_manager.selected_card_to_play
-    row = int(chosen_coords[0])
-    column = int(chosen_coords[1])
-
-    # TODO - is it better to always read the cookie value, or should we just reference current player?
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]
+
+    if player_name != game_manager.current_player.name:
+        flash_io(f"It's not your turn to choose where to place a card. Current player's turn is {game_manager.current_player.name}")
+        return
+
+    row = int(chosen_coords[0])
+    column = int(chosen_coords[1])
 
     try:
         game_manager.play_card_at_chosen_coords(player_name=player_name, row=row, column=column)
     except ValueError as e:
         flash_io(str(e) + " Please re-select what card to play", "warning")
+
     emit_game_state(request)
 
 

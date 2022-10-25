@@ -74,6 +74,7 @@ class GameManager:
 
     def get_amt_of_cards_left(self) -> int:
         # TODO - refactor this? Could assign the deck as a gm class var, but would duplicate?
+        print(f"returning {self.scorer.players[0].deck.get_amt_of_cards_left()}")
         return self.scorer.players[0].deck.get_amt_of_cards_left()
 
     def select_card_to_play(self, card_name: str) -> None:
@@ -101,24 +102,26 @@ class GameManager:
         player = self.get_player_instance(player_name)
 
         player.discard_card(card_to_discard, to_discard=True)
-
+        print("Checking if game is over")
         if self.is_game_over():
+            print("Game is over")
             self.game_phase = GameState.SCORING
-
-        self.start_next_round()
+        else:
+            self.start_next_round()
 
     def play_card_at_chosen_coords(self, player_name: str, row: int, column: int):
         player = self.get_player_instance(player_name)
         try:
             player.play_card(self.selected_card_to_play, row=row, column=column)
-            self.selected_card_to_play = None
-            self.game_phase = GameState.CHOOSE_DISCARD
         except ValueError as e:
             # User chose an invalid location for a card (e.g. not adjacent to an existing card)
             # - notifying user and resetting to start of play phase
             self.selected_card_to_play = None
             self.game_phase = GameState.CHOOSE_CARD_TO_PLAY
             raise e
+
+        self.selected_card_to_play = None
+        self.game_phase = GameState.CHOOSE_DISCARD
 
 
 class GameState(Enum):

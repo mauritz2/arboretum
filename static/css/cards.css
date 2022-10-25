@@ -1,19 +1,29 @@
 /* ratio of the cards should be 3:2 */
 
+/* reduce the spacing between the cards in the table to conserve space? */
+
+body {
+  background-color: rgb(45,45,45) !important;
+  color: white !important;
+    caret-color: transparent;
+}
+
 .card_on_hand {
-    height: 180px;
-    width: 120px;
-    border-radius: 10px;
+    height: 9em;
+    width: 6em;
+    border-radius: .5em;
 }
 
 .card_on_board {
-    height: 90px;
-    width: 60px;
-    border-radius: 10px;
+    height: 4.5em;
+    width: 3em;
+    border-radius: .5em;
 }
 
-.blank {
-    opacity: 0.5;
+.card_on_mini_board {
+    height: 2em;
+    width: 1.4em;
+    border-radius: .25em;
 }
 
 .dimmed
@@ -21,17 +31,9 @@
     opacity: 0.5;
 }
 
-.card_on_mini_board {
-    height: 30px;
-    width: 20px;
-    border-radius: 3px;
-}
-
-.scoring_tree_type:hover {
-  width:100%;
-  height:100%;
-  top:0;left:0;right:0;
-  background-color:rgba(255,255,255, 0.5);
+.hide
+{
+    display: none;
 }
 
 .zoom:hover {
@@ -42,11 +44,13 @@
     scale: 5;
 }
 
-body {
-  background-color: rgb(45,45,45) !important;
-  color: white !important;
-    caret-color: transparent;
+.scoring_tree_type:hover {
+  width:100%;
+  height:100%;
+  top:0;left:0;right:0;
+  background-color:rgba(255,255,255, 0.5);
 }
+
 
 .overlay-button-container {
     position: relative;
@@ -84,14 +88,3 @@ body {
   opacity: 1;
 }
 
-.deck-full
-{
-    content : url("other/deck-full.png");
-    height: 180px;
-    width: 120px;
-}
-
-.hide_button
-{
-    display: none;
-}

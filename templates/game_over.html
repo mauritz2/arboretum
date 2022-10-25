@@ -55,14 +55,14 @@
                     {% if game_phase == "Choose Coords" %}
                     <form action="/choose_coordinates" method="post">
                         <input name="coords" type="hidden" value="{{player_index}}{{outer_loop, inner_loop}}">
-                        <input class="card_on_board blank blank_choose_coord" src="../static/css/other/blank-w-border.png"
+                        <input class="card_on_board dimmed blank_choose_coord" src="../static/css/other/blank-w-border.png"
                                type="image">
                     </form>
                     {% else %}
                     <!-- Form tag is here to ensure formatting is the same as during coord selection -->
                     <form>
                         <!-- Not used - putting here to mirror padding when coords are being selected-->
-                        <input disabled class="card_on_board blank" id="{{player_index}}{{outer_loop}}{{inner_loop}}" src="../static/css/other/blank-w-border.png" type="image">
+                        <input disabled class="card_on_board dimmed" id="{{player_index}}{{outer_loop}}{{inner_loop}}" src="../static/css/other/blank-w-border.png" type="image">
                     </form>
                     {% endif %}
                     {% endif %}

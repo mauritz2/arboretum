@@ -1,37 +1,38 @@
 {% extends "base.html" %}
 {% block game %}
 
-<div class="row align-items-end">
-    <!-- Deck -->
-    <!--TODO - consider replacing the empty deck with the empty card png-->
-    <div class="col-1 offset-1">
-        <p class="mb-0"><strong>Deck</strong></p>
-        <p id="cards_left"></p>
-        <form>
-            <div class="overlay-button-container">
-                <img class="card_on_hand" src="../static/css/other/deck-full.png">
-                <div class="hide_button" id="draw_button_container">
-                    <input class="btn btn-dark" id="draw_button" type="button" value='Draw card'>
-                </div>
-            </div>
-        </form>
+<div class="row">
+    <div class="col-3 offset-3">
+        <h4 class="mb-3" id="main_board_title"></h4>
     </div>
-    <div class="col-1" id="discard_div">
+</div>
+
+<div class="row">
+    <div class="col-2 offset-1 mb-5" id="discard_div">
         <!-- Discard pile(s)-->
     </div>
-    <div class="col-5">
-        <h4 class="mb-1" id="main_board_title"></h4>
-        <table class="table-sm" id="main_board">
+    <div class="col-4 mb-5">
+        <table class="table-condensed" id="main_board">
             <!-- Main Board-->
         </table>
     </div>
-    <div class="col-3" id="side_board_container">
+    <div class="col-3 mb-5" id="side_board_container">
         <!--Side board(s)-->
     </div>
 </div>
 
-<!--Player hand-->
-<div class="row justify-content-center" id="player_hand_div">
+
+<div class="row mb-2">
+    <div class="col-2 offset-1">
+        <strong id="cards_left">The deck</strong>
+    </div>
+    <div class="col-4">
+        <strong>Your cards</strong>
+    </div>
+</div>
+
+<div class="row" id="player_hand_div">
+    <!--Player hand and deck -->
 </div>
 
 <script>
