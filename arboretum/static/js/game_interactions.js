@@ -69,7 +69,7 @@ function update_side_boards(side_board, current_player_uid, current_player_name)
     let content = ""
 
     content += "<p class='fade-in-text'><small>" + current_player_name + "'s board" + "</small></p>"
-    content += '<table className="table-condensed">'
+    content += '<table class="table-condensed">'
 
     for( const [row_index, row] of side_board.entries()){
         content += '<tr>'
