@@ -212,44 +212,27 @@ function update_hand(cards_on_hand) {
 
     console.log(cards_on_hand)
 
-    // Draw deck
-    let deck = ""
-    deck += '<div class="col-1 offset-2 mb-1">'
-    deck += '<form>'
-    deck += '<div class="overlay-button-container">'
-    deck += '<img class="card_on_hand" src="../static/css/other/deck-full.png">'
-    deck += '<div class="hide" id="draw_button_container">'
-    deck += '<input class="btn btn-dark" id="draw_button" type="button" value="Draw card">'
-    deck += '</div>'
-    deck += '</div>'
-    deck += '</form>'
-    deck += '</div>'
-
-    player_hand_el.append(deck);
-
     // Hands
+    player_hand_el.append('<div class="col-1 offset-1"></div>')
 
     cards_on_hand.forEach(function (card) {
+        // TODO - verify again if these truly have to be nested in this func. Can't they be outside?
+        let player_hand = ""
+        player_hand += "<div class='col-1'>"
+        player_hand += "<div class='overlay-button-container'>"
+        player_hand += "<img class='card_on_hand' src='../static/css/playing_cards/" + card + ".png'>"
+        player_hand += "<form class='card_to_play hide'>"
+        player_hand += "<input name='card_name' type='hidden' value='" + card + "'>"
+        player_hand += "<input type='submit' class='btn btn-dark' value='Play card'>"
+        player_hand += "</form>"
+        player_hand += "<form class='discard_btn hide'>"
+        player_hand += "<input name='card_name' type='hidden' value='" + card + "'>"
+        player_hand += "<input type='submit' class='btn btn-dark' value='Discard card'>"
+        player_hand += "</form>"
+        player_hand += "</div>"
+        player_hand += "</div>"
 
-    // TODO - verify again if these truly have to be nested in this func. Can't they be outside?
-    let player_hand = ""
-
-    player_hand += "<div class='col-1'>"
-    player_hand += "<div class='overlay-button-container'>"
-    player_hand += "<img class='card_on_hand' src='../static/css/playing_cards/" + card + ".png'>"
-    player_hand += "<form class='card_to_play hide'>"
-    player_hand += "<input name='card_name' type='hidden' value='" + card + "'>"
-    player_hand += "<input type='submit' class='btn btn-dark' value='Play card'>"
-    player_hand += "</form>"
-    player_hand += "<form class='discard_btn hide'>"
-    player_hand += "<input name='card_name' type='hidden' value='" + card + "'>"
-    player_hand += "<input type='submit' class='btn btn-dark' value='Discard card'>"
-    player_hand += "</form>"
-    player_hand += "</div>"
-    player_hand += "</div>"
-
-    $("#player_hand_div").append(player_hand)
-
+        $("#player_hand_div").append(player_hand)
     });
 
     $(".card_to_play").on("submit", function (event){
@@ -276,6 +259,12 @@ function update_discard(top_discard_cards, cur_player_uid) {
 
     let discard_div = $("#discard_div")
     discard_div.empty();
+
+
+    // Draw deck
+
+
+    discard_div.append(deck);
 
     //let heading_el = '<p class="mb-0 mt-3"><strong>Discard piles</strong></p>'
     //discard_div.append(heading_el)

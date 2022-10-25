@@ -1,39 +1,57 @@
 {% extends "base.html" %}
 {% block game %}
 
+<!--Main board title-->
 <div class="row">
     <div class="col-4 offset-2">
-        <h4 class="mb-1" id="main_board_title"></h4>
+        <h4 id="main_board_title"></h4>
     </div>
 </div>
 
 <div class="row justify-content-center">
-    <div class="col-4 offset-2 mb-2">
+    <!-- Draw pile -->
+    <div class="col-1 offset-1">
+    let deck = ""
+    deck += '<div class="col-2">'
+    deck += '<form>'
+    deck += '<div class="overlay-button-container">'
+    deck += '<img class="card_on_hand" src="../static/css/other/deck-full.png">'
+    deck += '<div class="hide" id="draw_button_container">'
+    deck += '<input class="btn btn-dark" id="draw_button" type="button" value="Draw card">'
+    deck += '</div>'
+    deck += '</div>'
+    deck += '</form>'
+    deck += '</div>'
+    </div>
+
+    <!-- Discard piles -->
+    <div class="row align-items-end mt-5"  id="discard_div">
+
+    </div>
+
+    <div class="col-4 offset-2">
         <table class="table-condensed" id="main_board">
             <!-- Main Board-->
         </table>
     </div>
     <div class="col-6">
-        <div class="row mb-2" id="side_board_container">
+        <div class="row" id="side_board_container">
         </div>
         <!--Side board(s)-->
-        <div class="row"  id="discard_div">
-        </div>
+
     </div>
 </div>
 
 
-<div class="row mb-2">
+<div class="row">
     <div class="col-2 offset-2">
-        <strong id="cards_left">The deck</strong>
-    </div>
-    <div class="col-4">
         <strong>Your cards</strong>
     </div>
 </div>
 
 <div class="row" id="player_hand_div">
-    <!--Player hand and deck -->
+
+    <!--Player hand -->
 </div>
 
 <script>
