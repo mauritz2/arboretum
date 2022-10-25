@@ -2,28 +2,29 @@
 {% block game %}
 
 <div class="row">
-    <div class="col-3 offset-3">
-        <h4 class="mb-3" id="main_board_title"></h4>
+    <div class="col-4 offset-2">
+        <h4 class="mb-1" id="main_board_title"></h4>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-2 offset-1 mb-5" id="discard_div">
-        <!-- Discard pile(s)-->
-    </div>
-    <div class="col-4 mb-5">
+<div class="row justify-content-center">
+    <div class="col-4 offset-2 mb-2">
         <table class="table-condensed" id="main_board">
             <!-- Main Board-->
         </table>
     </div>
-    <div class="col-3 mb-5" id="side_board_container">
+    <div class="col-6">
+        <div class="row mb-2" id="side_board_container">
+        </div>
         <!--Side board(s)-->
+        <div class="row"  id="discard_div">
+        </div>
     </div>
 </div>
 
 
 <div class="row mb-2">
-    <div class="col-2 offset-1">
+    <div class="col-2 offset-2">
         <strong id="cards_left">The deck</strong>
     </div>
     <div class="col-4">

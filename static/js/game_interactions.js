@@ -69,6 +69,8 @@ function update_side_boards(side_board, current_player_uid, current_player_name)
     let side_board_el = $("#side_board_container");
 
     let content = ""
+
+    content += '<div class="col-4">'
     content += "<p><strong>" + current_player_name + "'s board" + "</strong></p>"
     content += '<table className="table-condensed">'
 
@@ -90,6 +92,8 @@ function update_side_boards(side_board, current_player_uid, current_player_name)
     }
 
     content += '</table>'
+    content += '</div>'
+
     side_board_el.append(content);
 }
 
@@ -210,7 +214,7 @@ function update_hand(cards_on_hand) {
 
     // Draw deck
     let deck = ""
-    deck += '<div class="col-2 offset-1 mb-5">'
+    deck += '<div class="col-1 offset-2 mb-1">'
     deck += '<form>'
     deck += '<div class="overlay-button-container">'
     deck += '<img class="card_on_hand" src="../static/css/other/deck-full.png">'
@@ -219,7 +223,6 @@ function update_hand(cards_on_hand) {
     deck += '</div>'
     deck += '</div>'
     deck += '</form>'
-    //deck += '<p ></p>'
     deck += '</div>'
 
     player_hand_el.append(deck);
@@ -274,14 +277,14 @@ function update_discard(top_discard_cards, cur_player_uid) {
     let discard_div = $("#discard_div")
     discard_div.empty();
 
-    let heading_el = '<p class="mb-0 mt-3"><strong>Discard piles</strong></p>'
-    discard_div.append(heading_el)
+    //let heading_el = '<p class="mb-0 mt-3"><strong>Discard piles</strong></p>'
+    //discard_div.append(heading_el)
 
     Object.entries(top_discard_cards).forEach(([player, card]) => {
 
         let content = ""
 
-        content += '<div class="col-6">'
+        content += '<div class="col-2">'
         //content += '<p class="mb-0 mt-3"><strong>Discard pile</strong></p>'
         // Replace here with the actual player's name
         content += '<p><small>' + player + '</small></p>'

@@ -14,29 +14,13 @@
     <div class="container-fluid">
         <!--Flash messages-->
         <div class="row justify-content-center text-center">
-            <div class="col-12" id="messages">
-                {% with messages = get_flashed_messages(with_categories=True) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            {% if category == "error" %}
-                                {% set alert_class = "alert-danger" %}
-                            {% else %}
-                                {% set alert_class = "alert-primary" %}
-                            {% endif %}
-                            <div class="alert {{alert_class}} py-0 my-1" role="alert">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-            </div>
+            <div class="col-12 py-0" id="messages"></div>
         </div>
             {% block game %}
             <!-- Game area -->
             {% endblock %}
         </div>
     </div>
-
 </body>
 
 
