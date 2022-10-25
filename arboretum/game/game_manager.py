@@ -9,12 +9,12 @@ class GameManager:
     what phase in the current turn it is, when the game is over. The Game Manager also sets up the game,
     e.g. creating the scorer with the right amount of players.
 
-    This is the only game logic class that the Flask app arboretum.py should reference. It hides the other
+    This is the only game logic class that the Flask app app.py should reference. It hides the other
     functions and properties of the other classes
 
     # TODO - rename to game_manager.py and Game_Manager class?
     # TODO - add the GameState manipulations into this class, as opposed to having the web app do we game
-    # TODO - create dummy funcs for the things arboretum.py reference the game_manager for. Make everything else _
+    # TODO - create dummy funcs for the things app.py reference the game_manager for. Make everything else _
     # TODO - set up some cool enum structure that defines the round? E.g. draw, discard etc. with conditions on when to progress?
 
     """

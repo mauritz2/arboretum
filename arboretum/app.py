@@ -1,11 +1,11 @@
 import json
-from game import game_creator, GameState, GameManager
 import random
+from arboretum.game import game_creator, GameState, GameManager
 from flask import Flask, render_template, request, url_for, make_response
 from flask_socketio import SocketIO, emit
 
 """
-Purpose of arboretum.py: 
+Purpose of app.py: 
 - Lets players join the game
 - Creates the game when the players are ready
 - Get player game input from the client
@@ -38,15 +38,13 @@ Longer-term
 
 # Flask config
 app = Flask(__name__)
-app.secret_key = b'this-is-a-dev-env-secret-key-abc-abc'
+app.secret_key = 'dev-secret'
 app.debug = True
 socketio = SocketIO(app)
-# app.host="0.0.0.0"
 
 # Global variables
 uid_to_player_map = {}
 game_manager = GameManager
-
 
 ### LOBBY VIEWS ###
 
@@ -322,6 +320,5 @@ def game_over():
                            )
 
 
-if __name__ == "__main__":
-    socketio.run(app)
-
+# if __name__ == "__main__":
+#     socketio.run(app)
