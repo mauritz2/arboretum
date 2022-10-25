@@ -254,18 +254,11 @@ function update_discard(top_discard_cards, cur_player_uid) {
     let discard_div = $("#discard_div")
     discard_div.empty();
 
-    //let heading_el = '<p class="mb-0 mt-3"><strong>Discard piles</strong></p>'
-    //discard_div.append(heading_el)
-
     Object.entries(top_discard_cards).forEach(([player, card]) => {
 
         let content = ""
-
-        //content += '<div class="col-2">'
-        //content += '<p class="mb-0 mt-3"><strong>Discard pile</strong></p>'
-        // Replace here with the actual player's name
-        content += '<p class="mb-1"><small>' + player + "'s discard" + '</small></p>'
-        content += '<div class="overlay-button-container mb-2 flex-d justify-content-center text-center">'
+        content += '<p><small>' + player + "'s discard" + '</small></p>'
+        content += '<div class="overlay-button-container flex-d justify-content-center text-center">'
 
         if(card === null)
         {
