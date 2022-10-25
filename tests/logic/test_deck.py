@@ -1,5 +1,5 @@
 import pickle
-from game import Card
+from arboretum.game.logic.card import Card
 
 
 def test_shuffle_deck(deck):

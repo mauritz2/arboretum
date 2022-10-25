@@ -1,8 +1,8 @@
 import random
 
-import game.config as config
-from game.logic.card import Card
-from game.logic.player import Player
+import arboretum.game.config as config
+from arboretum.game.logic.card import Card
+from arboretum.game.logic.player import Player
 
 
 class Scorer:

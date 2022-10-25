@@ -1,5 +1,5 @@
+import arboretum.game.config as config
 from typing import Literal
-import game.config as config
 from dataclasses import dataclass, asdict
 from json import dumps
 

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from game.logic.card import Card
+from arboretum.game.logic.card import Card
 
 
 @dataclass()

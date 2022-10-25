@@ -1,7 +1,7 @@
-import game.config as config
+import arboretum.game.config as config
 import random
 import itertools
-from game.logic.card import Card
+from arboretum.game.logic.card import Card
 
 
 class Deck:

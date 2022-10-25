@@ -1,5 +1,11 @@
 import pytest
-from game import Board, Deck, Scorer, Player, Card, Discard, GameManager
+from arboretum.game import GameManager
+from arboretum.game.logic.board import Board
+from arboretum.game.logic.deck import Deck
+from arboretum.game.logic.scorer import Scorer
+from arboretum.game.logic.player import Player
+from arboretum.game.logic.card import Card
+from arboretum.game.logic.discard import Discard
 
 
 @pytest.fixture
@@ -49,7 +55,7 @@ def player(board, deck, discard):
 
 @pytest.fixture
 def player2(board2, deck, discard):
-    player2 = Player(name="Player 2", deck=deck, board=board2, discard=discard)
+    player2 = player.Player(name="Player 2", deck=deck, board=board2, discard=discard)
     # Resetting to a blank hand to negate that player instance randomly draws cards on instantiation
     player2.cards_on_hand = {}
     return player2
@@ -57,7 +63,7 @@ def player2(board2, deck, discard):
 
 @pytest.fixture
 def scorer(player, player2):
-    return Scorer(players=[player, player2], trees=["Cassia", "Blue Spruce", "Jacaranda", "Oak"])
+    return scorer.Scorer(players=[player, player2], trees=["Cassia", "Blue Spruce", "Jacaranda", "Oak"])
 
 @pytest.fixture
 def gamemanager():

@@ -1,10 +1,10 @@
-import game.config as config
-from game.logic.player import Player
-from game.logic.discard import Discard
-from game.logic.deck import Deck
-from game.logic.board import Board
-from game.logic.scorer import Scorer
-from game.game_manager import GameManager
+import arboretum.game.config as config
+from arboretum.game.logic.player import Player
+from arboretum.game.logic.discard import Discard
+from arboretum.game.logic.deck import Deck
+from arboretum.game.logic.board import Board
+from arboretum.game.logic.scorer import Scorer
+from arboretum.game.game_manager import GameManager
 
 
 class GameCreator:

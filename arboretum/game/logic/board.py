@@ -1,6 +1,6 @@
-import game.config as config
+from arboretum.game import config
 from typing import Literal
-from game.logic.card import Card
+from arboretum.game.logic.card import Card
 
 
 class Board:

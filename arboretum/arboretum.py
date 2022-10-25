@@ -27,6 +27,8 @@ Shorter-term
 - Update path highlighting now that coords have changed
 - Fix buttons and overlays so they match card size
 - Better game-over screen where you can click to display board-cards of that player
+- Implement logic to make cards amounts dynamic based on player amount
+- Fix failing game logic test cases
 
 Longer-term
 - Light only up possible card placements (i.e. adjacent to existing trees)

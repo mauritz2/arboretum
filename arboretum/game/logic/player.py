@@ -1,7 +1,7 @@
-import game.config as config
-from game.logic.deck import Deck
-from game.logic.board import Board
-from game.logic.discard import Discard
+import arboretum.game.config as config
+from arboretum.game.logic.deck import Deck
+from arboretum.game.logic.board import Board
+from arboretum.game.logic.discard import Discard
 
 
 class Player:

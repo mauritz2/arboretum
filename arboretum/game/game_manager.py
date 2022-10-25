@@ -1,5 +1,5 @@
-from game.logic.player import Player
-from game.logic.scorer import Scorer
+from arboretum.game.logic.player import Player
+from arboretum.game.logic.scorer import Scorer
 from enum import Enum
 
 

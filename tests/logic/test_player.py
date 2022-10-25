@@ -1,5 +1,5 @@
 import pytest
-from game import Card
+from arboretum.game.logic.card import Card
 from conftest import cards as c
 
 
