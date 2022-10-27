@@ -22,12 +22,10 @@ TODO:
 Shorter-term
 - Dynamic header showing what game phase the current player is at
 - Refactor JS code
-- Fix buttons and overlays so they match card size
-- Better game-over screen where you can click to display board-cards of that player
-- Implement logic to make cards amounts dynamic based on player amount
 - Fix failing game logic test cases
+- Better game-over screen where you can click to display board-cards of that player
 - Update path highlighting now that coords have changed
-
+- Create more cards (8 total for 3 players)
 
 Longer-term
 - Light only up possible card placements (i.e. adjacent to existing trees)

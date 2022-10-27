@@ -4,7 +4,7 @@ BOARD_COLUMNS = 10
 
 # Card configs
 # TODO - dynamically increase the amount of cards based on amount of players
-TREES = ["Cassia", "Blue Spruce", "Jacaranda", "Oak"]
+TREES = ["Cherry Blossom", "Tulip Popular", "Royal Poinciana", "Cassia", "Blue Spruce", "Jacaranda", "Oak"]
 CARDS_PER_TREE_TYPE = 8
 NUM_CARDS_STARTING_HAND = 7
 

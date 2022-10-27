@@ -1,14 +1,25 @@
 from PIL import Image, ImageFont, ImageDraw
 import pathlib
 
+"""
+Utility for creating playing cards based on template .pngs
+"""
+
+# Note: words in template files for trees should be separated with spaces (i.e. blue spruce_template
+# instead of blue_spruce_template) the naming of the template affects the name of the output.png,
+# which is referenced in the .html templates
+
 # Config
-BASE_URL = "../static/css"
+BASE_URL = "../arboretum/static/css"
 INPUT_FOLDER = "other"
 OUTPUT_FOLDER = "playing_cards"
 BLANK_CARD_PNGS = ["blue spruce_template.png",
                    "cassia_template.png",
                    "oak_template.png",
-                   "jacaranda_template.png"]
+                   "jacaranda_template.png",
+                   "royal poinciana_template.png",
+                   "tulip popular_template.png",
+                   "cherry blossom_template.png"]
 
 CARDS_TO_CREATE = 8
 TITLE_FONT = ImageFont.truetype("calibri.ttf", 100)
