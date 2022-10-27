@@ -1,5 +1,5 @@
 from arboretum.game.logic.card import Card
-from conftest import cards as c
+from tests.game.conftest import cards as c
 
 
 def test_find_paths_single_simple_path(scorer):

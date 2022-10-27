@@ -42,6 +42,7 @@ body {
 
 .zoom-larger:hover {
     scale: 5;
+
 }
 
 .scoring_tree_type:hover {
@@ -94,4 +95,15 @@ body {
 
 .overlay-button-container:hover input {
   opacity: 1;
+}
+
+td {
+    position: relative;
+    z-index: 1;
+
+}
+
+/* create this new selector */
+td:hover {
+    z-index: 2;
 }

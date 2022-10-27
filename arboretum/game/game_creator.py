@@ -13,13 +13,22 @@ class GameCreator:
     """
 
     @staticmethod
+    def create_deck(num_players: int) -> Deck:
+
+        num_trees = config.AMT_TREES_PER_AMT_PLAYER[num_players]
+        trees = config.TREES[:num_trees]
+
+        deck = Deck(tree_types=trees, num_cards_per_type=config.CARDS_PER_TREE_TYPE)
+        return deck
+
+    @staticmethod
     def create_game(player_names: list[str]) -> GameManager:
         """
         Creates all the class instances needed to run the game and returns the GameManager
         instance
         """
         players = []
-        deck = Deck()
+        deck = GameCreator.create_deck(len(player_names))
 
         for player_name in player_names:
             discard = Discard(cards=[])

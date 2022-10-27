@@ -20,15 +20,14 @@ It does not
 
 TODO:
 Shorter-term
-- Alignment CSS fine tuning
 - Dynamic header showing what game phase the current player is at
-- Fix CSS bug where other cards display on top of zoomed card
 - Refactor JS code
-- Update path highlighting now that coords have changed
 - Fix buttons and overlays so they match card size
 - Better game-over screen where you can click to display board-cards of that player
 - Implement logic to make cards amounts dynamic based on player amount
 - Fix failing game logic test cases
+- Update path highlighting now that coords have changed
+
 
 Longer-term
 - Light only up possible card placements (i.e. adjacent to existing trees)

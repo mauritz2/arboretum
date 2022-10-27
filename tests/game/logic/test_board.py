@@ -1,6 +1,6 @@
 import pytest
 from arboretum.game.logic.card import Card
-from conftest import cards as c
+from tests.game.conftest import cards as c
 
 
 def test_shape_create_empty_board_grid(board):

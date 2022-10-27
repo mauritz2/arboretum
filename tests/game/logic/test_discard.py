@@ -1,4 +1,4 @@
-from conftest import cards as c
+from tests.game.conftest import cards as c
 
 
 def test_get_top_card(discard):
