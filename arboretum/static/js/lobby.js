@@ -5,12 +5,14 @@ socket.on("update player list", (current_players) => update_players(JSON.parse(c
 // JQUERY EVENT LISTENERS
 $(function(){
     $("#start_button").on("click", function(){
+        event.preventDefault()
         socket.emit("start game");
     });
 });
 
 $(function(){
     $('#join_game').on("click", function (){
+        event.preventDefault()
         let player_name = $("#player_name_input").val();
         socket.emit('sit down', player_name);
     });
@@ -18,6 +20,7 @@ $(function(){
 
 $(function(){
     $("#leave_game").on("click", function(){
+        event.preventDefault()
         socket.emit("stand up");
     });
 });

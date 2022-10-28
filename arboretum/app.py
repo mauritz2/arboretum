@@ -43,8 +43,6 @@ uid_to_player_map = {}
 game_manager = GameManager
 
 ### LOBBY VIEWS ###
-
-
 @app.route("/", methods=["GET"])
 def lobby():
     response = make_response(render_template("lobby.html"))
@@ -108,6 +106,17 @@ def get_board_state():
         return
 
     game_manager = game_creator.create_game(player_names)
+    from arboretum.game.logic.card import Card
+    game_manager.scorer.players[0].board.board_grid[0][0] = Card("Oak", 1)
+    game_manager.scorer.players[0].board.board_grid[0][1] = Card("Oak", 2)
+    game_manager.scorer.players[0].board.board_grid[0][2] = Card("Oak", 3)
+    game_manager.scorer.players[0].board.board_grid[1][0] = Card("Jacaranda", 1)
+    game_manager.scorer.players[0].board.board_grid[1][1] = Card("Jacaranda", 3)
+    game_manager.scorer.players[0].board.board_grid[1][2] = Card("Jacaranda", 4)
+    game_manager.scorer.players[0].board.board_grid[1][3] = Card("Jacaranda", 5)
+    game_manager.scorer.players[0].board.board_grid[2][1] = Card("Oak", 8)
+
+
     emit('redirect', json.dumps(url_for('main')), broadcast=True)
 
 
@@ -167,7 +176,8 @@ def emit_game_state(req) -> (dict, list[str]):
                         "current_player_id": current_player_id,
                         "player_boards": player_boards,
                         "num_cards_in_deck": num_cards_in_deck,
-                        "top_discard_cards": top_discard_cards}
+                        "top_discard_cards": top_discard_cards,
+                        "uid_to_player_map": uid_to_player_map}
 
     # Cards on hand are emitted separately since they're player-specific. The rest is public data.
     emit("update hand", json.dumps(cards_on_hand), to=request.sid)

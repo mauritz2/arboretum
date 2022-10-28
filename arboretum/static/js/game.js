@@ -52,6 +52,8 @@ function update_board_state(game_state){
     let cur_player_name = game_state["current_player_id"]["player_name"];
     let player_boards = game_state["player_boards"];
     let num_cards_in_deck = game_state["num_cards_in_deck"];
+    let uid_to_player_map = game_state["uid_to_player_map"];
+
 
     // Update game phase player message
     update_game_status_heading(cur_player_name, game_phase);
@@ -64,8 +66,9 @@ function update_board_state(game_state){
             update_main_board(player_boards[board_uid], game_phase, cur_player_uid, cur_player_name);
         }
         else {
+            let board_owner_name = uid_to_player_map[board_uid]
             // Create these boards as the smaller boards on the screen
-            update_side_boards(player_boards[board_uid], cur_player_uid, cur_player_name);
+            update_side_board(player_boards[board_uid], board_owner_name);
         }
     }
 
@@ -86,13 +89,13 @@ function update_game_status_heading(current_player_name, game_phase) {
         $("#main_board_title").text(current_player_name + " is currently in the " + game_phase.toLowerCase() + " phase");
 }
 
-function update_side_boards(board_data, current_player_uid, current_player_name){
+function update_side_board(board_data, board_owner_name){
     let side_board_el = $("#side_board_container");
 
     // Creating HTML elements like this is used a lot in this file. It's the best way I found to create elements,
     // using something like React would make this a lot clearer
     let side_board = "";
-    side_board += "<p><small>" + current_player_name + "'s board" + "</small></p>";
+    side_board += "<p><small>" + board_owner_name + "'s board" + "</small></p>";
     side_board += '<table class="table-condensed">';
 
     for (const row of board_data.values()){
