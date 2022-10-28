@@ -36,7 +36,6 @@
 
     <!-- Player boards -->
     {% for player in player_boards %}
-        {% set player_index = player[-1] %}
         <div class="col-4">
         <h4 class="mb-1">{{player}}'s board</h4>
         <table class="table-condensed">
@@ -50,7 +49,8 @@
                     {% if card.name != None %}
                     <!-- TODO - address that IDs are 11, but values are (1,2). Make consistently 11?-->
                     <!--ID syntax: player_num + row_num + col_num. Example: 111 means (Player 1, Row 1, Column 1)-->
-                    <img class="card_on_board zoom" id="{{player_index}}{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.name}}.png">
+                    <!--TODO - writing the player name here is risky as game could break, e.g. what if player name contains an escape char - will be fine for now though-->
+                    <img class="card_on_board zoom" id="{{player}}{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.name}}.png">
                     {% else %}
                     {% if game_phase == "Choose Coords" %}
                     <form action="/choose_coordinates" method="post">

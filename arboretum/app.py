@@ -20,7 +20,6 @@ It does not
 
 TODO:
 Shorter-term
-- Refactor JS code
 - Fix failing game logic test cases
 - Better game-over screen where you can click to display board-cards of that player
 - Update path highlighting now that coords have changed
@@ -68,8 +67,14 @@ def on_sit_down(player_name):
         return
 
     if len(player_name) == 0:
-        # TODO - client-side validation would be better here
+        # TODO - client-side validation would be better for these validations
         flash_io("Player name can't be blank. Please choose a name and join the game.", "warning")
+        return
+
+    if " " in player_name:
+        # Disallowing spaces because the player name is used in game_over.html as an HTML id, which doesn't
+        # allow spaces.
+        flash_io("Player name can't contain spaces. Please choose a name and join the game.", "warning")
         return
 
     player_uid = request.cookies.get("player_uid")
@@ -301,7 +306,7 @@ def game_over():
 
     winners, top_paths = game_manager.get_winner()
 
-    # TODO - should this be implemented as part of the scorer? It is a very specific id/coord structure
+    # TODO - this would fit better if implemented as part of the scorer
     for player in top_paths:
         for tree_dict in top_paths[player]:
             list_of_coords = []
@@ -309,9 +314,12 @@ def game_over():
                 player_instance = game_manager.get_player_instance(player)
                 (row, col) = player_instance.board.find_coords_of_card(card)
                 # If is player num, row, col (e.g. 111 is Player 1 row 1 column 1)
-                coords_id = str(player)[-1] + str(row) + str(col)
+                coords_id = player + str(row) + str(col)
                 list_of_coords.append(coords_id)
             top_paths[player][tree_dict]["Path"] = list_of_coords
+
+    print("\n Top paths below \n")
+    print(top_paths)
 
     return render_template("game_over.html",
                            player_hands=player_hands,
