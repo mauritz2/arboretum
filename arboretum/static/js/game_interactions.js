@@ -5,13 +5,15 @@ const socket = io(); // to emit events and listen for events
 const my_uid = getCookie("player_uid") // the player user ID (e.g. 123)
 const blank_card_name = "blank-w-border" // the filename for the blank card png
 
-// SOCKET LISTENERS
+// SOCKET EVENT LISTENERS
 socket.on("message", (message) => show_message(JSON.parse(message)["text"], JSON.parse(message)["category"]));
 socket.on("update hand", (cards_on_hand) => update_hand(JSON.parse(cards_on_hand)));
 socket.on("update board state", (board_state) => update_board_state(JSON.parse(board_state)));
 
 // JQUERY EVENT LISTENERS
 $(function(){
+    // $function() is needed since otherwise the event listener is applied before the page completely load. This leads
+    // to that the button doesn't do anything.
     $("#draw_button").on("click",function () {
         socket.emit("draw card");
     });
