@@ -7,7 +7,7 @@ from arboretum.game.logic.scorer import Scorer
 from arboretum.game.game_manager import GameManager
 
 
-def get_tree_types(num_players: int) -> Deck:
+def get_tree_types(num_players: int) -> list[str]:
     """
     Returns the trees to use in the game, e.g. the names and the amount
     """
@@ -34,4 +34,3 @@ def create_game(player_names: list[str]) -> GameManager:
     scorer = Scorer(players=players, trees=tree_types)
     game_manager = GameManager(scorer=scorer)
     return game_manager
-

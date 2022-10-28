@@ -5,30 +5,21 @@ from enum import Enum
 
 class GameManager:
     """
-    Class to manage the phases of the game, i.e. who's turn it is,
-    what phase in the current turn it is, when the game is over. The Game Manager also sets up the game,
-    e.g. creating the scorer with the right amount of players.
+    Class to manage the phases of the game, i.e. who's turn it is, what phase in the current turn it is,
+    when the game is over.
 
-    This is the only game logic class that the Flask app app.py should reference. It hides the other
+    This is the only game logic class that app.py should reference. This hides the other
     functions and properties of the other classes
-
-    # TODO - rename to game_manager.py and Game_Manager class?
-    # TODO - add the GameState manipulations into this class, as opposed to having the web app do we game
-    # TODO - create dummy funcs for the things app.py reference the game_manager for. Make everything else _
-    # TODO - set up some cool enum structure that defines the round? E.g. draw, discard etc. with conditions on when to progress?
-
     """
 
     def __init__(self, scorer: Scorer = None) -> None:
         self.scorer = scorer
         self.has_not_taken_turn = self.scorer.players.copy()
-        # TODO - Remove current player? Orr use it more? Maybe easier than having to check the UID all the time
         self.current_player = self._get_next_player()
         self.game_phase = GameState.CHOOSE_WHAT_TO_DRAW
         self.num_cards_drawn_current_turn = 0
         self.selected_card_to_play = None
-        # self.players ... (one day :-))
-        print(f"I have been created with players {self.scorer.players}")
+        # TODO - move self.players here from scorer()? Might be more cohesive
 
     def start_next_round(self):
         """
@@ -73,8 +64,9 @@ class GameManager:
             raise ValueError(f"Tried finding instance of {name}, but it didn't exist in {self.scorer.players}")
 
     def get_amt_of_cards_left(self) -> int:
-        # TODO - refactor this? Could assign the deck as a gm class var, but would duplicate?
-        print(f"returning {self.scorer.players[0].deck.get_amt_of_cards_left()}")
+        # TODO - refactor this? Could assign the deck as a gm class var, but would duplicate the same deck
+        # instance so that it would exist in every player class, and also the game manager which is odd
+        # keeping it like this for now
         return self.scorer.players[0].deck.get_amt_of_cards_left()
 
     def select_card_to_play(self, card_name: str) -> None:
@@ -131,15 +123,5 @@ class GameState(Enum):
     CHOOSE_WHERE_TO_PLAY = "Choose Coords"
     CHOOSE_DISCARD = "Choose Discard"
     SCORING = "Scoring"
-
-
-# TODO - add messages back in using flash_io
-player_game_state_messages = {
-    GameState.CHOOSE_WHAT_TO_DRAW: "Draw two cards from either the deck or one of the discard piles",
-    GameState.CHOOSE_CARD_TO_PLAY: "Select a card to play",
-    GameState.CHOOSE_WHERE_TO_PLAY: "Select a location on the board where you want to place your card",
-    GameState.CHOOSE_DISCARD: "Choose a card to discard. It will appear in your discard pile.",
-    GameState.SCORING: "The game is over"
-}
 
 

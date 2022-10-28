@@ -19,8 +19,6 @@ It does not
 - Communicate with all the classes in the game module (only game creator and game manager)
 
 TODO:
-Shorter-term
-- Fix failing game logic test cases
 
 Longer-term ideas
 - Sign-in (i.e. support multiple games at once)
@@ -51,7 +49,7 @@ def lobby():
         return response
 
     # Otherwise, create a new user ID (uid) and set it in a cookie
-    # TODO - create a MD5 hash or something instead to remove risk of collision
+    # TODO - generate a has instead of a random int to remove risk of collision
     response.set_cookie("player_uid", value=str(random.randrange(1, 999)))
     return response
 
@@ -78,7 +76,6 @@ def on_sit_down(player_name):
 
     player_uid = request.cookies.get("player_uid")
     uid_to_player_map[player_uid] = player_name
-    # TODO - create special func for updating the player list
     emit("update player list", json.dumps(list(uid_to_player_map.values())), broadcast=True)
     flash_io(f"You've joined the game as {player_name}")
 
@@ -162,15 +159,12 @@ def emit_game_state(req) -> (dict, list[str]):
 
     # Get top discard cards
     top_discard_cards = {}
-    # TODO - refactor
+    # TODO - refactor - (1) odd for players to be part of the scorer class, (2) also this can be list comprehension
     for p in game_manager.scorer.players:
         top_discard_cards[p.name] = p.discard.get_top_card(only_str=True)
 
     # Get the board for all players
     player_boards = {}
-    # TODO - to think about: where is the source of truth of what players exist? GameManager?
-    # TODO - can we send the player name here as well? Or can we send a mapping between UID and player separately?
-    # Currently no way to show the names of each players side board
     for uid in uid_to_player_map:
         p_instance = game_manager.get_player_instance(uid_to_player_map[uid])
         player_boards[uid] = p_instance.board.get_board_state()
@@ -225,7 +219,7 @@ def draw_card_from_deck():
 def discard_card(card_to_discard):
     global game_manager
 
-    # TODO - the lines to get the player name are a bit repetitive - break out into func=
+    # TODO - the lines to get the player name are a bit repetitive - break out into func?
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]
 
@@ -293,7 +287,7 @@ def game_over():
     """
     Gets the data to display in the UI on the game over screen and then renders the page
     """
-    # TODO - this is repetition with main() - break out into function?
+    # TODO - this data could be standardized with emit_game_state() which generates very similar data
     global game_manager
     player_boards = {}
     player_hands = {}
@@ -316,9 +310,6 @@ def game_over():
                 coords_id = player + str(row) + str(col)
                 list_of_coords.append(coords_id)
             top_paths[player][tree_dict]["Path"] = list_of_coords
-
-    print("\n Top paths below \n")
-    print(top_paths)
 
     return render_template("game_over.html",
                            player_hands=player_hands,

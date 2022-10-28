@@ -56,7 +56,6 @@ class Player:
         Draws a card from that pile (i.e. removes it from that discard and adds it to player hand)
         Type hint is 'Player' as a str since from __future__ import annotations was throwing an error
 
-        # TODO - refactor so it takes a PLayer name as input as opposed to passing an entire Player instance
         """
         # TODO - would this make more sense if this took a player name as input vs. a player instance?
         # Downside is that it would have to call get_player_instance on the scorer class, which would be odd

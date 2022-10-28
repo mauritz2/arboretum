@@ -115,7 +115,7 @@ class Scorer:
         # to them and indicate when everything has been followed? Maybe that's the best approach
         # Then change the for i in range(20) to a while loop that tracks whether all options at crossroads
         # have been followed. What's the best data structure to keep track of the cross-roads?
-        # {cross_road_tuple: {adj_tuple:traversed_bool} --> {"(1,1"): {"1,1": True, ... }
+        # {cross_road_tuple: {adj_tuple:traversed_bool} --> {"(1,1)": {"(1,1)": True, ... }
         # We would need a function is_any_crossroad_unexplored() that traverses this dict and finds any remaining
         # Still we will end up looping through many times to find all the paths...
         # Not a great solution either. Leaving this as-is for now. Most commonly there are no branches

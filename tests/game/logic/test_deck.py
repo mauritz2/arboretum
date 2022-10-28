@@ -16,7 +16,7 @@ def test_generate_deck(deck):
     """
     Verify deck gets correct size and is made up of Card instances
     """
-    assert len(deck.cards) == 32
+    assert len(deck.cards) == 64
     assert type(deck.cards) == list
     assert isinstance(deck.cards[0], Card)
     for card in deck.cards:
@@ -49,6 +49,6 @@ def test_get_amt_of_cards_left(deck):
     """
     Verify we can get amount of cards left
     """
-    assert deck.get_amt_of_cards_left() == 32
+    assert deck.get_amt_of_cards_left() == 64
     deck.remove_top_card()
-    assert deck.get_amt_of_cards_left() == 31
+    assert deck.get_amt_of_cards_left() == 63
