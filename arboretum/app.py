@@ -20,12 +20,11 @@ It does not
 
 TODO:
 Shorter-term
-- Dynamic header showing what game phase the current player is at
 - Refactor JS code
 - Fix failing game logic test cases
 - Better game-over screen where you can click to display board-cards of that player
 - Update path highlighting now that coords have changed
-- Create more cards (8 total for 3 players)
+- Make sure the game over screen only lists the trees actually in the game
 
 Longer-term
 - Light only up possible card placements (i.e. adjacent to existing trees)

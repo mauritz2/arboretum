@@ -33,6 +33,10 @@ function update_board_state(game_state){
     let cur_player_uid = game_state["current_player_id"]["uid"];
     let cur_player_name = game_state["current_player_id"]["player_name"]
 
+
+    // Update game phase heading
+    update_game_status_heading(cur_player_name, game_phase);
+
     // Update boards
     let player_boards = game_state["player_boards"]
 
@@ -60,6 +64,12 @@ function update_board_state(game_state){
 
     // Show/hide buttons based on game state - this has to happen after hand and discard pile updates - otherwise not all elements will exist yet
     toggle_buttons(game_phase, cur_player_uid, num_cards_in_deck);
+
+}
+
+function update_game_status_heading(current_player_name, game_phase)
+{
+        $("#main_board_title").text(current_player_name + " is currently in the " + game_phase.toLowerCase() + " phase")
 
 }
 
@@ -146,7 +156,6 @@ function getCookie(cname) {
 
 function update_main_board(main_board, current_player_uid, current_player_name) {
 
-    $("#main_board_title").text(current_player_name + " is playing")
 
     let board = $("#main_board")
     board.empty();

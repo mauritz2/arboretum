@@ -19,6 +19,7 @@ BLANK_CARD_PNGS = ["blue spruce_template.png",
                    "jacaranda_template.png",
                    "royal poinciana_template.png",
                    "tulip popular_template.png",
+                   "dogwood_template.png",
                    "cherry blossom_template.png"]
 
 CARDS_TO_CREATE = 8
