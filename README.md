@@ -7,6 +7,8 @@ This is an implementation of the [Arboretum](https://boardgamegeek.com/boardgame
 This implementation is built by me purely for learning purposes and to be able to play with my friends online
 since no digital version exists.
 
+The game can currently be played by 2-3 players. 
+
 ## Built With
 
 * [Python](https://www.python.org/)
