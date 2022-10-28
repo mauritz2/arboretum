@@ -7,13 +7,12 @@ from arboretum.game.logic.scorer import Scorer
 from arboretum.game.game_manager import GameManager
 
 
-def create_deck(num_players: int) -> Deck:
-
+def get_tree_types(num_players: int) -> Deck:
+    """
+    Returns the trees to use in the game, e.g. the names and the amount
+    """
     num_trees = config.AMT_TREES_PER_AMT_PLAYER[num_players]
-    trees = config.TREES[:num_trees]
-
-    deck = Deck(tree_types=trees, num_cards_per_type=config.CARDS_PER_TREE_TYPE)
-    return deck
+    return config.TREES[:num_trees]
 
 
 def create_game(player_names: list[str]) -> GameManager:
@@ -22,7 +21,9 @@ def create_game(player_names: list[str]) -> GameManager:
     instance
     """
     players = []
-    deck = create_deck(len(player_names))
+    tree_types = get_tree_types(len(player_names))
+
+    deck = Deck(tree_types=tree_types, num_cards_per_type=config.CARDS_PER_TREE_TYPE)
 
     for player_name in player_names:
         discard = Discard(cards=[])
@@ -30,7 +31,7 @@ def create_game(player_names: list[str]) -> GameManager:
         player = Player(name=player_name, deck=deck, discard=discard, board=board)
         players.append(player)
 
-    scorer = Scorer(players=players)
+    scorer = Scorer(players=players, trees=tree_types)
     game_manager = GameManager(scorer=scorer)
     return game_manager
 

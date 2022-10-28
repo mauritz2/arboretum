@@ -2,8 +2,8 @@
 {% block game %}
 
 <!--Winner announcement message-->
-<div class="row text-center">
-    <div class="col-12">
+<div class="row">
+    <div class="col-4 offset-1">
         {% if winners|length > 1 %}
             <h2 class="text-warning my-5">The game is a tie between:
             {% for winner in winners %}
@@ -15,57 +15,36 @@
             {% endif %}
     </div>
 </div>
-<!-- Scoring information -->
 <div class="row">
-    <div class="col-2">
-        <div class="row align-items-center">
-            <div class="col">
-                {% for player in top_paths %}
-                    <p><strong>Scoring tree types for {{ player }}</strong></p>
-                        {% for tree in top_paths[player] %}
-                            {% set score = top_paths[player][tree]["Score"] %}
-                            {% if score != None %}
-                            <div class="scoring_tree_type">
-                                <p onmouseover='highlight_path("{{player}}", "{{tree}}");' onmouseleave="dim_all_cards();">{{tree}}: {{score}}</p>
-                            </div>
-                            {% endif %}
-                        {% endfor %}
-                {% endfor %}
-            </div>
-        </div>
+    {% for player in top_paths %}
+    <!-- Scoring information -->
+    <div class="col-2 offset-1">
+        <p><strong>Scoring tree types for {{ player }}</strong></p>
+            {% for tree in top_paths[player] %}
+                {% set score = top_paths[player][tree]["Score"] %}
+                {% if score != None %}
+                    <div class="scoring_tree_type">
+                        <p onmouseover='highlight_path("{{player}}", "{{tree}}");' onmouseleave="dim_all_cards();">{{tree}}: {{score}}</p>
+                    </div>
+                {% endif %}
+            {% endfor %}
     </div>
-
     <!-- Player boards -->
-    {% for player in player_boards %}
-        <div class="col-4">
-        <h4 class="mb-1">{{player}}'s board</h4>
+    <div class="col-5">
+        <strong class="mb-1">{{player}}'s board</strong>
         <table class="table-condensed">
             {% for row in player_boards[player] %}
-
             {% set outer_loop = loop.index - 1 %}
             <tr>
                 {% for card in row %}
                 {% set inner_loop = loop.index - 1 %}
                 <td>
                     {% if card.name != None %}
-                    <!-- TODO - address that IDs are 11, but values are (1,2). Make consistently 11?-->
-                    <!--ID syntax: player_num + row_num + col_num. Example: 111 means (Player 1, Row 1, Column 1)-->
-                    <!--TODO - writing the player name here is risky as game could break, e.g. what if player name contains an escape char - will be fine for now though-->
-                    <img class="card_on_board zoom" id="{{player}}{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.name}}.png">
+                        <!--ID syntax: player_num + row_num + col_num. Example: 111 means (Player 1, Row 1, Column 1)-->
+                        <!--TODO - writing the player name here is risky as game could break, e.g. what if player name contains an escape char - will be fine for now though-->
+                        <img class="card_on_board zoom" id="{{player}}{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.name}}.png">
                     {% else %}
-                    {% if game_phase == "Choose Coords" %}
-                    <form action="/choose_coordinates" method="post">
-                        <input name="coords" type="hidden" value="{{player_index}}{{outer_loop, inner_loop}}">
-                        <input class="card_on_board dimmed blank_choose_coord" src="../static/css/other/blank-w-border.png"
-                               type="image">
-                    </form>
-                    {% else %}
-                    <!-- Form tag is here to ensure formatting is the same as during coord selection -->
-                    <form>
-                        <!-- Not used - putting here to mirror padding when coords are being selected-->
-                        <input disabled class="card_on_board dimmed" id="{{player_index}}{{outer_loop}}{{inner_loop}}" src="../static/css/other/blank-w-border.png" type="image">
-                    </form>
-                    {% endif %}
+                        <input class="card_on_board dimmed blank_choose_coord" src="../static/css/other/blank-w-border.png" type="image">
                     {% endif %}
                 </td>
                 {% endfor %}
@@ -73,12 +52,9 @@
             {% endfor %}
         </table>
     </div>
-    {% endfor %}
 </div>
-
 <div class="row">
-    {% for player in player_hands %}
-        <div class="col-6">
+        <div class="col-6 offset-3">
             <div class="row">
                 <div class="col">
                     <div class="mb-1"><strong>{{player}}'s hand</strong></div>
@@ -87,13 +63,13 @@
             <div class="row">
                 <div class="col">
                     {% for card in player_hands[player] %}
-                    <img class="card_on_hand" src="../static/css/playing_cards/{{card}}.png">
+                        <img class="card_on_hand" src="../static/css/playing_cards/{{card}}.png">
                     {% endfor %}
                 </div>
             </div>
         </div>
-{% endfor %}
 </div>
+{% endfor %}
 
 <script>
     // Get the top paths as a JS variable from the Jinja template
