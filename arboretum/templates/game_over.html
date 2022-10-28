@@ -1,22 +1,23 @@
 {% extends "base.html" %}
 {% block game %}
 
+<!--Winner announcement message-->
+<div class="row text-center">
+    <div class="col-12">
+        {% if winners|length > 1 %}
+            <h2 class="text-warning my-5">The game is a tie between:
+            {% for winner in winners %}
+                <strong>{{winner}}</strong>
+            {% endfor %}
+            </h2>
+            {% else %}
+                <h2 class="text-warning my-5">The winner is <strong>{{winners[0]}}</strong></h2>
+            {% endif %}
+    </div>
+</div>
+<!-- Scoring information -->
 <div class="row">
-    <!-- Scoring information -->
     <div class="col-2">
-        <div class="row">
-            <div class="col">
-                {% if winners|length > 1 %}
-                    <h5 class="text-warning my-5">The game is a tie between:
-                    {% for winner in winners %}
-                        <u>{{winner}}</u>
-                    {% endfor %}
-                    </h5>
-                {% else %}
-                    <h5 class="text-warning my-5">The winner is <u>{{winners[0]}}</u></h5>
-                {% endif %}
-            </div>
-        </div>
         <div class="row align-items-center">
             <div class="col">
                 {% for player in top_paths %}
@@ -95,7 +96,8 @@
 </div>
 
 <script>
-    var top_paths = ({{ top_paths|tojson|safe }})
+    // Get the top paths as a JS variable from the Jinja template
+    let top_paths = ({{ top_paths|tojson|safe }})
     dim_all_cards();
 </script>
 
