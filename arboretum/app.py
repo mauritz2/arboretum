@@ -185,12 +185,12 @@ def emit_game_state(req) -> (dict, list[str]):
 
 
 @socketio.on("get board state")
-def get_board_state(req=None):
-    # TODO - remove this? Not sure if needed, maybe emit game stat can be socketio.on()
-    if req:
-        emit_game_state(req)
-    else:
-        emit_game_state(request)
+def get_board_state():
+    """
+    Listens to "get board state" from the client and forwards it to the function to send the
+    latest board state back. This is only used once when main.html requests the board state on load
+    """
+    emit_game_state(request)
 
 
 @socketio.on("choose card to play")
@@ -214,8 +214,6 @@ def draw_card_from_deck():
 
     game_manager.draw_card(player_name)
 
-    # TODO - Can emit state be set to run after each request, or at least for some?
-    # Maybe we can have a custom decorator for that that calls emit_game_state at the end
     emit_game_state(request)
 
 
@@ -233,9 +231,7 @@ def discard_card(card_to_discard):
     else:
         game_manager.discard_card(player_name=player_name, card_to_discard=card_to_discard)
 
-        print(f"The current game state is {game_manager.game_phase}\n")
         if game_manager.game_phase == GameState.SCORING:
-            print("Going to redirect\n")
             # The deck is empty, meaning that the game is over - redirecting to game over/scoring screen
             emit('redirect', json.dumps(url_for('game_over')), broadcast=True)
 
@@ -264,7 +260,6 @@ def draw_from_discard(player_to_draw_from):
 @socketio.on("choose coords")
 def choose_coords(chosen_coords):
     global game_manager
-    print(f"\n\nCommencing choose coords with {chosen_coords}\n\n")
 
     player_uid = request.cookies.get("player_uid")
     player_name = uid_to_player_map[player_uid]
