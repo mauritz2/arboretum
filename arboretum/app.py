@@ -21,13 +21,12 @@ It does not
 TODO:
 Shorter-term
 - Fix failing game logic test cases
-- Better game-over screen where you can click to display board-cards of that player
-- Update path highlighting now that coords have changed
-- Make sure the game over screen only lists the trees actually in the game
 
-Longer-term
-- Light only up possible card placements (i.e. adjacent to existing trees)
+Longer-term ideas
+- Sign-in (i.e. support multiple games at once)
+- Light only up possible card placements when playing a card (i.e. adjacent to existing trees) 
 - Make design more responsive so it fits on smaller screens
+- Introduce player colors, e.g. players name is always specific color and button highlighter is same color
 
 """
 
