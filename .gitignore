@@ -4,4 +4,4 @@ __pycache__
 .idea/
 .pytest_cache
 flask_session
-arboretum/.env
+.env
