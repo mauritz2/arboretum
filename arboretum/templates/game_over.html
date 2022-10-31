@@ -42,9 +42,9 @@
                     {% if card.name != None %}
                         <!--ID syntax: player_name + row_num + col_num. Example: 111 means (Player 1, Row 1, Column 1)-->
                         <!--TODO - writing the player name here is risky as game could break, e.g. what if player name contains an escape char - will be fine for now though-->
-                        <img class="card_on_board zoom" id="{{player}}{{outer_loop}}{{inner_loop}}" src="../static/css/playing_cards/{{card.name}}.png">
+                        <img class="card_on_board zoom" id="{{player}}{{outer_loop}}{{inner_loop}}" src="/static/css/playing_cards/{{card.name}}.png">
                     {% else %}
-                        <input class="card_on_board dimmed blank_choose_coord" src="../static/css/other/blank-w-border.png" type="image">
+                        <input class="card_on_board dimmed blank_choose_coord" src="/static/css/other/blank-w-border.png" type="image">
                     {% endif %}
                 </td>
                 {% endfor %}
@@ -63,7 +63,7 @@
             <div class="row">
                 <div class="col">
                     {% for card in player_hands[player] %}
-                        <img class="card_on_hand" src="../static/css/playing_cards/{{card}}.png">
+                        <img class="card_on_hand" src="/static/css/playing_cards/{{card}}.png">
                     {% endfor %}
                 </div>
             </div>
