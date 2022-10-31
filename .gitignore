@@ -3,5 +3,4 @@ tests/__pycache__
 __pycache__
 .idea/
 .pytest_cache
-flask_session
-.env
+arboretum/.env
