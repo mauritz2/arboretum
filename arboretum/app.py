@@ -1,4 +1,5 @@
 import json
+import os
 import random
 from arboretum.game import game_creator, GameState, GameManager
 from flask import Flask, render_template, request, url_for, make_response
@@ -30,8 +31,7 @@ Longer-term ideas
 
 # Flask config
 app = Flask(__name__)
-app.secret_key = 'dev-secret'
-app.debug = True
+app.secret_key = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
 # Global variables
@@ -107,16 +107,6 @@ def get_board_state():
         return
 
     game_manager = game_creator.create_game(player_names)
-    from arboretum.game.logic.card import Card
-    game_manager.scorer.players[0].board.board_grid[0][0] = Card("Oak", 1)
-    game_manager.scorer.players[0].board.board_grid[0][1] = Card("Oak", 2)
-    game_manager.scorer.players[0].board.board_grid[0][2] = Card("Oak", 3)
-    game_manager.scorer.players[0].board.board_grid[1][0] = Card("Jacaranda", 1)
-    game_manager.scorer.players[0].board.board_grid[1][1] = Card("Jacaranda", 3)
-    game_manager.scorer.players[0].board.board_grid[1][2] = Card("Jacaranda", 4)
-    game_manager.scorer.players[0].board.board_grid[1][3] = Card("Jacaranda", 5)
-    game_manager.scorer.players[0].board.board_grid[2][1] = Card("Oak", 8)
-
 
     emit('redirect', json.dumps(url_for('main')), broadcast=True)
 

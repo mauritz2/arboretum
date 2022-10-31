@@ -23,9 +23,20 @@ The game can currently be played by 2-3 players.
 * [Flask SocketIO](https://flask-socketio.readthedocs.io)
 
 ## Running the game
+Environment variables. Can be set in the .env file or in the operating system.
 
-Navigate to the same folder as the app.py file
+| Variable | Example Value 
+| :---:   |:-------------:|
+| SECRET_KEY |  "my_secret"  |
+
+## Running the game
+
+Navigate to the same folder as the app.py file and execute:
 ```
-flask run
+python -m flask run
 ```
 
+To run in debug
+```
+python -m flask --debug run
+```
