@@ -4,10 +4,21 @@
 
 This is an implementation of the [Arboretum](https://boardgamegeek.com/boardgame/140934/arboretum) boardgame created by [Dan Cassar](http://dancassar.com/)
 
-This implementation is built by me purely for learning purposes and to be able to play with my friends online
-since no digital version exists.
+This implementation is built by me purely for learning purposes and to play with my friends online.
 
-The game can currently be played by 2-3 players. 
+The game currently supports 2-3 players.
+
+### Player turn
+Player draws cards (from deck or discard), plays a card, and discards a card.
+
+![](basic_turn.gif)
+
+
+### End of game scoring
+The game determines who scores for what tree type and calculates its top-scoring path. The player with the highest score wins. 
+The UI supports mousing over each tree type to see which path was the highest scoring.  
+![](scoring.gif)
+
 
 ## Built With
 
