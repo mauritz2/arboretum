@@ -2,14 +2,14 @@
 
 ## About The Project
 
-This is an implementation of the [Arboretum](https://boardgamegeek.com/boardgame/140934/arboretum) boardgame created by [Dan Cassar](http://dancassar.com/)
+This is an implementation of the [Arboretum](https://boardgamegeek.com/boardgame/140934/arboretum) boardgame created by [Dan Cassar](http://dancassar.com/).
 
-This implementation is built by me purely for learning purposes and to play with my friends online.
+It's built by me purely for learning purposes and to play with my friends online.
 
 The game currently supports 2-3 players.
 
 ### Player turn
-Player draws cards (from deck or discard), plays a card, and discards a card.
+During a turn a player draws two cards (from deck or discard), plays a card, and discards a card.
 
 ![](basic_turn.gif)
 
@@ -34,13 +34,15 @@ The UI supports mousing over each tree type to see which path was the highest sc
 * [Flask SocketIO](https://flask-socketio.readthedocs.io)
 
 ## Running the game
-Environment variables. Can be set in the .env file or in the operating system.
+
+### Environment variables
+Environment variables. Can be set in the .env file or the operating system.
 
 | Variable | Example Value 
 | :---:   |:-------------:|
 | SECRET_KEY |  "my_secret"  |
 
-## Running the game
+### Running the app
 
 Navigate to the same folder as the app.py file and execute:
 ```
