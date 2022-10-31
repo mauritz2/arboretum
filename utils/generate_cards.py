@@ -12,7 +12,7 @@ Utility for creating playing cards based on template .pngs
 # Config
 BASE_URL = "../arboretum/static/css"
 INPUT_FOLDER = "other"
-OUTPUT_FOLDER = "playing_cards"
+OUTPUT_FOLDER = "playingcards"
 BLANK_CARD_PNGS = ["blue spruce_template.png",
                    "cassia_template.png",
                    "oak_template.png",
@@ -33,6 +33,7 @@ for blank_card in BLANK_CARD_PNGS:
     file_path = base_path / INPUT_FOLDER / blank_card
     card_name = blank_card.split(".")[0]
     card_name = card_name.replace("_template", "")
+    card_name = card_name.title()
 
     for i in range(1, CARDS_TO_CREATE + 1):
         my_image = Image.open(file_path).convert('RGB')

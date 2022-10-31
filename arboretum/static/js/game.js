@@ -103,10 +103,10 @@ function update_side_board(board_data, board_owner_name){
         for (const card of row.values()){
             side_board += '<td>';
              if (card != null){
-                side_board += '<img class="card_on_mini_board zoom-larger" src="/static/css/playing_cards/' + card + '.png">';
+                side_board += '<img class="card_on_mini_board zoom-larger" src="/static/css/playingcards/' + card + '.png">';
              }
              else{
-                 side_board += '<img class="card_on_mini_board dimmed" src="/static/css/playing_cards/' + blank_card_name + '.png">';
+                 side_board += '<img class="card_on_mini_board dimmed" src="/static/css/playingcards/' + blank_card_name + '.png">';
              }
             side_board += '</td>';
         }
@@ -156,13 +156,13 @@ function update_main_board(board_data, game_phase, current_player_uid){
             main_board += "";
             main_board += '<td>';
             if (card != null){
-                main_board += '<img class="card_on_board zoom" id="' + row_index + col_index + '" src="/static/css/playing_cards/' + card + '.png">';
+                main_board += '<img class="card_on_board zoom" id="' + row_index + col_index + '" src="/static/css/playingcards/' + card + '.png">';
             }
             else{
                 if (game_phase === "Choose Coords" && current_player_uid === my_uid){
                     main_board += '<form class="choose_coord_btn">';
                     main_board += '<input name="coords" type="hidden" value="' + row_index + col_index + '">';
-                    main_board += '<input class="card_on_board blank_choose_coord" src="/static/css/playing_cards/' + blank_card_name + '.png" type="image">';
+                    main_board += '<input class="card_on_board blank_choose_coord" src="/static/css/playingcards/' + blank_card_name + '.png" type="image">';
                     main_board += '</form>';
                 }
                 else{
@@ -191,7 +191,7 @@ function update_hand(cards_on_hand){
         let player_hand = "";
         player_hand += "<div class='col-1 d-flex justify-player_hand-center text-center'>";
         player_hand += "<div class='overlay-button-container'>";
-        player_hand += "<img class='card_on_hand' src='/static/css/playing_cards/" + card + ".png'>";
+        player_hand += "<img class='card_on_hand' src='/static/css/playingcards/" + card + ".png'>";
         player_hand += "<form class='card_to_play hide'>";
         player_hand += "<input name='card_name' type='hidden' value='" + card + "'>";
         player_hand += "<input type='submit' class='btn btn-dark' value='Play card'>";
@@ -228,10 +228,10 @@ function update_discard(top_discard_cards, cur_player_uid, game_phase){
         discard += '<div class="overlay-button-container">';
 
         if(card === null){
-            discard += '<img class="card_on_hand dimmed" src="/static/css/playing_cards/' + blank_card_name + '.png">';
+            discard += '<img class="card_on_hand dimmed" src="/static/css/playingcards/' + blank_card_name + '.png">';
         }
         else{
-            discard += '<img class="card_on_hand" src="/static/css/playing_cards/' + card + '.png">';
+            discard += '<img class="card_on_hand" src="/static/css/playingcards/' + card + '.png">';
         }
         discard += '<form class="draw_discard_form ';
 
